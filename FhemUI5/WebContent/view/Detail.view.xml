@@ -1,0 +1,15 @@
+<core:View controllerName="de.kjumybit.fhem.controller.Detail"
+	xmlns:html="http://www.w3.org/1999/xhtml" 
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns:m="sap.m" 
+	xmlns:semantic="sap.m.semantic"
+	displayBlock="true">
+	<semantic:DetailPage id="viewDetail"
+						title="{i18n>detailTitle}"
+						xmlns="sap.m.semantic">
+		<content>
+			<m:Text text="Hello World Detail"/>
+		</content> <!-- sap.ui.core.Control -->
+	</semantic:DetailPage>
+</core:View>
