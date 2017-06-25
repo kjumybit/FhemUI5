@@ -2,14 +2,22 @@
 	xmlns:html="http://www.w3.org/1999/xhtml" 
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc" 
-	xmlns:m="sap.m" 
-	xmlns:semantic="sap.m.semantic"
+	xmlns="sap.m" 
+	xmlns:s="sap.m.semantic"
 	displayBlock="true">
-	<semantic:DetailPage id="viewDetail"
-						title="{i18n>detailTitle}"
-						xmlns="sap.m.semantic">
-		<content>
-			<m:Text text="Hello World Detail"/>
-		</content> <!-- sap.ui.core.Control -->
-	</semantic:DetailPage>
+	<s:DetailPage id="viewDeviceList"
+						title="{i18n>detailDeviceList}">
+		<s:content>
+			<Text text="Hello World Detail"/>
+		</s:content> <!-- sap.ui.core.Control -->
+		<s:messagesIndicator>
+			<s:MessagesIndicator press="onMessagesButtonPress"/>
+		</s:messagesIndicator>
+		<s:customFooterContent>
+			<OverflowToolbarButton 
+				icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
+				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"
+				text="Fhem Service Connection" />
+		</s:customFooterContent>
+	</s:DetailPage>
 </core:View>

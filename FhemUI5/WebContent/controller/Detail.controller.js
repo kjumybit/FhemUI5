@@ -1,6 +1,8 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function(Controller) {
+	'sap/ui/core/mvc/Controller',
+	'sap/m/MessagePopover',
+	'sap/m/MessagePopoverItem'	
+], function(Controller, MessagePopover, MessagePopoverItem) {
 	"use strict";
 
 	return Controller.extend("de.kjumybit.fhem.controller.Detail", {
@@ -10,9 +12,27 @@ sap.ui.define([
 	* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
 	* @memberOf helloworld.Main
 	*/
-//		onInit: function() {
-//
-//		},
+	onInit: function() {
+		
+		// initialize message popover
+		var oMessageProcessor = new sap.ui.core.message.ControlMessageProcessor();
+		var oMessageManager = sap.ui.getCore().getMessageManager();
+ 
+		oMessageManager.registerMessageProcessor(oMessageProcessor);
+		
+		
+		oMessageManager.addMessages(
+				new sap.ui.core.message.Message({
+					message: "Something wrong happened",
+					type: sap.ui.core.MessageType.Error,
+					processor: oMessageProcessor
+				})
+		);
+		
+		//TODO: only for testing
+		// var oModel = JSON.parse('{ "name" : "hello \u0022world\u0022" }');
+		
+	},
 
 	/**
 	* Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
@@ -40,5 +60,11 @@ sap.ui.define([
 //
 //		}
 
+	/** ================================================================================
+	 *  App event handler
+	 ** ================================================================================ */
+	
+	
+	
 	});
 });

@@ -81,10 +81,12 @@
 			"targets": {
 				"master": {
 					"viewName": "Master",
+					"viewLevel": 1,
 					"controlAggregation": "masterPages"				
 				},
 				"detail": {
 					"viewName": "Detail",
+					"viewLevel": 2,
 					"controlAggregation": "detailPages"				
 				}
 			}			
