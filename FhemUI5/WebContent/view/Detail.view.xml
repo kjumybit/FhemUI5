@@ -5,11 +5,49 @@
 	xmlns="sap.m" 
 	xmlns:s="sap.m.semantic"
 	displayBlock="true">
-	<s:DetailPage id="viewDeviceList"
-						title="{i18n>detailDeviceList}">
+	<s:DetailPage id="viewDeviceList" title="{i18n>detailDeviceList}">
 		<s:content>
-			<Text text="Hello World Detail"/>
-		</s:content> <!-- sap.ui.core.Control -->
+
+			<Table id="tblDeviceList" 		
+				   items="{ path: 'fhemMetaData>/DeviceSet',
+				            sorter : {
+								path : 'fhemMetaData>Internals/TYPE',
+								group : true
+							},
+							groupHeaderFactory: '.grouper.getDeviceSetGroupHeader' 
+						  }" > 
+				<columns>
+					<Column witdh="auto">	
+						<Text text="{i18n>device}" />
+					</Column>					
+					<Column>	
+						<Text text="{i18n>state}" />
+					</Column>
+					<Column minScreenWidth="Tablet">	
+						<Text text="{i18n>stateTime}" 
+						/>
+					</Column>								
+				</columns>
+				<items>
+					<ColumnListItem>
+						<cells>
+							<ObjectIdentifier 
+								title="{ parts:[{path:'fhemMetaData>Attributes/alias'},{path:'fhemMetaData>Name'}],
+	    						    formatter: '.formatter.getDeviceName' 
+	    					    }" />
+							<Text text="{fhemMetaData>Internals/STATE}" />
+							<Text text="{ path: 'fhemMetaData>Readings/state/Time',
+								          type: 'sap.ui.model.type.DateTime', 
+								          formatOptions: {
+											source: { pattern: 'yyyy-MM-dd HH:mm:ss' }
+										  }
+							}" />
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+
+		</s:content> 
 		<s:messagesIndicator>
 			<s:MessagesIndicator press="onMessagesButtonPress"/>
 		</s:messagesIndicator>

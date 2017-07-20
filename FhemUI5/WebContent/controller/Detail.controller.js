@@ -1,18 +1,27 @@
 sap.ui.define([
 	'sap/ui/core/mvc/Controller',
 	'sap/m/MessagePopover',
-	'sap/m/MessagePopoverItem'	
-], function(Controller, MessagePopover, MessagePopoverItem) {
+	'sap/m/MessagePopoverItem',
+	'de/kjumybit/fhem/model/formatter',
+	'de/kjumybit/fhem/model/grouper'
+], function(Controller, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
 	"use strict";
 
 	return Controller.extend("de.kjumybit.fhem.controller.Detail", {
 
+		
+	// init local members
+	formatter: Formatter,
+	grouper: Grouper,
+		
 	/**
 	* Called when a controller is instantiated and its View controls (if available) are already created.
 	* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
 	* @memberOf helloworld.Main
 	*/
 	onInit: function() {
+
+		
 		
 		// initialize message popover
 		var oMessageProcessor = new sap.ui.core.message.ControlMessageProcessor();

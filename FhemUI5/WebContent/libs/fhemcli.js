@@ -149,14 +149,17 @@ fhem.model = (function fhemModel() {
 
 	"use strict"
 
+	/**
+	 * Receive device meta data, store it in the model instance and
+	 * inform model change listeners
+	 */
 	function _onMetaData(oData) {
-		//TODO: evaluate Fhem data type
 		if (oData) {
-			this.fireEvent("metaDataLoaded", oData);
+			this.mFhemMetaData = oData; // { DeviceSet: {}, RoomSet: {}, DeviceTypeSet: {} };
+			this.fireEvent("metaDataLoaded");
 		}
 	}
 
-	
 	function _onValueData(oData) {
 		//TODO: evaluate Fhem data type
 		if (oData) {
@@ -189,10 +192,11 @@ fhem.model = (function fhemModel() {
 
 	
 	//var Model = (new function FhemModel() {
-	
+	//TODO: describe mParameters
 	function Model(mParameters) {
 		//TODO
 		
+		this.mFhemMetaData = { DeviceSet: {}, RoomSet: {}, DeviceTypeSet: {}, DeviceSubTypeSet: {} };
 		this.mEventRegistry = {};
 		
 		this._fhemService = new fhem.core.Service();
@@ -214,6 +218,26 @@ fhem.model = (function fhemModel() {
 	};
 	
 	
+	Model.prototype.getMetaData = function () {
+		return this.mFhemMetaData;
+	}
+	
+	Model.prototype.getRoomSet = function () {
+		return this.mFhemMetaData.RoomSet;
+	}
+	
+	Model.prototype.getDeviceTypeSet = function () {
+		return this.mFhemMetaData.DeviceTypeSet;
+	}
+
+	Model.prototype.getDeviceSubTypeSet = function () {
+		return this.mFhemMetaData.DeviceTypeSet;
+	}
+	
+	Model.prototype.getDeviceSet = function () {
+		return this.mFhemMetaData.DeviceSet;
+	}
+	
 	Model.prototype.sendCommand = function () {
 		//TODO
 	};
@@ -230,14 +254,17 @@ fhem.model = (function fhemModel() {
 
 	Model.prototype.attachRequestCompleted = function(oData, fnFunction, oListener) {
 		//TODO		
+		return this;
 	};
 	
 	Model.prototype.attachRequestFailed = function(oData, fnFunction, oListener) {
-		//TODOc		
+		//TODO
+		return this;
 	};
 	
 	Model.prototype.attachRequestSent = function(oData, fnFunction, oListener) {
 		//TODO		
+		return this;
 	};
 
 	Model.prototype.attachConnectionFailed = function(oData, fnFunction, oListener) {
@@ -405,7 +432,6 @@ fhem.model = (function fhemModel() {
 	};	
 	
 	
-//	}());
 	
 	/**
 	 * export public components

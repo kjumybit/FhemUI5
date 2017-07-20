@@ -76,7 +76,7 @@ sap.ui.define([
 		_getFhemModel : function () {
 			
 			jQuery.sap.require("fhem.model");
-			//this._fhemModel = fhem.model.Model({ host: 'himberrypi.fritz.box', port: '8086'});					
+					
 			this._fhemModel = new fhem.model.Model({
 				host: 'localhost', port: '8086',
 				onConnection: this._onFhemConnection.bind(this),
@@ -106,6 +106,12 @@ sap.ui.define([
 		_onMetaDataLoaded : function(oEvent) {
 			// this is bound to the component
 			this._setRuntimeFhemConnectionState(true);
+			var oModel = new JSONModel();
+			oModel.setData(this._fhemModel.getMetaData());
+			// oModel.loadData("model/fhemJsonList2.json"); // local testing
+			// oModel.setDefaultBindingMode(sap.ui.model.BindingMode.OneWay);
+			this.setModel(oModel, "fhemMetaData" );  // won't work for tables 
+			this.setModel(oModel);
 		},
 		
 		/**
