@@ -40,18 +40,20 @@ sap.ui.define([
 			// set the device model
 			this.setModel(Models.createDeviceModel(), "device");
 
+			// set the initial side navigation model (level 1)
+			this.setModel(Models.createSideNavigationModel(), "sideNavigation");
+			
 			// set the local app configuration model
 			var oAppSettingsModel = Models.createAppSettingsModel();
 			this.setModel(oAppSettingsModel, "settings" );
 
-			// connect to Fhem backend server
+			// connect to Fhem backend server and get metadata model
 			if ( oAppSettingsModel.getProperty("/server/host") && 
 				 oAppSettingsModel.getProperty("/server/port") ) {
 				
 				this.oState.fhemConnection.hasParameters = true;
 				this._getFhemModel();
 			}
-			
 			
 		},
 
@@ -88,31 +90,35 @@ sap.ui.define([
 		},
 
 		_onFhemConnection : function(oEvent) {
-			// this is bound to the component
 			this._setRuntimeFhemConnectionState(false);
 		},
 
 		
 		_onErrorFhemConnection : function(oEvent) {
-			// this is bound to the component
 			this._setRuntimeFhemConnectionState(false);
 		},
 		
 		_onFhemDisconnect : function(oEvent) {
-			// this is bound to the component
 			this._setRuntimeFhemConnectionState(false);
 		},
+
 		
+		/**
+		 * Handle Fhem metadata 
+		 * Set & update local models
+		 * - Fhem data model
+		 * - Side navigation model 
+		 */
 		_onMetaDataLoaded : function(oEvent) {
-			// this is bound to the component
+			
 			this._setRuntimeFhemConnectionState(true);
 			var oModel = new JSONModel();
 			oModel.setData(this._fhemModel.getMetaData());
 			// oModel.loadData("model/fhemJsonList2.json"); // local testing
-			// oModel.setDefaultBindingMode(sap.ui.model.BindingMode.OneWay);
-			this.setModel(oModel, "fhemMetaData" );  // won't work for tables 
-			this.setModel(oModel);
+			this.setModel(oModel, "fhemMetaData" );  
+			this._setSideNavModelfromFhem();
 		},
+		
 		
 		/**
 		 * update Fhem connection state in runtime model 
@@ -122,7 +128,41 @@ sap.ui.define([
 			this.oState.fhemConnection.isConnected = bConnected;
 			var oModel = this.getModel("runtime");
 			oModel.setProperty("/fhemConnection/isConnected", bConnected);
+		},
+		
+		
+		/**
+		 * Update sideNavigation model with Fhem metadata
+		 * - Groups (TODO)
+		 * - Rooms
+		 * - Device Types
+		 * - Device Sub Types 
+		 */
+		_setSideNavModelfromFhem: function() {
 			
+			var oFhemData = this._fhemModel.getMetaData();
+			var oNavModel = this.getModel("sideNavigation");
+			var oNavItems = oNavModel.getProperty("/appNavTree/dynamicItems");
+			
+			// iterate over all main navigation items (Fhem categories) and
+			// add corresponding Fhem items to as sub item to current navigation item
+			for (var i=0, iL=oNavItems.length; i<iL; i++ ) {
+				if (oNavItems[i].fhemModelRef.setName) {
+					
+					oNavItems[i].items = [];	
+					var aFhemItems = oFhemData[oNavItems[i].fhemModelRef.setName];
+					if (!aFhemItems) continue;
+					
+					for (var j=0, jL=aFhemItems.length; j<jL; j++) {
+						oNavItems[i].items.push({
+							"itemId": (oNavItems[i].fhemModelRef.nameProperty ? aFhemItems[j][oNavItems[i].fhemModelRef.nameProperty] : aFhemItems[j] ) 
+						});
+					}
+				}
+			}
+			// update navigation model
+			oNavModel.setProperty("/appNavTree/dynamicItems", oNavItems);
 		}
+		
 	});
 })

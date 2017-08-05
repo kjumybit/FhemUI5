@@ -1,4 +1,4 @@
-<core:View controllerName="de.kjumybit.fhem.controller.Detail"
+<core:View controllerName="de.kjumybit.fhem.controller.DeviceList"
 	xmlns:html="http://www.w3.org/1999/xhtml" 
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc" 
@@ -11,7 +11,7 @@
 			<Table id="tblDeviceList" 		
 				   items="{ path: 'fhemMetaData>/DeviceSet',
 				            sorter : {
-								path : 'fhemMetaData>Internals/TYPE',
+								path : 'Internals/TYPE',
 								group : true
 							},
 							groupHeaderFactory: '.grouper.getDeviceSetGroupHeader' 

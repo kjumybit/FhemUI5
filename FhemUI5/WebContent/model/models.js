@@ -15,6 +15,9 @@ sap.ui.define([
 			return oModel;
 		},
 		
+		/**
+		 * Create FMS backend configuration model
+		 */
 		createAppSettingsModel: function() {
 			// load local web storage containing app configuration data
 			jQuery.sap.require("jquery.sap.storage");
@@ -35,7 +38,13 @@ sap.ui.define([
 			var oModel = new JSONModel(oSettings);
 			oModel.setDefaultBindingMode("TwoWay");
 			return oModel;
+		},
+		
+		/**
+		 * Create side panel navigation list 
+		 */
+		createSideNavigationModel: function() {
+			return new JSONModel("model/NavigationTree.json");
 		}
-
 	};
 });

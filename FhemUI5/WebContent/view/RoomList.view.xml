@@ -1,0 +1,24 @@
+<core:View controllerName="de.kjumybit.fhem.controller.Overview"
+	xmlns:html="http://www.w3.org/1999/xhtml" 
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	xmlns:s="sap.m.semantic"
+	displayBlock="true">
+	<s:DetailPage id="viewOverview" title="{i18n>Overview}">
+		<s:content>
+
+		<!-- Tile List -->
+	
+		</s:content> 
+		<s:messagesIndicator>
+			<s:MessagesIndicator press="onMessagesButtonPress"/>
+		</s:messagesIndicator>
+		<s:customFooterContent>
+			<OverflowToolbarButton 
+				icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
+				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"
+				text="Fhem Service Connection" />
+		</s:customFooterContent>
+	</s:DetailPage>
+</core:View>

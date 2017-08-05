@@ -7,7 +7,7 @@ sap.ui.define([
 ], function(Controller, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
 	"use strict";
 
-	return Controller.extend("de.kjumybit.fhem.controller.Detail", {
+	return Controller.extend("de.kjumybit.fhem.controller.DeviceList", {
 
 		
 	// init local members

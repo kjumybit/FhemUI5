@@ -1,0 +1,38 @@
+{
+	"appNavTree": {
+		"dynamicItems": [
+			{
+				"navItemID": "dashboard",
+				"sort": "0",
+				"fhemModelRef": {},
+				"items": []
+			},	
+			{
+				"navItemID": "roomList",
+				"sort": "1",
+				"fhemModelRef": {
+					"setName": "RoomSet"
+				},
+				"items": []
+			},
+			{
+				"navItemID": "deviceList",
+				"sort": "2",
+				"fhemModelRef": { 
+					"setName": "DeviceSet",
+					"nameProperty": "Name"
+				},				
+				"items": []				 	
+			},
+			{
+				"navItemID": "deviceTypeList",
+				"sort": "3",
+				"fhemModelRef": {
+					"setName": "DeviceTypeSet"
+				},				
+				"items": []				 	
+			}					
+		],
+		"fixedItems": []
+	}
+}

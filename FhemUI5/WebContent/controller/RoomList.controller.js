@@ -1,18 +1,28 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function(Controller) {
+	'sap/ui/core/mvc/Controller',
+	'sap/m/MessagePopover',
+	'sap/m/MessagePopoverItem',
+	'de/kjumybit/fhem/model/formatter',
+	'de/kjumybit/fhem/model/grouper'
+], function(Controller, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
 	"use strict";
 
-	return Controller.extend("de.kjumybit.fhem.controller.Master", {
+	return Controller.extend("de.kjumybit.fhem.controller.RoomList", {
 
+		
+	// init local members
+	formatter: Formatter,
+	grouper: Grouper,
+		
 	/**
 	* Called when a controller is instantiated and its View controls (if available) are already created.
 	* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
 	* @memberOf helloworld.Main
 	*/
-//		onInit: function() {
-//
-//		},
+	onInit: function() {
+
+				
+	},
 
 	/**
 	* Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
@@ -40,5 +50,11 @@ sap.ui.define([
 //
 //		}
 
+	/** ================================================================================
+	 *  App event handler
+	 ** ================================================================================ */
+	
+	
+	
 	});
 });

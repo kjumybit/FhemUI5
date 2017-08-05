@@ -72,23 +72,47 @@
 				"viewPath": "de.kjumybit.fhem.view",
 				"controlId": "app"
 	 	 	},
-	  		"routes": [{
-		  		"pattern": "",
-		  		"viewName": "App",
-		  		"name": "App",
-		  		"target": ["detail", "master"]		  		  
-			}],
+	  		"routes": [
+	  			{
+		  			"pattern": "",
+		  			"viewName": "App",
+		  			"name": "App",
+		  			"target": ["devices", "navigation"]		  		  
+				}, {
+		  			"pattern": "overview",
+		  			"name": "overview",
+		  			"target": "overview"		  		  			
+				}, {
+		  			"pattern": "devices",
+		  			"name": "devices",
+		  			"target": "devices"		  		  			
+				}, {
+		  			"pattern": "rooms",
+		  			"name": "rooms",
+		  			"target": "rooms"		  		  							
+				}
+			],
 			"targets": {
-				"master": {
-					"viewName": "Master",
+				"navigation": {
+					"viewName": "Navigation",
 					"viewLevel": 1,
 					"controlAggregation": "masterPages"				
 				},
-				"detail": {
-					"viewName": "Detail",
-					"viewLevel": 2,
+				"overview": {
+					"viewName": "Overview",
+					"viewLevel": 1,
 					"controlAggregation": "detailPages"				
-				}
+				},
+				"rooms": {
+					"viewName": "RoomList",
+					"viewLevel": 1,
+					"controlAggregation": "detailPages"				
+				},	
+				"devices": {
+					"viewName": "DeviceList",
+					"viewLevel": 1,
+					"controlAggregation": "detailPages"				
+				}				
 			}			
 		}
   	}	

@@ -150,12 +150,12 @@ fhem.model = (function fhemModel() {
 	"use strict"
 
 	/**
-	 * Receive device meta data, store it in the model instance and
+	 * Receive device meta data from backend, store it in the model instance and
 	 * inform model change listeners
 	 */
 	function _onMetaData(oData) {
 		if (oData) {
-			this.mFhemMetaData = oData; // { DeviceSet: {}, RoomSet: {}, DeviceTypeSet: {} };
+			this.mFhemMetaData = oData; // { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };
 			this.fireEvent("metaDataLoaded");
 		}
 	}
@@ -178,6 +178,7 @@ fhem.model = (function fhemModel() {
 		//TODO: evaluate Fhem data type
 
 		oFhemBaseModel._fhemService.registerEventHandler(fhem.core.SubscribeEvent.getMetaData, _onMetaData, oFhemBaseModel);
+		// retrieve meta data from backend
 		oFhemBaseModel._fhemService.sendEvent(fhem.core.PublishEvent.getMetaData, null);
 	}
 	
@@ -194,9 +195,14 @@ fhem.model = (function fhemModel() {
 	//var Model = (new function FhemModel() {
 	//TODO: describe mParameters
 	function Model(mParameters) {
-		//TODO
+		//TODO: use new class (type) for FHEM metadata
 		
-		this.mFhemMetaData = { DeviceSet: {}, RoomSet: {}, DeviceTypeSet: {}, DeviceSubTypeSet: {} };
+		this.mFhemMetaData = { 
+				DeviceSet: [], 
+				RoomSet: [], 
+				DeviceTypeSet: [], 
+				DeviceSubTypeSet: [] 
+		};
 		this.mEventRegistry = {};
 		
 		this._fhemService = new fhem.core.Service();
