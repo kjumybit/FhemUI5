@@ -80,15 +80,19 @@
 		  			"target": ["devices", "navigation"]		  		  
 				}, {
 		  			"pattern": "overview",
-		  			"name": "overview",
+		  			"name": "Overview",
 		  			"target": "overview"		  		  			
 				}, {
 		  			"pattern": "devices",
-		  			"name": "devices",
-		  			"target": "devices"		  		  			
+		  			"name": "DeviceList",
+		  			"target": "devices"
+		  		}, {
+		  			"pattern": "devicetypes",
+		  			"name": "DeviceTypeList",
+		  			"target": "deviceTypes"		  				  		  			
 				}, {
 		  			"pattern": "rooms",
-		  			"name": "rooms",
+		  			"name": "RoomList",
 		  			"target": "rooms"		  		  							
 				}
 			],
@@ -112,7 +116,12 @@
 					"viewName": "DeviceList",
 					"viewLevel": 1,
 					"controlAggregation": "detailPages"				
-				}				
+				},
+				"deviceTypes": {
+					"viewName": "DeviceTypeList",
+					"viewLevel": 1,
+					"controlAggregation": "detailPages"				
+				}												
 			}			
 		}
   	}	

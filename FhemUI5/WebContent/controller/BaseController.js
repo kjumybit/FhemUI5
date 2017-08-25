@@ -4,6 +4,16 @@ sap.ui.define([
 		"use strict";
 
 		return Controller.extend("de.kjumybit.fhem.controller.BaseController", {
+			
+			/**
+			 * Returns Fhem model from component property
+			 * @return {fhem.model.Model}
+			 */
+			getFhemModel: function () {
+				return this.getOwnerComponent()._fhemModel;
+			},
+			
+			
 			/**
 			 * Convenience method for accessing the router.
 			 * @public

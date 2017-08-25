@@ -15,7 +15,13 @@
 								group : true
 							},
 							groupHeaderFactory: '.grouper.getDeviceSetGroupHeader' 
-						  }" > 
+						  }"
+					headerText="Devices (nn)"
+					inset="true"
+					growing="true"
+					growingScrollToLoad="true"
+					backgroundDesign="Solid">
+					<!-- class="sapUiResponsiveMargin"> -->					
 				<columns>
 					<Column witdh="auto">	
 						<Text text="{i18n>device}" />
@@ -54,8 +60,7 @@
 		<s:customFooterContent>
 			<OverflowToolbarButton 
 				icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
-				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"
-				text="Fhem Service Connection" />
+				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
 		</s:customFooterContent>
 	</s:DetailPage>
 </core:View>

@@ -2,23 +2,21 @@
 	xmlns:html="http://www.w3.org/1999/xhtml" 
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc" 
-	xmlns:m="sap.m" 
-	xmlns:semantic="sap.m.semantic"
+	xmlns="sap.m" 
+	xmlns:s="sap.m.semantic"
 	xmlns:t="sap.tnt"
 	displayBlock="true">
-	<semantic:MasterPage id="viewMaster" 
-						title="{i18n>masterTitle}"
-						titleLevel="Auto"
+	<s:MasterPage id="viewNavigation" 
+						title="{i18n>navTitle}"
 						showNavButton="true" 
-						showSubHeader="false" 
-						showFooter="true"
-						navButtonPress="onPressMasterBack" 
-						xmlns="sap.m.semantic">
-		<!-- ><subHeader></subHeader> --> <!-- sap.m.IBar -->
-		<content>
-			<t:SideNavigation id="sideNavigation" itemSelect="onNavItemSelect" width="100%">
-            </t:SideNavigation>
-		</content> <!-- sap.ui.core.Control -->
-		<filter></filter> <!-- sap.m.semantic.IFilter -->
-	</semantic:MasterPage>
+						navButtonPress="onPressNavigationBack">
+		<s:content>
+			<t:SideNavigation id="sideNavigation" width="320px" />
+		</s:content>
+
+		<s:customFooterContent>
+			<OverflowToolbarButton icon="sap-icon://action-settings" />
+		</s:customFooterContent>
+		
+	</s:MasterPage>
 </core:View>

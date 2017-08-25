@@ -1,31 +1,23 @@
-<core:View controllerName="de.kjumybit.fhem.controller.RoomList"
+<core:View controllerName="de.kjumybit.fhem.controller.DeviceTypeList"
 	xmlns:html="http://www.w3.org/1999/xhtml" 
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc" 
 	xmlns="sap.m" 
-	xmlns:l="sap.ui.layout"
 	xmlns:s="sap.m.semantic"
 	displayBlock="true">
-	<s:DetailPage id="viewRoomList" title="{i18n>RoomList}">
-	
+	<s:DetailPage id="viewDeviceTypeList" title="{i18n>DeviceTypeList}">
 		<s:content>
 
 		<!-- Tile List -->
-			<l:HorizontalLayout id="TileRoomList" allowWrapping="true" class="sapUiResponsiveContentPadding">
-			</l:HorizontalLayout>
 	
 		</s:content> 
-		
 		<s:messagesIndicator>
 			<s:MessagesIndicator press="onMessagesButtonPress"/>
 		</s:messagesIndicator>
-		
 		<s:customFooterContent>
 			<OverflowToolbarButton 
 				icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
-				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"
-				text="Fhem Service Connection" />
+				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}" />
 		</s:customFooterContent>
-		
 	</s:DetailPage>
 </core:View>

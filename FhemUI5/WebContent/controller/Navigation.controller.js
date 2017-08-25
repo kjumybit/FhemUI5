@@ -70,7 +70,8 @@ sap.ui.define([
 							path: 'sideNavigation>items',
 							templateShareable: "false"					//avoids framework warning
 						},
-						expanded: false
+						expanded: false,
+						select: [this.onNavItemSelect, this]
 					}),
 					path: 'sideNavigation>/appNavTree/dynamicItems',      //no curly brackets here!
 					templateShareable: "false"
@@ -82,14 +83,28 @@ sap.ui.define([
 		
 		
 		/**
-		 * Handles item selection in navigation list depending on 
-		 * item level (overview, devices, rooms) and item 
+		 * Handles item selection in navigation list on level 1 
+		 * (overview, devices, rooms, ...) and selected sub item
+		 * @parameter oEvent ..,
+		 * @parameter oEvent.getSource() ... Navigation List Item (Level 1)   
 		 */
-		onNavItemSelect: function(item) {
-			var oRouter = this.getRouter();
+		onNavItemSelect: function(oEvent) {
 			
-			//TODO: Testing: it works
-			oRouter.navTo("overview");
+			var oRouter = this.getRouter();
+			var oItem = oEvent.getParameters("item");
+			if (!oItem) return;
+			
+			var sText = oItem.item.getText();
+			
+			// get model binding of selected navigation item
+			var oBindingContext = oEvent.getSource().getBindingContext('sideNavigation');
+			if (!oBindingContext) return;
+			
+			// get view name of item
+			var oItemProperty = oBindingContext.getProperty();
+			if (oItemProperty.view) {
+				oRouter.navTo(oItemProperty.view);
+			}
 		},
 		
 	
@@ -97,8 +112,10 @@ sap.ui.define([
 		 * Handles page Back button press
 		 * Hide navigation view (master page)
 		 */
-		onPressMasterBack: function() {
+		onPressNavigationBack: function(oEvent) {
 			//TODO
+			//this.getOwnerComponent()._oApp.setMode("HideMode");
+			this.getOwnerComponent()._oApp.hideMaster();
 		}
 		
 	});
