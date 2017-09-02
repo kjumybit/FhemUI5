@@ -71,11 +71,13 @@ sap.ui.define([
 							templateShareable: "false"					//avoids framework warning
 						},
 						expanded: false,
-						select: [this.onNavItemSelect, this]
+						select: [this.onNavItemSelect, this],
+						icon: "sap-icon://fhem/hm_ccu"
 					}),
 					path: 'sideNavigation>/appNavTree/dynamicItems',      //no curly brackets here!
 					templateShareable: "false"
-				}
+				},
+				width: "auto"
 			});
 			
 			return oNavigationListTemplate;
@@ -114,7 +116,7 @@ sap.ui.define([
 		 */
 		onPressNavigationBack: function(oEvent) {
 			//TODO
-			//this.getOwnerComponent()._oApp.setMode("HideMode");
+			this.getOwnerComponent()._oApp.setMode("HideMode");
 			this.getOwnerComponent()._oApp.hideMaster();
 		}
 		

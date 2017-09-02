@@ -1,0 +1,52 @@
+<core:View controllerName="de.kjumybit.fhem.controller.DeviceDetail"
+	xmlns:html="http://www.w3.org/1999/xhtml" 
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	displayBlock="true">
+	<Page id="viewDeviceDetail" title="{i18n>DeviceDetail}">
+		<content>
+
+ 
+				<ObjectHeader title="Device Name" intro="Device Type" number="12 / 15 / 18" numberUnit="Einheit" 
+					fullScreenOptimized="true" backgroundDesign="Solid" icon="sap-icon://heating-cooling" responsive="true" titleLevel="H2">					
+				    <statuses>					
+				        <ObjectStatus text="Status Text"/>					
+				    </statuses>					
+					<attributes>
+				    	<ObjectAttribute text="attribute text" title="Attribute Titel"/>					
+					</attributes>				
+				</ObjectHeader>
+					
+				<OverflowToolbar width="100%" design="Solid">					
+				    <content>					
+				        <Text text="Aktionstasten" />					
+				        <ToolbarSpacer/>					
+				        <Switch />
+				    </content>					
+				</OverflowToolbar>
+					
+				<IconTabBar backgroundDesign="Transparent">					
+				    <items>					
+				        <IconTabFilter text="Readings" icon="sap-icon://measure">
+				        </IconTabFilter>
+					
+				        <IconTabFilter text="Attributes" icon="sap-icon://action-settings" />
+					
+				        <IconTabFilter text="Charts" icon="sap-icon://line-chart" /></items>
+					
+				</IconTabBar>		
+
+ 
+		</content> 
+
+		<footer>
+			<Bar> 
+				<contentRight>
+			    	<Button icon="sap-icon://action-settings"/>
+			    </contentRight>
+			</Bar>		
+		</footer>
+		
+	</Page>
+</core:View>

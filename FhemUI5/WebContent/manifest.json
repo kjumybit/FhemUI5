@@ -15,6 +15,7 @@
 	"sap.ui": {
 		"_version": "1.1.0",
 		"technology": "UI5",
+		"fullWidth": true,
 		"icons": {
 			"icon": "",
 			"favIcon": "",
@@ -30,12 +31,15 @@
 		},
 		"supportedThemes": [
 			"sap_hcb",
-			"sap_bluecrystal"
+			"sap_bluecrystal",
+			"sap_belize",
+			"sap_belize_plus"
 		]
 	},
 
 	"sap.ui5": {
 		"_version": "1.1.0",
+		"handleValidation": true,
 		"rootView": {
 			"viewName": "de.kjumybit.fhem.view.App",
 			"type": "XML"
@@ -61,16 +65,22 @@
 			}
 		},
 		"resources": {
-			"css": [{
-				"uri": "css/style.css"
-			}]
+			"css": [
+				{
+					"uri": "css/style.css"
+				},
+				{
+					"uri": "css/fhemfont.css"
+				}				
+			]
 		},
 		"routing": {
 		  	"config": {
 		  		"routerClass": "sap.m.routing.Router",
 				"viewType": "XML",
 				"viewPath": "de.kjumybit.fhem.view",
-				"controlId": "app"
+				"controlId": "app",
+				"transition": "show"
 	 	 	},
 	  		"routes": [
 	  			{
@@ -78,22 +88,31 @@
 		  			"viewName": "App",
 		  			"name": "App",
 		  			"target": ["devices", "navigation"]		  		  
-				}, {
+				},
+				{
 		  			"pattern": "overview",
 		  			"name": "Overview",
 		  			"target": "overview"		  		  			
-				}, {
+				},
+				{
 		  			"pattern": "devices",
 		  			"name": "DeviceList",
 		  			"target": "devices"
-		  		}, {
+		  		},
+		  		{
 		  			"pattern": "devicetypes",
 		  			"name": "DeviceTypeList",
 		  			"target": "deviceTypes"		  				  		  			
-				}, {
+				},
+				{
 		  			"pattern": "rooms",
 		  			"name": "RoomList",
 		  			"target": "rooms"		  		  							
+				},
+				{
+		  			"pattern": "devicedetail",
+		  			"name": "DeviceDetail",
+		  			"target": "deviceDetail"		  		  							
 				}
 			],
 			"targets": {
@@ -119,6 +138,11 @@
 				},
 				"deviceTypes": {
 					"viewName": "DeviceTypeList",
+					"viewLevel": 1,
+					"controlAggregation": "detailPages"				
+				},
+				"deviceDetail": {
+					"viewName": "DeviceDetail",
 					"viewLevel": 1,
 					"controlAggregation": "detailPages"				
 				}												

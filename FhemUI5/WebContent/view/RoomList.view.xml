@@ -4,28 +4,34 @@
 	xmlns:mvc="sap.ui.core.mvc" 
 	xmlns="sap.m" 
 	xmlns:l="sap.ui.layout"
-	xmlns:s="sap.m.semantic"
 	displayBlock="true">
-	<s:DetailPage id="viewRoomList" title="{i18n>RoomList}">
+	<Page id="viewRoomList" title="{i18n>RoomList}">
 	
-		<s:content>
+		<content>
 
-		<!-- Tile List -->
+			<!-- Tile List -->
+			<Panel width="auto" backgroundDesign="Transparent" >
+				<headerToolbar>
+					<Toolbar>
+						<Title text="Etage oder Gruppe"/>
+					</Toolbar>
+				</headerToolbar>
+		
 			<l:HorizontalLayout id="TileRoomList" allowWrapping="true" class="sapUiResponsiveContentPadding">
 			</l:HorizontalLayout>
-	
-		</s:content> 
+			</Panel>
+			
+		</content> 
+				
+		<footer>
+			<Bar>
+				<contentRight>
+					<Button 
+						icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
+						type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
+				</contentRight>
+			</Bar>
+		</footer>
 		
-		<s:messagesIndicator>
-			<s:MessagesIndicator press="onMessagesButtonPress"/>
-		</s:messagesIndicator>
-		
-		<s:customFooterContent>
-			<OverflowToolbarButton 
-				icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
-				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"
-				text="Fhem Service Connection" />
-		</s:customFooterContent>
-		
-	</s:DetailPage>
+	</Page>
 </core:View>

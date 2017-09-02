@@ -1,13 +1,13 @@
 sap.ui.define([
-	'sap/ui/core/mvc/Controller',
+	'de/kjumybit/fhem/controller/BaseController',
 	'sap/m/MessagePopover',
 	'sap/m/MessagePopoverItem',
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(Controller, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
+], function(BaseController, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
 	"use strict";
 
-	return Controller.extend("de.kjumybit.fhem.controller.Overview", {
+	return BaseController.extend("de.kjumybit.fhem.controller.Overview", {
 
 		
 	// init local members

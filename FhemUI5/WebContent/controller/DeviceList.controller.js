@@ -1,13 +1,13 @@
 sap.ui.define([
-	'sap/ui/core/mvc/Controller',
+	'de/kjumybit/fhem/controller/BaseController',
 	'sap/m/MessagePopover',
 	'sap/m/MessagePopoverItem',
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(Controller, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
+], function(BaseController, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
 	"use strict";
 
-	return Controller.extend("de.kjumybit.fhem.controller.DeviceList", {
+	return BaseController.extend("de.kjumybit.fhem.controller.DeviceList", {
 
 		
 	// init local members
@@ -48,32 +48,39 @@ sap.ui.define([
 	* (NOT before the first rendering! onInit() is used for that one!).
 	* @memberOf helloworld.Main
 	*/
-//		onBeforeRendering: function() {
-//
-//		},
+	//		onBeforeRendering: function() {
+	//
+	//	},
 
 	/**
 	* Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
 	* This hook is the same one that SAPUI5 controls get after being rendered.
 	* @memberOf helloworld.Main
 	*/
-//		onAfterRendering: function() {
-//
-//		},
+	//		onAfterRendering: function() {
+	//
+	//		},
 
 	/**
 	* Called when the Controller is destroyed. Use this one to free resources and finalize activities.
 	* @memberOf helloworld.Main
 	*/
-//		onExit: function() {
-//
-//		}
+	//		onExit: function() {
+	//
+	//		}
 
 	/** ================================================================================
 	 *  App event handler
 	 ** ================================================================================ */
 	
-	
+	/**
+	 * 
+	 */
+	onItemPress: function(oEvent) {
+		//TODO
+		var oRouter = this.getRouter();
+		oRouter.navTo("DeviceDetail");
+	}
 	
 	});
 });

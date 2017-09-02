@@ -23,6 +23,7 @@ sap.ui.define([
 				return sap.ui.core.UIComponent.getRouterFor(this);
 			},
 
+			
 			/**
 			 * Convenience method for getting the view model by name.
 			 * @public
@@ -33,6 +34,18 @@ sap.ui.define([
 				return this.getView().getModel(sName);
 			},
 
+			
+			/**
+			 * Convenience method for getting the view model by name.
+			 * @public
+			 * @param {string} [sName] the model name
+			 * @returns {sap.ui.model.Model} the model instance
+			 */
+			getComponentModel : function (sName) {
+				return this.getOwnerComponent().getModel(sName);
+			},
+
+			
 			/**
 			 * Convenience method for setting the view model.
 			 * @public
@@ -44,6 +57,7 @@ sap.ui.define([
 				return this.getView().setModel(oModel, sName);
 			},
 
+			
 			/**
 			 * Getter for the resource bundle.
 			 * @public

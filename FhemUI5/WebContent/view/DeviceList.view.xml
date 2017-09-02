@@ -3,11 +3,12 @@
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc" 
 	xmlns="sap.m" 
-	xmlns:s="sap.m.semantic"
 	displayBlock="true">
-	<s:DetailPage id="viewDeviceList" title="{i18n>detailDeviceList}">
-		<s:content>
-
+	<Page id="viewDeviceList" title="{i18n>detailDeviceList}">
+		<content>
+			
+			<Panel backgroundDesign="Transparent">
+			
 			<Table id="tblDeviceList" 		
 				   items="{ path: 'fhemMetaData>/DeviceSet',
 				            sorter : {
@@ -16,11 +17,8 @@
 							},
 							groupHeaderFactory: '.grouper.getDeviceSetGroupHeader' 
 						  }"
-					headerText="Devices (nn)"
-					inset="true"
 					growing="true"
-					growingScrollToLoad="true"
-					backgroundDesign="Solid">
+					growingScrollToLoad="true">
 					<!-- class="sapUiResponsiveMargin"> -->					
 				<columns>
 					<Column witdh="auto">	
@@ -35,32 +33,36 @@
 					</Column>								
 				</columns>
 				<items>
-					<ColumnListItem>
+					<ColumnListItem type="Navigation" press="onItemPress">
 						<cells>
 							<ObjectIdentifier 
-								title="{ parts:[{path:'fhemMetaData>Attributes/alias'},{path:'fhemMetaData>Name'}],
-	    						    formatter: '.formatter.getDeviceName' 
-	    					    }" />
+								title="{ 
+									parts:[{path:'fhemMetaData>Attributes/alias'},{path:'fhemMetaData>Name'}],
+	    						    formatter: '.formatter.getDeviceName'
+	    					    }"/>
 							<Text text="{fhemMetaData>Internals/STATE}" />
 							<Text text="{ path: 'fhemMetaData>Readings/state/Time',
 								          type: 'sap.ui.model.type.DateTime', 
 								          formatOptions: {
 											source: { pattern: 'yyyy-MM-dd HH:mm:ss' }
-										  }
-							}" />
+										}
+							}"/>
 						</cells>
 					</ColumnListItem>
 				</items>
 			</Table>
+		</Panel>
 
-		</s:content> 
-		<s:messagesIndicator>
-			<s:MessagesIndicator press="onMessagesButtonPress"/>
-		</s:messagesIndicator>
-		<s:customFooterContent>
-			<OverflowToolbarButton 
-				icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
-				type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
-		</s:customFooterContent>
-	</s:DetailPage>
+		</content> 
+		
+		<footer>
+			<Bar>
+				<contentRight>
+					<Button 
+						icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
+						type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
+				</contentRight>
+			</Bar>
+		</footer>
+	</Page>
 </core:View>
