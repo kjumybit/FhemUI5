@@ -4,6 +4,9 @@ sap.ui.define([
 ], function(JSONModel, Device) {
 	"use strict";
 
+	// private methods
+	
+	// pubic methods
 	return {
 
 		/** 
@@ -15,30 +18,29 @@ sap.ui.define([
 			return oModel;
 		},
 		
+		
 		/**
-		 * Create FMS backend configuration model
+		 * Create runtime model
 		 */
-		createAppSettingsModel: function() {
-			// load local web storage containing app configuration data
-			jQuery.sap.require("jquery.sap.storage");
-			var oStorage = jQuery.sap.storage(jQuery.sap.storage.Type.local);
-			var oSettings = oStorage.get("appSettings");
-			
-			if (!oSettings) {
-				// initialize storage
-				oSettings = {
-					"server": {
-						"host": "192.168.0.1",
-						"port": "8086"
-					}
+		createRuntimeModel: function() {
+			let mState = {
+				fhemConnection : {
+					isConnected : false,
 				}
-			}
-			
-			// create model and set configuration data
-			var oModel = new JSONModel(oSettings);
-			oModel.setDefaultBindingMode("TwoWay");
-			return oModel;
+			};
+			return new JSONModel(mState);
 		},
+		
+				
+		/**
+		 * Create user dialog model
+		 */
+		createUserDialogModel: function() {
+			return new JSONModel({
+				//TODO
+			});
+		},
+		
 		
 		/**
 		 * Create side panel navigation list 

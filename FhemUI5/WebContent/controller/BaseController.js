@@ -1,16 +1,86 @@
 sap.ui.define([
-		"sap/ui/core/mvc/Controller"
-	], function (Controller) {
+	"sap/ui/core/mvc/Controller",
+	"sap/ui/model/json/JSONModel"	
+], function (Controller, JSONModel) {
 		"use strict";
 
+		const _sComponent = "BaseController";		
+		
 		return Controller.extend("de.kjumybit.fhem.controller.BaseController", {
 			
 			/**
-			 * Returns Fhem model from component property
-			 * @return {fhem.model.Model}
+			 * 
+			 */
+			onInit: function() {
+			
+				if (true) {
+					
+				};
+				
+			},
+						
+			
+			/**
+			 * Get array index of property value of an JSON object in an array
+			 * @param sProperty the name of an object property 
+			 * @param value the property value
+			 * @param aArray an array of JSON objects
+			 * @returns iIndex the array index o fthe frist object with mathich property value
+			 *                 or -1, if no object has been found
+			 */
+			getArrayIndex: function (sProperty, value, aArray) {
+				var index = -1;
+				for (var i=0, iL=aArray.length; i<iL; i++) {
+					var o = aArray[i];
+					if (o[sProperty] && o[sProperty] == value) {
+						index = i;
+						break;
+					}
+				}
+				return index;
+			},
+									
+			
+			/**
+			 * Set & Get Fhem service model from component property
+			 * 
+			 * @return {de.kjumybit.fhem.service.FhemService}
 			 */
 			getFhemModel: function () {
-				return this.getOwnerComponent()._fhemModel;
+				return this.getOwnerComponent().fhemModel;
+			},
+			
+			setFhemModel: function (oFhemModel) {
+				return this.getOwnerComponent().fhemModel = oFhemModel;
+			},
+
+			
+			/**
+			 * Get JSON Model for Fhem metadata
+			 */
+			getFhemMetaModel: function () {
+				let oModel = this.getOwnerComponent().getModel('fhemMetaData');
+				if (!oModel) {
+					jQuery.sap.log.debug("Create new Fhem netadata model", null, _sComponent);					
+					oModel = new JSONModel();
+					this.getOwnerComponent().setModel(oModel, 'fhemMetaData');
+				}
+				return oModel;
+			},
+							
+			
+			/**
+			 * Get settings object.
+			 * 
+			 * @returns {oSettings} [de.kjumybit.fhem.libs.Settings]
+			 */
+			getSettings: function () {
+				return this.getOwnerComponent().oSettings;			
+			},
+			
+			
+			getRuntimeModel: function() {
+				return this.getOwnerComponent().getModel('runtime');	
 			},
 			
 			

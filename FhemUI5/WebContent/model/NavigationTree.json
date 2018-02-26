@@ -5,6 +5,9 @@
 				"navItemID": "dashboard",
 				"i18nText": "navItemDashBoard",
 				"view": "Overview",
+				"detailView": {
+					"view": ""
+				},
 				"sort": "0",
 				"fhemModelRef": {},
 				"items": []
@@ -12,7 +15,11 @@
 			{
 				"navItemID": "roomList",
 				"i18nText": "navItemRooms",
-				"view": "RoomList",												
+				"view": "RoomList",
+				"detailView": {
+					"view": "DeviceList",
+					"query": "room"					
+				},
 				"sort": "1",
 				"fhemModelRef": {
 					"setName": "RoomSet"
@@ -22,7 +29,11 @@
 			{
 				"navItemID": "deviceList",
 				"i18nText": "navItemDevices",
-				"view": "DeviceList",								
+				"view": "DeviceList",
+				"detailView": {
+					"view": "DeviceDetail",
+					"parameter": "deviceId"
+				},
 				"sort": "2",
 				"fhemModelRef": { 
 					"setName": "DeviceSet",
@@ -33,7 +44,11 @@
 			{
 				"navItemID": "deviceTypeList",
 				"i18nText": "navItemDeviceTyps",
-				"view": "DeviceTypeList",								
+				"view": "DeviceTypeList",
+				"detailView": {
+					"view": "DeviceList",
+					"query": "deviceType"
+				},
 				"sort": "3",
 				"fhemModelRef": {
 					"setName": "DeviceTypeSet"
