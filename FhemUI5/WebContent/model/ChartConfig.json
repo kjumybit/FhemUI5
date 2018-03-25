@@ -1,0 +1,80 @@
+{
+	"charts": {
+		"HwcStorageTemp": {
+			"title": "Warmwasserspeicher",
+			"assignedDevices": ["MQTT_D_EBUSD"],
+			"rooms": [],
+			"library": "chartjs",			
+			"chartjs": {
+				"chartType": "Line",
+				"options": {
+					"responsive": true,
+					"maintainAspectRatio": true,
+					"layout": {
+            			"padding": {
+                			"left": 5,
+                			"right": 0,
+                			"top": 0,
+                			"bottom": 0
+            			}
+        			},					
+					"scales": {
+						"xAxes": [{
+                			"type":	"time",
+                			"time": {
+                				"isoWeekday": true,
+                    			"displayFormats": {
+                    				"second": "H:mm:ss",
+                    				"minute": "H:mm",
+                        			"hour": "H",
+                        			"day": "MMM D"
+                    			}
+                    		},
+                			"distribution": "series",
+                			"bounds": "data"
+            			}],
+            			"yAxes": [{
+            				"offset": true
+            			}],
+               			"ticks": {
+               				"source": "auto"
+               			}            			
+        			}
+				},							
+				"chartData": {
+    				"datasets": [{
+      					"label": "Speichertemp. oben",
+      					"fillColor": "rgba(220,220,220,0.2)",
+      					"strokeColor": "rgba(220,220,220,1)",
+      					"pointRadius": 0,
+      					"pointColor": "rgba(220,220,220,1)",
+      					"pointStrokeColor": "#fff",
+      					"pointHighlightFill": "#fff",
+      					"pointHighlightStroke": "rgba(220,220,220,1)",
+      					"data": [],
+      					"fhemDataSource": "StorageTempUpper"
+      				}]
+      			}										
+			}
+		}
+	},
+	"fhemDataSources": {
+		"StorageTempUpper": {
+			"logDevice": "DB_Log_MariaDB", 
+			"device": "MQTT_D_EBUSD",
+			"reading": "StorageCylUpperTemp",
+			"localData": [
+				{ "t": "2018-03-01 09:30", "y": 1 },
+				{ "t": "2018-03-01 09:31", "y": 2 },						
+				{ "t": "2018-03-01 09:32", "y": 3 },
+				{ "t": "2018-03-01 09:33", "y": 4 },
+				{ "t": "2018-03-01 09:34", "y": 3 },
+				{ "t": "2018-03-01 09:35", "y": 4 },
+				{ "t": "2018-03-01 09:36", "y": 5 },
+				{ "t": "2018-03-01 09:37", "y": 6 },
+				{ "t": "2018-03-01 09:38", "y": 4 },
+				{ "t": "2018-03-01 09:39", "y": 2 }																																				
+			]										
+		}				
+	} 
+}

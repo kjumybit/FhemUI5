@@ -6,12 +6,12 @@ sap.ui.define(function() {
 	// jQuery.sap.require("sap.ui.core.format.DateFormat");
 	var formatter = {
 			
-			/**
-			 * Get device name depending on Alias attribute 
-			 */
-			getDeviceName: function (sDevAlias, sDevName) {	
-				return (sDevAlias ? sDevAlias : sDevName);
-			},
+		/**
+		 * Get device name depending on Alias attribute 
+		 */
+		getDeviceName: function (sDevAlias, sDevName) {	
+			return (sDevAlias ? sDevAlias : sDevName);
+		},
 	};
 	
 	return formatter;

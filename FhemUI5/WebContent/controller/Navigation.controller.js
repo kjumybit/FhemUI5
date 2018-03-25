@@ -200,7 +200,7 @@ sap.ui.define([
 		 * - main items: /appNavTree/dynamicItems(navItemID)
 		 * - sub items:  /appNavTree/dynamicItems/items(itemId)
 		 * 
-		 * @returns {sap/tnt/NavigationList} the navigation list
+		 * @return {sap/tnt/NavigationList} the navigation list
 		 */
 		_createNavigationList: function() {
 			

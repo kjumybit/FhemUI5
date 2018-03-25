@@ -40,13 +40,6 @@ sap.ui.define([
 				//TODO
 			});
 		},
-		
-		
-		/**
-		 * Create side panel navigation list 
-		 */
-		createSideNavigationModel: function() {
-			return new JSONModel("model/NavigationTree.json");
-		}
+				
 	};
 });

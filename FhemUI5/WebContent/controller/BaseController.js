@@ -25,7 +25,7 @@ sap.ui.define([
 			 * @param sProperty the name of an object property 
 			 * @param value the property value
 			 * @param aArray an array of JSON objects
-			 * @returns iIndex the array index o fthe frist object with mathich property value
+			 * @return iIndex the array index o fthe frist object with mathich property value
 			 *                 or -1, if no object has been found
 			 */
 			getArrayIndex: function (sProperty, value, aArray) {
@@ -72,7 +72,7 @@ sap.ui.define([
 			/**
 			 * Get settings object.
 			 * 
-			 * @returns {oSettings} [de.kjumybit.fhem.libs.Settings]
+			 * @return {oSettings} [de.kjumybit.fhem.libs.Settings]
 			 */
 			getSettings: function () {
 				return this.getOwnerComponent().oSettings;			
@@ -87,7 +87,7 @@ sap.ui.define([
 			/**
 			 * Convenience method for accessing the router.
 			 * @public
-			 * @returns {sap.ui.core.routing.Router} the router for this component
+			 * @return {sap.ui.core.routing.Router} the router for this component
 			 */
 			getRouter : function () {
 				return sap.ui.core.UIComponent.getRouterFor(this);
@@ -98,7 +98,7 @@ sap.ui.define([
 			 * Convenience method for getting the view model by name.
 			 * @public
 			 * @param {string} [sName] the model name
-			 * @returns {sap.ui.model.Model} the model instance
+			 * @return {sap.ui.model.Model} the model instance
 			 */
 			getModel : function (sName) {
 				return this.getView().getModel(sName);
@@ -109,7 +109,7 @@ sap.ui.define([
 			 * Convenience method for getting the view model by name.
 			 * @public
 			 * @param {string} [sName] the model name
-			 * @returns {sap.ui.model.Model} the model instance
+			 * @return {sap.ui.model.Model} the model instance
 			 */
 			getComponentModel : function (sName) {
 				return this.getOwnerComponent().getModel(sName);
@@ -121,7 +121,7 @@ sap.ui.define([
 			 * @public
 			 * @param {sap.ui.model.Model} oModel the model instance
 			 * @param {string} sName the model name
-			 * @returns {sap.ui.mvc.View} the view instance
+			 * @return {sap.ui.mvc.View} the view instance
 			 */
 			setModel : function (oModel, sName) {
 				return this.getView().setModel(oModel, sName);
@@ -131,7 +131,7 @@ sap.ui.define([
 			/**
 			 * Getter for the resource bundle.
 			 * @public
-			 * @returns {sap.ui.model.resource.ResourceModel} the resourceModel of the component
+			 * @return {sap.ui.model.resource.ResourceModel} the resourceModel of the component
 			 */
 			getResourceBundle : function () {
 				return this.getOwnerComponent().getModel("i18n").getResourceBundle();

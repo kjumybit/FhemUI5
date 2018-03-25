@@ -19,3 +19,19 @@
 	height: 100%;
     max-width: 100%;
 }
+
+/**
+ * Charting: Chart.js 
+ */
+.chartJSControl {
+  padding: 16px;
+}
+
+canvas[id^='chartJSCanvas__jscontrol'] {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  width: 100%;
+}

@@ -1,13 +1,14 @@
 sap.ui.define([
+	'jquery.sap.global',	
 	'de/kjumybit/fhem/controller/BaseController',
-	'sap/m/MessagePopover',
-	'sap/m/MessagePopoverItem',
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper',
 	'sap/ui/model/json/JSONModel',
 	'sap/ui/layout/form/FormElement',
-	'sap/m/Text'
-], function(BaseController, MessagePopover, MessagePopoverItem, Formatter, Grouper, JSONModel, FormElement, Text) {
+	'sap/m/Text',
+	'de/kjumybit/fhem/chart/ChartModel',
+	'de/kjumybit/fhem/chart/ChartBase'	
+], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, ChartModel, Chart) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceDetail", {
@@ -97,6 +98,9 @@ sap.ui.define([
 			var aAttributes = this._mapAttributes(aDeviceSet[i].Attributes);
 //			this.oDeviceDetailModel.setProperty("/Attributes", aAttributes);  // via binding
 			this._createAttributes(this.byId("formAttributes"), aAttributes);    // via JScript			
+			
+			//TODO: Prototyp charts
+			this._createChart(this.byId("chart_test"));    // via JScript
 			
 		},
 		
@@ -190,7 +194,36 @@ sap.ui.define([
 				}));
 				oFormContainer.addFormElement(oFormElement);											
 			}			
-		}
+		},
+		
+
+		//TODO: POC only
+		// implement "load" Method in ChartModel class
+		_createChart: function(oVBoxIn) {
+			
+			var oVBox = oVBoxIn;
+			oVBox.destroyItems();
+
+			let oChartModel = this.getModel("Charts");
+			if (!oChartModel) {
+				oChartModel=  new ChartModel("HwcStorageTemp");
+				this.setModel(oChartModel, "Charts");
+			}
+			
+			
+			// create chart control with data set binding
+			let oChart = new Chart( {
+				witdh: "400",
+				height: "100",
+				responsive: "true",
+				chartType: oChartModel.getType(),
+				options: oChartModel.getOptions(),
+				data: "{Charts>/chartData}"
+			});
+				
+			oVBox.addItem(oChart);														
+		},
+				
 		
 	});
 });

@@ -4,9 +4,10 @@
 sap.ui.define([
 	"jquery.sap.global",
 	"sap/ui/base/ManagedObject",
-	"./FhemWebSocket"
+	"./FhemWebSocket",
+	'../base/Helper'
 ],
-	function(jQuery, ManagedObject, FhemWebSocket) {
+	function(jQuery, ManagedObject, FhemWebSocket, Helper) {
 		"use strict";
 										
 		var FhemService = ManagedObject.extend("de.kjumybit.fhem.service.FhemService", /** @lends de.kjumybit.fhem.service.FhemService.prototype */ {
@@ -67,11 +68,14 @@ sap.ui.define([
 					"getServiceMetadata",
 					"getDeviceTypeSet",
 					"getDeviceSet",
+					"getDevice",
 					"getDeviceSubTypeSet",
 					"getRoomSet",
 					"isMetaDataFailed",
 					"isMetaDataLoaded",
-					"sendCommand",
+					"callFhemCommand",
+					"callDeviceAction",
+					"callDbLogQuery",					
 					"refreshServiceMetadata",									  
 				],					
 				
@@ -175,19 +179,106 @@ sap.ui.define([
 		FhemService.prototype.getDeviceSet = function () {
 			return this.mFhemMetaData.DeviceSet;
 		};
-		
-		
-		FhemService.prototype.sendCommand = function () {
-			//TODO
-		};
-		
-				
-		// Private section
+
 		
 		/**
-		 * Receive device meta data from backend, store it in the model instance and
-		 * inform model change listeners via OpenUI5 events.
+		 * Get device definition for device {sDevice}
+		 * 
+		 * @param {String} sDevice Device name
+		 * 
+		 * @returns {object} oDevice Device definition or {null} if device is unknown  
+		 */
+		FhemService.prototype.getDevice = function (sDevice) {
+			let i = Helper.getArrayIndex("Name", sDevice, this.mFhemMetaData.DeviceSet); 
+			return (i ? this.mFhemMetaData.DeviceSet[i] : null);
+		};
+
+		
+		FhemService.prototype.sendFhemCommand = function () {
+			//TODO callDbLogQuery
+		};
+
+		
+		/**
+		 * Retrieve log entries from a DbLog Device {sDevice} applying the command in 
+		 * {mQuery.command} 
+		 * 
+		 * @param {Object} mQuery         Query parameters
+		 * 
+		 * 				   mQuery.from    DateTime
+		 *                 mQuery.from.date "YYYY-MM-DD"
+		 *                 mQuery.from.time "HH:MM:SS"
+		 * 				   mQuery.to      DateTime
+		 *                 mQuery.to.date
+		 *                 mQuery.to.time
+		 *                 mQuery.device  {String} Name of device to retrieve the values for reading {reading} 
+		 *                 mQuery.reading {String} Name of the reading the values are retrieved
+		 *   			   mQuery.success Success handler function with an {oData} parameter
+		 *   							  oData.results [] Result rest as array of DbLog entries    
+		 *                 mQuery.error   Error handler function with an {oError} parameter
+		 *                 
+		 * Command example: 
+		 * 		get DB_Log_MariaDB - webchart 2017-10-01_00:00:00 2017-10-02_23:59:59 KG_IZ_StromZaehler timerange TIMESTAMP energyTagesVerbrauch
+		 */
+		FhemService.prototype.callDbLogQuery = function (sDevice, mQuery) {
+			
+			// check Parameter
+			let oDbLogDevice = this.getDevice(sDevice);
+			jQuery.sap.assert(oDbLogDevice, "DbLog Device " + sDevice + " not found in the metadata!");
+			
+			if (!oDbLogDevice) {
+				return false;
+			} 			
+			
+			jQuery.sap.assert((oDbLogDevice.Internals.TYPE === "DbLog"), "Device " + sDevice + " is not a Fhem DbLog device!");
+
+			if (oDbLogDevice.Internals.TYPE !== "DbLog") {
+				return false;
+			} 
+			
+			var fnSuccess = mQuery.success;
+			var fnError = mQuery.error;
+			
+			// prepare and submit service request
+			let sCommand = "get " +  sDevice + " - webchart " 
+						 + mQuery.from.date + "_" + mQuery.from.time + " " 
+						 + mQuery.to.date + "_" + mQuery.to.time + " "
+						 + mQuery.device + " timerange TIMESTAMP "  
+		                 + mQuery.reading;
+			
+			this._fhemWebSocket.sendRequest({
+				"event": FhemWebSocket.M_PUBLISH_EVENTS.dbLog,
+				"data": sCommand,
+			    "success": function(oData) {
+					// call application handler
+			    	fnSuccess(oData);
+				}.bind(this),
+			    "error": function(oError) {
+			    	// call application handler
+			    	fnError(oError);
+			    }.bind(this)
+			});
+		
+		};
+				
+		
+		// Static properties and methods
+		FhemService.dummyVar = "";
+		FhemService.fooBar = function() {};
+		
+		
+		// Private, statics section
+		
+		/**
+		 * Handles successfully metadata request from Fhem backend.
+		 * 
+		 * Store metadata in the model instance and inform model change listeners 
+		 * via OpenUI5 events.
+		 * 
 		 * Called by fhem.core.Service ws connection handler.
+		 * 
+		 * @params {oEvent} oEvent Event
+		 * 					oEvent.getParameters() {de.kjumybit.fhem.service.Metadata}
 		 */
 		function _onMetaData(oEvent) {
 			this.mFhemMetaData = oEvent.getParameters(); // { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };

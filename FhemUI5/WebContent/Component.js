@@ -2,11 +2,13 @@ sap.ui.define([
 	"sap/ui/core/UIComponent", 
 	"sap/ui/Device", 
 	"jquery.sap.global",
+	"de/kjumybit/fhem/core",
 	"de/kjumybit/fhem/model/models",
+	"sap/ui/model/json/JSONModel",	
 	"sap/ui/core/IconPool",
 	"de/kjumybit/fhem/libs/Settings",
 	"de/kjumybit/fhem/service/FhemService"
-], function(UIComponent, Device, jQuery, Models, IconPool, Settings, FhemService) {
+], function(UIComponent, Device, jQuery, fhem, Models, JSONModel, IconPool, Settings, FhemService) {
 	"use strict";
 
 	return UIComponent.extend("de.kjumybit.fhem.Component", {
@@ -35,9 +37,6 @@ sap.ui.define([
 			
 			// set the device model
 			this.setModel(Models.createDeviceModel(), "device");
-
-			// set the initial side navigation model (level 1)
-			this.setModel(Models.createSideNavigationModel(), "sideNavigation");
 			
 			// set the local app configuration model
 			this.oSettings = new Settings(); 
@@ -45,7 +44,11 @@ sap.ui.define([
 			
 			this._registerFhemIcons();
 			
+			// initialize own library
+			fhem.Init(this);		// TODO
+			
 			//TODO
+									
 			jQuery.sap.log.setLevel(jQuery.sap.log.Level.DEBUG);
 		},
 		

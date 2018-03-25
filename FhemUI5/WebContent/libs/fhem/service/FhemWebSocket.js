@@ -51,6 +51,7 @@ sap.ui.define([
 					"disconnect",
 					"isConnected",
 					"sendMetadataRequest",
+					"sendRequest"
 				],					
 				
 				// events
@@ -78,25 +79,26 @@ sap.ui.define([
 		// Fhem Websocket events send to the Fhem backend service
 		FhemWebSocket.M_PUBLISH_EVENTS = {
 				getMetaData : "getMetaData",
-				getValueOnce : "getValueOnce",  
-				getValueOnChange : "getValueOnChange",
-				getDeviceOnChange : "getDeviceOnChange",
-				getAllValuesOnChange : "getAllValuesOnChange",
-				getAllDevicesOnChange : "getAllDevicesOnChange",
-				getAllValues : "getAllValues",
-				refreshValues : "refreshValues",
-				command : "command"
+				// getValueOnce : "getValueOnce",  
+				// getValueOnChange : "getValueOnChange",
+				// getDeviceOnChange : "getDeviceOnChange",
+				// getAllValuesOnChange : "getAllValuesOnChange",
+				// getAllDevicesOnChange : "getAllDevicesOnChange",
+				// getAllValues : "getAllValues",
+				// refreshValues : "refreshValues",
+				dbLog: "dbLog"                           
 		};
 		
 		// Fhem Websocket events received from the Fhem backend service
 		FhemWebSocket.M_SUBSCRIBE_EVENTS = {
 				getMetaData : "metaData",
 				getMetaDataError : "metaDataError",
-				getValueOnce : "value",
-				getValueOnChange : "value",
-				getAllValuesOnChange : "value",
-				getDeviceOnChange : "device",
-				getAllDevicesOnChange : "device",
+				// getValueOnce : "value",
+				// getValueOnChange : "value",
+				// getAllValuesOnChange : "value",
+				// getDeviceOnChange : "device",
+				// getAllDevicesOnChange : "device",
+				dbLogError: "dbLogError"
 		};		
 		
 				
@@ -148,7 +150,8 @@ sap.ui.define([
 					}
 				}.bind(this)
 			);
-						
+
+									
 			//TODO: ???
 			return this;
 		};
@@ -175,39 +178,67 @@ sap.ui.define([
 
 		
 		/**
+		 * Send a metadata request event to the Fhem backend 
 		 * 
 		 * @public
 		 * @returns {Promise}  
 		 */
 		FhemWebSocket.prototype.sendMetaDataRequest = function() {
 			//TODO: return promise
-
-			// register internal event handler (success) that fires a metaDataLoaded event
-			this._socket.on(FhemWebSocket.M_SUBSCRIBE_EVENTS.getMetaData, function(mData) {
+											
+			// submit event with callback
+			this._socket.emit(FhemWebSocket.M_PUBLISH_EVENTS.getMetaData, null, function(mData) {
 				this.fireMetaDataLoaded(mData);
 				jQuery.sap.log.debug(this + " - metaDataLoaded was fired");
 				return this;				
 			}.bind(this));
 			
-			// register internal event handler (error)
-			//TODO
+			return this;
+		};
+							
+				
+		/**
+		 * Send a WebSocket event to the Fhem backend 
+		 * 
+		 * @param  {object} mSettings
+		 * 			        mSettings.event   {FhemWebSocket.M_PUBLISH_EVENTS}
+		 *                  mSettings.data    event data 
+		 *                  mSettings.success Success handler function fnSuccess(mData)
+		 *                  mSetiings.error   Error handler function fnError(oError)
+		 * @returns {Promise} 
+		 */
+		//TODO: implement as promise
+		//TODO: implement error handler
+		FhemWebSocket.prototype.sendRequest = function(mSettings) {
+			
+			if (!FhemWebSocket.M_PUBLISH_EVENTS[mSettings.event]) {
+				jQuery.sap.log.error(this + " - Unknown Fhem event " + mSettings.event);
+				//TODO: trigger error
+				mSettings.error({
+					sMessage: "Unknown Fhem event " + mSettings.event
+				});
+			}
 			
 			// submit event
-			this._socket.emit(FhemWebSocket.M_PUBLISH_EVENTS.getMetaData, null);
+			this._socket.emit(mSettings.event, mSettings.data, mSettings.success);
 			
-			return this;
+			return true;			
 		};
 
 		
-		// Private section
-		
+		// Private method section
 		
 		/**
-		 * 
-		 * @returns {Promise} 
+		 * Template
 		 */
-		function _sendRequest () {
-			//TODO
+		FhemWebSocket._fooBar = function () {
+			
+		};
+		
+		
+		// Static method section
+		
+		function fooBar() {
 			
 		};
 		

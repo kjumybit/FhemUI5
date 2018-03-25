@@ -9,7 +9,29 @@
 			"version": "1.0.0"
 		},
 		"title": "{{appTitle}}",
-		"description": "{{appDescription}}"
+		"subTitle": "{{appSubTitle}}",
+		"description": "{{appDescription}}",
+		"dataSources": {
+			"sideNavigation": {
+				"uri": "model/NavigationTree.json",
+				"type": "JSON"
+			},
+			"charts": {
+				"uri": "model/ChartConfig.json",
+				"type": "JSON"
+			}			
+		},
+		"openSourceComponents": [
+			{
+                "name": "socket.io",
+                "packagedWithMySelf": true 
+            },		
+            {
+                "name": "Chart.js",
+                "packagedWithMySelf": true 
+            }
+		],		
+		"offline": false
 	},
 
 	"sap.ui": {
@@ -53,16 +75,33 @@
 			}
 		},
 		"contentDensities": {
-			"compact": false,
+			"compact": true,
 			"cozy": true
 		},
+	    "config": {
+    		"chartjsModel": "/model/data_chartjs.json"
+    	},
 		"models": {
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
 					"bundleName": "de.kjumybit.fhem.i18n.i18n"
 				}
-			}
+			},
+			"sideNavigation": {
+				"type": "sap.ui.model.json.JSONModel",
+				"dataSource": "sideNavigation",
+				"settings": {
+					"defaultBindingMode": "OneWay"
+				}				
+			},
+			"chartConfig": {
+				"type": "sap.ui.model.json.JSONModel",
+				"dataSource": "charts",
+				"settings": {
+					"defaultBindingMode": "OneWay"
+				}				
+			}									
 		},
 		"resources": {
 			"css": [
@@ -72,6 +111,11 @@
 				{
 					"uri": "css/fhemfont.css"
 				}				
+			],
+			"js": [
+				{
+		    		"uri": "/libs/Chart.bundle.min.js"
+		      	}
 			]
 		},
 		"routing": {

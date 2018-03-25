@@ -5,6 +5,7 @@
 	xmlns="sap.m"
 	xmlns:l="sap.ui.layout"
 	xmlns:f="sap.ui.layout.form"
+	xmlns:chart="de.kjumybit.fhem.chart"
 	displayBlock="true">
 	<Page id="viewDeviceDetail" title="{i18n>DeviceDetail}">
 		<content>
@@ -139,6 +140,9 @@
 				        
 				    	<!-- Charts -->				        
 				        <IconTabFilter text="Charts" icon="sap-icon://line-chart">
+				        	<VBox id="chart_test">
+            					<!-- width & height only used for ratio of the chart, but not used if control is set to responsive -->
+          					</VBox>				                  							        
 						</IconTabFilter>
 						
 					</items>
