@@ -121,6 +121,7 @@ sap.ui.define([
 		 */
 		FhemService.prototype.refreshServiceMetadata = function(){
 			//TODO return this._loadMetadata();
+			return undefined;
 		};
 
 		
@@ -251,11 +252,11 @@ sap.ui.define([
 				"data": sCommand,
 			    "success": function(oData) {
 					// call application handler
-			    	fnSuccess(oData);
+					fnSuccess(oData);
 				}.bind(this),
 			    "error": function(oError) {
-			    	// call application handler
-			    	fnError(oError);
+					// call application handler
+					fnError(oError);
 			    }.bind(this)
 			});
 		
@@ -288,6 +289,10 @@ sap.ui.define([
 		};
 
 		
+		/**
+		 * 
+		 * @param {Object} oData 
+		 */
 		function _onValueData(oData) {
 			//TODO: evaluate Fhem data type
 			if (oData) {
@@ -296,6 +301,10 @@ sap.ui.define([
 		};
 		
 		
+		/**
+		 * 
+		 * @param {Object} Data 
+		 */
 		function _onDeviceData(Data) {
 			//TODO: evaluate Fhem data type
 			if (oData) {

@@ -53,7 +53,18 @@
       					"pointHighlightStroke": "rgba(220,220,220,1)",
       					"data": [],
       					"fhemDataSource": "StorageTempUpper"
-      				}]
+					  },{
+						"label": "Speichertemp. unten",
+						"fillColor": "rgba(220,220,220,0.2)",
+						"strokeColor": "rgba(220,220,220,1)",
+						"pointRadius": 0,
+						"pointColor": "rgba(220,220,220,1)",
+						"pointStrokeColor": "#fff",
+						"pointHighlightFill": "#fff",
+						"pointHighlightStroke": "rgba(220,220,220,1)",
+						"data": [],
+						"fhemDataSource": "StorageTempLower"
+					}]
       			}										
 			}
 		}
@@ -75,6 +86,12 @@
 				{ "t": "2018-03-01 09:38", "y": 4 },
 				{ "t": "2018-03-01 09:39", "y": 2 }																																				
 			]										
-		}				
+		},
+		"StorageTempLower": {
+			"logDevice": "DB_Log_MariaDB", 
+			"device": "MQTT_D_EBUSD",
+			"reading": "StorageCylLowerTemp",
+			"localData": []
+		}																
 	} 
 }

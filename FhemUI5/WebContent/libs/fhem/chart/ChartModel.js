@@ -10,25 +10,53 @@
 // Provides the Chart.js based model implementation
 sap.ui.define([
 	'jquery.sap.global',
-	"sap/ui/model/ClientModel",	
+	'sap/ui/model/ClientModel',	
 	'sap/ui/model/Context', 
 	'de/kjumybit/fhem/core',
 	'./ChartPropertyBinding'	
 ],
 	function(jQuery, ClientModel, Context, FhemCore, ChartPropertyBinding) {
 	"use strict";
+
+	// statics
+	
+	/**
+	 * the chart configuration 
+	 */
+	var _oCharts = null;
+	var _oDataSources = null;
+	var _bConfigLoadded = false;
+	
+	
+	/**
+	 * Initialize module.
+	 * Load chart configuration.
+	 * 
+	 * @returns {boolean} Configuration loaded
+	 */
+	var _init = function() {
 		
+		let oModel = FhemCore.getChartMetaModel();
+		
+		if (oModel && !_bConfigLoadded) {
+			_oCharts = oModel.getProperty('/charts');
+			_oDataSources = oModel.getProperty('/fhemDataSources');
+			_bConfigLoadded = true;
+		}
+		
+		return _bConfigLoadded;
+	};
+		
+
 	/**
 	 * Constructor for a new ChartModel.
 	 *  
 	 * @class
 	 * Model implementation for Charting data.
 	 *
-	 * A ChartModel is a class which holds data sets for Chart Controls. 
-	 * It provide charting options and data sets which can be bound to properties of a chart control.
-	 * Currentrly supported features:
-	 * - Only the <code>/chartData"</code> property can be bound to charting control
-	 * - All the properties are set by as constructor parameters or by the <code>setProperty</code> method.
+	 * A ChartModel is a class which holds metda data for a set of charts. 
+	 * A sinle chart is accessed using an <code>ID</code> and 
+	 * provides charting options and data sets which can be bound to properties of a chart control.
 	 * 
 	 * @extends sap.ui.model.ClientModel
 	 *
@@ -41,40 +69,27 @@ sap.ui.define([
 	 * @alias de.kjumybit.fhem.chart.ChartModel"
 	 */
 	var ChartModel = ClientModel.extend("de.kjumybit.fhem.chart.ChartModel", /** @lends de.kjumybit.fhem.chart.ChartModel.prototype */ {
-		//TODO: Implement a single chart model for a set of charts (all charts in a config file)
 
 		constructor: function(sChart) {
 			
 			ClientModel.apply(this, arguments);
-			
-			//TODO: a list of DbLog Models is required, depending on the number of Fhem data soruces
-
-			// this._oDbLogModel =
-			this.sChart = sChart;
-			
-			//TODO: check valid chart ID
-			this.oChart = _oCharts[this.sChart];
-			
-			this.sChartType = this.oChart.chartjs.chartType;
-			this.oOptions = this.oChart.chartjs.options;
 
 			// model data (defined in by superclass ClientModel)
-			// TODO: initialize with default values: check binding update
-			this.oData = {
-					"chartData": this.oChart.chartjs.chartData
-			};
+			this.oData = {};
+
+			//TODO: a list of DbLog Models is required, depending on the number of Fhem data soruces
+			//TODO: initialize with default values: check binding update
+
 			this._oMetaModel = null;
 			this.setDefaultBindingMode("OneWay");
-						
-			//TODO: create Fhem Data Source models						
-			//TODO retrieve initial data			
-			this._loadDataSets();
+			
+			_init();
 		},	
 		
 		metadata: {			
 			// methods
 			publicMethods : [
-				"getType", "getData", "getOptions"				
+				"getType", "getData", "getOptions", "getChartsForDevice"
 			],					
 		},
 		
@@ -91,28 +106,82 @@ sap.ui.define([
 		_init();		
 	};
 	
-	
+
 	/**
-	 * Retrieve data sets from Fhem backend and inform all bound UI controls.
+	 * <code>
+	 * oChart: {
+	 * 	   chartName: string,
+	 *     chartType: string,
+	 *     chartOptions: object,
+	 *     chartData: object
+	 * }
+	 * </code>
+	 * @param {string} sChart Chart ID
+	 * @returns {object} Chart object
+	 */
+	ChartModel.prototype._getChart = function(sChart) {
+		
+		let oChart = this.oData[sChart];
+		if (oChart) {
+			return oChart;
+		}
+
+		//TODO: check valid chart ID
+		let oChartConf = _oCharts[sChart];
+
+		// initialize new oChart from configuration
+		oChart = {
+			chartName: sChart,
+			chartType: oChartConf.chartjs.chartType,
+			chartOptions: oChartConf.chartjs.options,
+			chartData: oChartConf.chartjs.chartData
+		}
+		
+		this.oData[sChart] = oChart;
+		
+		//TODO retrieve initial data			
+		this._loadDataSets(oChart);
+
+		return oChart;
+	};
+
+
+	/**
+	 * Retrieve data sets from Fhem backend for a Chart {oChart} and inform all bound UI controls.
+	 * 
+	 * @param {object} oChart Chart definition of a single chart in the chart configuration 
 	 * @private 
 	 */
-	ChartModel.prototype._loadDataSets = function() {
+	ChartModel.prototype._loadDataSets = function(oChart) {
 		//TODO: replace POC
+		//TODO: use promises
 		
-		var fnSuccess = function (oData) {
-			 
-			let oChartData = this.oData.chartData; 
+		//var oThatChart = oChart; hint: not visible within getFnSuccess()
+
+		// on success DBLog query
+		var getFnSuccess = function (oDataSet) {
 			
-			oChartData.datasets[0].data = oData.data.map( function(oReading) { 
-				return { "t": oReading.TIMESTAMP, "y": Number(oReading.VALUE) };
-			});
+			let oMyDataSet = oDataSet;
+
+			return function (oData) {
+				//let oChartData = this.oData[oThatChart.chartName].chartData; 
+			
+				// get data set 
+				//oChartData.datasets[0].data = oData.data.map( function(oReading) { 
+				oMyDataSet.data = oData.data.map( function(oReading) { 
+					return { "t": oReading.TIMESTAMP, "y": Number(oReading.VALUE) };
+				});
 										
-			// update bindings
-			this.checkUpdate();
-		};
+				// update bindings
+				this.checkUpdate();
+			}.bind(this);
+			
+		}.bind(this);
 				
 		
 		let oFhem = FhemCore.getFhemService();
+		let oDataSet = this.oData[oChart.chartName].chartData.datasets[0]; 
+
 		oFhem.callDbLogQuery("DB_Log_MariaDB", {
 			from: { 
 				date: "2018-03-03",
@@ -124,50 +193,68 @@ sap.ui.define([
 			 },
 			 device: "KG_IZ_StromZaehler", 
 			 reading: "energyTagesVerbrauch",
-			 success: fnSuccess.bind(this),				    
+			 success: getFnSuccess.call(this, oDataSet),
 			 error: function(oError) {
-				 
+				 //TODO
 			 }.bind(this)                      				
 		});
 		
 								
 	};
 	
+
+	/**
+	 * Retrieve date from backend for data set <code>oDataSet</code>
+	 * 
+	 * @param {object} oDataSet Dataset of a chart 
+	 * @returns {promises} DBLog backend request
+	 * @private 
+	 */
+	ChartModel.prototype._loadDataSet = function(oDataSet) {
+
+
+		return undefined;
+	};
+
 	
 	/**
-	 * Get chart type.
+	 * Get chart type for chart {Chart ID}.
 	 * 
+	 * @param {string} sChart Chart ID
 	 * @public 
-	 * @returns {string} The chart type. 
+	 * @returns {string} The chart type or undefined.
 	 */
-	ChartModel.prototype.getType = function() {
-		return this.sChartType;
+	ChartModel.prototype.getType = function(sChart) {
+		let oChart = this._getChart(sChart);
+		return oChart && oChart.chartType;
 	};
 	
 
 	/**
-	 * Get chart options.
+	 * Get chart options for chart {Chart ID}.
 	 * 
+	 * @param {string} sChart Chart ID
 	 * @public 
-	 * @returns {object} An bject with display option. 
+	 * @returns {object} Chart display options or undefined.
 	 */
-	ChartModel.prototype.getOptions = function() {
-		return this.oOptions;
+	ChartModel.prototype.getOptions = function(sChart) {
+		let oChart = this._getChart(sChart);		
+		return oChart && oChart.chartOptions;
 	};
 
 
 	/**
-	 * Get chart data containing one or multiple data sets.
+	 * Get chart data containing one or multiple data sets for chart {Chart ID}.
 	 * 
+	 * @param {string} sChart Chart ID
 	 * @public 
 	 * @returns {object} A chart data object.  
 	 */
-	ChartModel.prototype.getData = function() {
-		return this.oData.chartData;
+	ChartModel.prototype.getData = function(sChart) {
+		let oChart = this._getChart(sChart);		
+		return oChart && oChart.chartData;
 	};
 
-	
-	
 		
 	/**
 	 * Sets a new value for the given property <code>sPropertyName</code> in the model.
@@ -175,9 +262,13 @@ sap.ui.define([
 	 *
 	 * @param {string}  sPath path of the property to set
 	 * 					Supported paths are: 
-	 * 						"/chartData"
+	 * 						"/<ChartID>/chartType"
+	 * 						"/<ChartID>/chartOptions"
+	 * 						"/<ChartID>/chartData"
 	 * @param {object} oValue an object in the format expected by the supported path
-	 * 				   "/chartData"       
+	 * 						"/<ChartID>/chartType"
+	 * 						"/<ChartID>/chartOptions"
+	 * 						"/<ChartID>/chartData"
 	 * @param {object} [oContext=null] the context which will be used to set the property
 	 * 				   Not supported yet.
 	 * @param {boolean} [bAsyncUpdate] whether to update other bindings dependent on this property asynchronously
@@ -186,10 +277,27 @@ sap.ui.define([
 	 */
 	ChartModel.prototype.setProperty = function(sPath, oValue, oContext, bAsyncUpdate) {
 		
-		switch (sPath) {
-		case "/chartData":
+		let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/")
+		//TODO: currently no relative paths are supported
+
+		let aPath = sPath.split("/");
+		let sChart = (bIsRelative ? aPath[0] : aPath[1])   
+		let sProperty = (bIsRelative ? aPath[1] : aPath[2])
+
+		let oChart = this._getChart(sChart);
+		//TODO: check valid chart
+
+		// TODO: check type of oData or use specific data type
+		switch (sProperty) {
+		case "chartType":
+			this.oData[sChart].chartType = oValue;
+			break;
+		case "chartOptions":
+			this.oData[sChart].chartOptions = oValue;
+			break;			
+		case "chartData":
 			// TODO: check type of oData or use specific data type
-			this.oData.chartData = oValue;
+			this.oData[sChart].chartData = oValue;
 			break;
 		default:
 			return false;
@@ -213,16 +321,34 @@ sap.ui.define([
 	 * @public
 	 */
 	ChartModel.prototype.getProperty = function(sPath, oContext) {
+
+		let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/")
+		//TODO: currently no relative paths are supported
+
+		let aPath = sPath.split("/");
+		let sChart = (bIsRelative ? aPath[0] : aPath[1])   
+		let sProperty = (bIsRelative ? aPath[1] : aPath[2])
 		let oValue = null;
+
+		let oChart = this._getChart(sChart);
+		//TODO: check valid chart
+
+		// TODO: check type of oData or use specific data type
 		
-		switch (sPath) {
-		case "/chartData":
-			oValue = this.oData.chartData;
+		switch (sProperty) {
+		case "chartType":
+			oValue = oChart.chartType;
+			break;
+		case "chartOptions":
+			oValue = oChart.chartOptions;
+			break;			
+		case "chartData":
+			oValue = oChart.chartData;
 			break;
 		default:
-			break;
+			break
 		}
-		
+			
 		return oValue;
 	};
 	
@@ -236,7 +362,17 @@ sap.ui.define([
 		return oBinding;
 	};
 	
-	
+	/**
+	 * Get list of chart IDs assigned to a Fhem device <code>sDevice</code>.
+	 * @param {string} sDevice Device name
+	 * @public 
+	 * @returns {string[]} Charts assigned to the device <code>sDevice</code>
+	 */
+	ChartModel.prototype.getChartsForDevice = function(sDevice) {
+		return Object.keys(_oCharts).filter(chart => _oCharts[chart].assignedDevices.includes(sDevice)) || [];
+	};
+
+
 	/**
 	 * Sets the meta model associated with this model
 	 *
@@ -253,34 +389,6 @@ sap.ui.define([
 	};
 	
 
-	// statics
-	
-	/**
-	 * the chart configuration 
-	 */
-	var _oCharts = null;
-	var _oDataSources = null;
-	var _bConfigLoadded = false;
-	
-	
-	/**
-	 * Initialize module.
-	 * Load chart configuration.
-	 */
-	var _init = function() {
-		
-		let oModel = FhemCore.getChartMetaModel();
-		
-		if (oModel && !_bConfigLoadded) {
-			_oCharts = oModel.getProperty('/charts');
-			_oDataSources = oModel.getProperty('/fhemDataSources');
-			_bConfigLoadded = true;
-		}
-		
-		return _bConfigLoadded;
-	};
-	
-	
 	return ChartModel;
 	
 }, /* bExport= */ true);

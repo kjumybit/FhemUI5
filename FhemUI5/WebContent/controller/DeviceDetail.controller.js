@@ -6,9 +6,8 @@ sap.ui.define([
 	'sap/ui/model/json/JSONModel',
 	'sap/ui/layout/form/FormElement',
 	'sap/m/Text',
-	'de/kjumybit/fhem/chart/ChartModel',
 	'de/kjumybit/fhem/chart/ChartBase'	
-], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, ChartModel, Chart) {
+], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, Chart) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceDetail", {
@@ -74,11 +73,11 @@ sap.ui.define([
 			// initialization on display view
 			this.onDisplay();
 			
-			var sDeviceId =  oEvent.getParameter("arguments").deviceId;
+			this.sDeviceId =  oEvent.getParameter("arguments").deviceId;
 			
 			// get path to device in Fhem JSON model
 			var aDeviceSet = this.getFhemMetaModel().getProperty('/DeviceSet');
-			var i = this.getArrayIndex('Name', sDeviceId, aDeviceSet);
+			var i = this.getArrayIndex('Name', this.sDeviceId, aDeviceSet);
 		
 			// bind the view to the concrete device
 			this.getView().bindElement('fhemMetaData>/DeviceSet/' + i);
@@ -201,27 +200,29 @@ sap.ui.define([
 		// implement "load" Method in ChartModel class
 		_createChart: function(oVBoxIn) {
 			
-			var oVBox = oVBoxIn;
+			let oVBox = oVBoxIn;
 			oVBox.destroyItems();
+			
+			let aCharts = this.getModel("Charts").getChartsForDevice(this.sDeviceId);
+			//let aCharts = ["HwcStorageTemp"];
 
-			let oChartModel = this.getModel("Charts");
-			if (!oChartModel) {
-				oChartModel=  new ChartModel("HwcStorageTemp");
-				this.setModel(oChartModel, "Charts");
-			}
-			
-			
-			// create chart control with data set binding
-			let oChart = new Chart( {
-				witdh: "400",
-				height: "100",
-				responsive: "true",
-				chartType: oChartModel.getType(),
-				options: oChartModel.getOptions(),
-				data: "{Charts>/chartData}"
+			aCharts.forEach(device => {
+				// create chart control with data set binding
+				let oChart = new Chart( {
+					witdh: "400",
+					height: "100",
+					responsive: "true",
+					chartType: "{Charts>/" + device + "/chartType}",
+					options: "{Charts>/" + device + "/chartOptions}",
+					data: "{Charts>/" + device + "/chartData}"  
+					//chartType: "{Charts>/HwcStorageTemp/chartType}",
+					//options: "{Charts>/HwcStorageTemp/chartOptions}",
+					//data: "{Charts>/HwcStorageTemp/chartData}"  					
+				});				
+
+				oVBox.addItem(oChart);																		
 			});
-				
-			oVBox.addItem(oChart);														
+
 		},
 				
 		

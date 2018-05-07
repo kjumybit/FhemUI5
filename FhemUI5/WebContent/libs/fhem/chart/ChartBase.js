@@ -81,15 +81,15 @@ sap.ui.define([
       var ctx = document.getElementById(CHART_CANVAS_NAME_PREFIX + this.getId()).getContext("2d");
 
 
-      	var chartType = this.getChartType().charAt(0).toLowerCase() + this.getChartType().slice(1);
-      	var chartData = this.getData();
-      	var chartOptions = this.getOptions();
-      	
-      	this._newCustomChart = new Chart(ctx, {
-      			type: chartType,
+        var chartType = this.getChartType().charAt(0).toLowerCase() + this.getChartType().slice(1);
+        var chartData = this.getData();
+        var chartOptions = this.getOptions();
+
+        this._newCustomChart = new Chart(ctx, {
+                type: chartType,
                 data: chartData,
                 options: chartOptions
-      	});
+        });
     },
 
     
@@ -127,7 +127,7 @@ sap.ui.define([
      * Handles <code>update</code> event. 
      */
     update: function(oEvent) {
-    	this._update();
+      this._update();
     },
     
         
@@ -135,7 +135,7 @@ sap.ui.define([
      * Set chart type.
      */
     setChartType: function(sChartType) {
-    	this.setProperty("chartType", sChartType, true);
+      this.setProperty("chartType", sChartType, true);
     },
     
     
@@ -143,7 +143,7 @@ sap.ui.define([
      * Set chart options.
      */
     setOptions: function(oOptions) {
-    	this.setProperty("options", oOptions, true);    	
+      this.setProperty("options", oOptions, true);    	
     },
     
     
@@ -151,7 +151,7 @@ sap.ui.define([
      * Set chart data with one or multipe data sets.
      */
     setData: function(oData) {
-    	this.setProperty("data", oData, true);
+      this.setProperty("data", oData, true);
         this._update();    	
     },
 
@@ -159,12 +159,12 @@ sap.ui.define([
     * update chart
     */
     _update: function() {
-    	// TODO: this._newCustomChart is not instantiated on Init of the control
-    	// the chart.js object should be implemented in constructor instead
-    	if (this._newCustomChart) {
-    		this._newCustomChart.update();
-    	}
-    	
+      // TODO: this._newCustomChart is not instantiated on Init of the control
+      // the chart.js object should be implemented in constructor instead
+      if (this._newCustomChart) {
+        this._newCustomChart.update();
+      }
+      
     }
     
     

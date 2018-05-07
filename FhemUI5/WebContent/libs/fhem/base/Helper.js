@@ -19,11 +19,12 @@ sap.ui.define([
 	
 	/**
 	 * Get array index of property value of an JSON object in an array
-	 * @param sProperty the name of an object property 
-	 * @param value the property value
-	 * @param aArray an array of JSON objects
-	 * @returns iIndex the array index o fthe frist object with mathich property value
-	 *                 or -1, if no object has been found
+	 * 
+	 * @param {string} sProperty the name of an object property 
+	 * @param {any} value the property value
+	 * @param {any[]} aArray an array of JSON objects
+	 * @returns {number} iIndex the array index o fthe frist object with mathich property value
+	 *                    or -1, if no object has been found
 	 */
 	 Helper.getArrayIndex = function (sProperty, value, aArray) {
 		let index = -1;

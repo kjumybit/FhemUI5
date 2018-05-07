@@ -13,20 +13,18 @@ sap.ui.define([
 			 */
 			onInit: function() {
 			
-				if (true) {
-					
-				};
-				
+				this.getView().addStyleClass(this.getOwnerComponent().getContentDensityClass());
+		
 			},
 						
 			
 			/**
 			 * Get array index of property value of an JSON object in an array
-			 * @param sProperty the name of an object property 
-			 * @param value the property value
-			 * @param aArray an array of JSON objects
-			 * @return iIndex the array index o fthe frist object with mathich property value
-			 *                 or -1, if no object has been found
+			 * @param {string} sProperty the name of an object property 
+			 * @param {object} value the property value
+			 * @param {object[]} aArray an array of JSON objects
+			 * @return {number} iIndex the array index o fthe frist object with mathich property value
+			 *                   or -1, if no object has been found
 			 */
 			getArrayIndex: function (sProperty, value, aArray) {
 				var index = -1;
@@ -44,7 +42,7 @@ sap.ui.define([
 			/**
 			 * Set & Get Fhem service model from component property
 			 * 
-			 * @return {de.kjumybit.fhem.service.FhemService}
+			 * @returns {de.kjumybit.fhem.service.FhemService} Fhem Service
 			 */
 			getFhemModel: function () {
 				return this.getOwnerComponent().fhemModel;
@@ -57,11 +55,12 @@ sap.ui.define([
 			
 			/**
 			 * Get JSON Model for Fhem metadata
+			 * @returns {sap.ui.model.json.JSONModel} JSON Model with Fhem metadata
 			 */
 			getFhemMetaModel: function () {
 				let oModel = this.getOwnerComponent().getModel('fhemMetaData');
 				if (!oModel) {
-					jQuery.sap.log.debug("Create new Fhem netadata model", null, _sComponent);					
+					jQuery.sap.log.debug("Create new Fhem metadata model", null, _sComponent);					
 					oModel = new JSONModel();
 					this.getOwnerComponent().setModel(oModel, 'fhemMetaData');
 				}

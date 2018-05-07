@@ -234,14 +234,7 @@ sap.ui.define([
 		FhemWebSocket._fooBar = function () {
 			
 		};
-		
-		
-		// Static method section
-		
-		function fooBar() {
-			
-		};
-		
+				
 				
 		return FhemWebSocket;
 

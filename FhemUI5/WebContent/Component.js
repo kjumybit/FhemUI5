@@ -45,7 +45,7 @@ sap.ui.define([
 			this._registerFhemIcons();
 			
 			// initialize own library
-			fhem.Init(this);		// TODO
+			fhem.init(this);		// TODO
 			
 			//TODO
 									
@@ -79,6 +79,7 @@ sap.ui.define([
 
 		/**
 		 * The content density adapts itself based on the device type
+		 * @returns {string} sContentDensityClass Content Density Class
 		 */
 		getContentDensityClass : function() {
 			if (!this._sContentDensityClass) {
