@@ -69,6 +69,35 @@ sap.ui.define([
 		},
 		
 		
+		/** ================================================================================
+		 *  App event handler
+		 ** ================================================================================ */
+
+		
+		/**
+		 * Handles press on a tile.
+		 * Navigate to the device list view, filtered by the room assigned to the selected
+		 * tile.
+		 * The room ID is stored in the subheader property of the tile.
+		 */
+		onTilePress: function (oEvent) {
+			
+			let oTile = oEvent.getSource();
+			let oRouter = this.getRouter();
+			
+			oRouter.navTo("DeviceList", {
+				"query": {
+					"room": oTile.getSubheader()
+				}
+			}); 				
+		},
+				
+		
+		/** ================================================================================
+		 *  Private functions
+		 ** ================================================================================ */
+		
+		
 		/**
 		 * Create Tile controls for all Fhem rooms. Add properties
 		 * - room name
@@ -76,6 +105,7 @@ sap.ui.define([
 		 * - icon
 		 * - number of devices
 		 */
+		//TODO: replace "Beschreibung" and numeric content
 		_createTiles: function() {
 						
 			var aRooms = this.getFhemModel().getRoomSet();
@@ -101,18 +131,6 @@ sap.ui.define([
 			
 		},
 		
-		
-		/** ================================================================================
-		 *  App event handler
-		 ** ================================================================================ */
-		
-		/**
-		 * Handles Tile press event.
-		 * Navigates to device list for the room.
-		 */
-		onTilePress: function(oEvent) {
 			
-		}
-	
 	});
 });

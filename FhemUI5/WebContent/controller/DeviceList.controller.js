@@ -2,85 +2,119 @@ sap.ui.define([
 	'de/kjumybit/fhem/controller/BaseController',
 	'sap/m/MessagePopover',
 	'sap/m/MessagePopoverItem',
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator",
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(BaseController, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
+], function(BaseController, MessagePopover, MessagePopoverItem, Filter, FilterOperator, Formatter, Grouper) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceList", {
 
 		
-	// init local members
-	formatter: Formatter,
-	grouper: Grouper,
-		
-	/**
-	* Called when a controller is instantiated and its View controls (if available) are already created.
-	* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
-	* @memberOf helloworld.Main
-	*/
-	onInit: function() {
-
-		
-		
-		// initialize message popover
-		var oMessageProcessor = new sap.ui.core.message.ControlMessageProcessor();
-		var oMessageManager = sap.ui.getCore().getMessageManager();
- 
-		oMessageManager.registerMessageProcessor(oMessageProcessor);
-		
-		
-		oMessageManager.addMessages(
-				new sap.ui.core.message.Message({
-					message: "Something wrong happened",
-					type: sap.ui.core.MessageType.Error,
-					processor: oMessageProcessor
-				})
-		);
-		
-		//TODO: only for testing
-		// var oModel = JSON.parse('{ "name" : "hello \u0022world\u0022" }');
-		
-	},
-
-	/**
-	* Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
-	* (NOT before the first rendering! onInit() is used for that one!).
-	* @memberOf helloworld.Main
-	*/
-	//		onBeforeRendering: function() {
-	//
-	//	},
-
-	/**
-	* Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
-	* This hook is the same one that SAPUI5 controls get after being rendered.
-	* @memberOf helloworld.Main
-	*/
-	//		onAfterRendering: function() {
-	//
-	//		},
-
-	/**
-	* Called when the Controller is destroyed. Use this one to free resources and finalize activities.
-	* @memberOf helloworld.Main
-	*/
-	//		onExit: function() {
-	//
-	//		}
-
-	/** ================================================================================
-	 *  App event handler
-	 ** ================================================================================ */
+		// init local members
+		formatter: Formatter,
+		grouper: Grouper,
+			
+		/**
+		* Called when a controller is instantiated and its View controls (if available) are already created.
+		* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
+		* @memberOf helloworld.Main
+		*/
+		onInit: function() {
 	
-	/**
-	 * 
-	 */
-	onItemPress: function(oEvent) {
-		//TODO
-		var oRouter = this.getRouter();
-		oRouter.navTo("DeviceDetail");
-	}
+			// call the base component's init function
+			BaseController.prototype.onInit.apply(this, arguments);
+		
+			this.getRouter().getRoute("DeviceList").attachPatternMatched(this.onDisplay, this);		
+		},
+	
+		
+		/**
+		* Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
+		* (NOT before the first rendering! onInit() is used for that one!).
+		* @memberOf helloworld.Main
+		*/
+		//		onBeforeRendering: function() {
+		//
+		//	},
+	
+		
+		/**
+		 * Called each time the view is displayed (via routing, but not for the root view)
+		 * The view may be called with an optional query parameter, which is used as a filter 
+		 * for displayed devices.
+		 * 
+		 * Supported query parameter (filter parameters): 
+		 * - room		: /DeviceSet/Attributes/room
+		 * - deviceType : /DeviceSet/Internals/TYPE
+		 *
+		 * @param {sap.ui.base.Event} oEvent pattern match event in route 'devicedetail' 
+		 */
+		onDisplay: function(oEvent) {
+			
+			let oArgs = oEvent.getParameter("arguments");
+			let oQuery = oArgs["?query"];
+			let aFilter = [];
+			
+			if (oQuery) {
+				// prepare filter value				
+				if (oQuery.deviceType) {
+					aFilter.push(new Filter("Internals/TYPE", FilterOperator.Contains, oQuery.deviceType));
+				} else if (oQuery.room) {
+					aFilter.push(new Filter("Attributes/room", FilterOperator.Contains, oQuery.room));					
+				} 				
+			}
+			 
+			// set filter for table item binding
+			let oTable = this.byId("tblDeviceList");
+			let oBinding = oTable.getBinding("items");
+			oBinding.filter(aFilter);
+			
+		},
+				
+		
+		/**
+		* Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
+		* This hook is the same one that SAPUI5 controls get after being rendered.
+		* @memberOf helloworld.Main
+		*/
+		//		onAfterRendering: function() {
+		//
+		//		},
+	
+		
+		/**
+		* Called when the Controller is destroyed. Use this one to free resources and finalize activities.
+		* @memberOf helloworld.Main
+		*/
+		//		onExit: function() {
+		//
+		//		}
+	
+		/** ================================================================================
+		 *  App event handler
+		 ** ================================================================================ */
+		
+		
+		/**
+		 * Handle device item selection. 
+		 * Show device detail. 
+		 */
+		onItemPress: function(oEvent) {
+			// the source is the table list item that got pressed 
+			this._showDeviceDetail(oEvent.getSource());
+		},
+		
+		
+		/**
+		 * Navigates to the detail view of the selected device.
+		 */
+		_showDeviceDetail: function(oDevice) {
+			this.getRouter().navTo("DeviceDetail", {
+				deviceId: oDevice.getBindingContext("fhemMetaData").getProperty("Name")
+			});
+		}
 	
 	});
 });

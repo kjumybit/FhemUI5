@@ -91,7 +91,7 @@ fhem.core = (new function fhemCore() {
 				oService._bConnected = false;
 				// call back error function
 				if (oService._oHandler.fnOnErrorFhemConnection) 
-					oService._oHandler.fnOnErrorFhemConnection();
+					oService._oHandler.fnOnErrorFhemConnection(oService._oHandler.oListener);
 			}
 		})(this));
 		
@@ -114,21 +114,26 @@ fhem.core = (new function fhemCore() {
 			return function() { 
 				oService._bConnected = false;
 				if (oService._oHandler.fnOnDisconnect) 
-					oService._oHandler.fnOnDisconnect();
+					oService._oHandler.fnOnDisconnect(oService._oHandler.oListener);
 
 			}
 		})(this));
 		
 		
+		Service.prototype.disconnect = function(args) {
+			this._socket.disconnect();
+			return this;
+		};
+		
 		Service.prototype.registerEventHandler = function(sEvent, fnCallback, oListener) {
 			this._socket.on(sEvent, fnCallback.bind(oListener));
 			return this;
-		}
+		};
 		
 		Service.prototype.sendEvent = function(sEvent, sData) {
 			this._socket.emit(sEvent);
 			return this;
-		}
+		};
 	}
 	
 			
@@ -151,7 +156,8 @@ fhem.model = (function fhemModel() {
 
 	/**
 	 * Receive device meta data from backend, store it in the model instance and
-	 * inform model change listeners
+	 * inform model change listeners via OpenUI5 events.
+	 * Called by fhem.core.Service ws connection handler.
 	 */
 	function _onMetaData(oData) {
 		if (oData) {
@@ -174,11 +180,16 @@ fhem.model = (function fhemModel() {
 		}
 	}
 
+	/**
+	 * Handle successful Fhem connection
+	 * Retrieve Fhem metadata via web socket connection.
+	 */
 	function _onSuccessFhemConnection(oFhemBaseModel) {
 		//TODO: evaluate Fhem data type
 
+		// register WS event handler for Fhem metadata event
 		oFhemBaseModel._fhemService.registerEventHandler(fhem.core.SubscribeEvent.getMetaData, _onMetaData, oFhemBaseModel);
-		// retrieve meta data from backend
+		// retrieve meta data from Fhem backend (fire ws metadata event)
 		oFhemBaseModel._fhemService.sendEvent(fhem.core.PublishEvent.getMetaData, null);
 	}
 	
@@ -188,12 +199,16 @@ fhem.model = (function fhemModel() {
 	
 
 	function _onFhemDisconnect(oFhemBaseModel) {
-		//TODO: evaluate Fhem data type
+		oFhemBaseModel.fireEvent("connectionClosed");
+		//TODO refresh internal data
 	}
 
 	
 	//var Model = (new function FhemModel() {
 	//TODO: describe mParameters
+	/**
+	 * 
+	 */
 	function Model(mParameters) {
 		//TODO: use new class (type) for FHEM metadata
 		
@@ -221,28 +236,34 @@ fhem.model = (function fhemModel() {
 			                        onSuccessFhemConnection: _onSuccessFhemConnection,
 			                        oListener: this
 		})
+		
+		//TODO: Test data: call this._onMetaData(oData) with imported mock data
 	};
 	
 	
+	Model.prototype.disconnect = function () {
+		this._fhemService.disconnect(null);
+	};
+	
 	Model.prototype.getMetaData = function () {
 		return this.mFhemMetaData;
-	}
+	};
 	
 	Model.prototype.getRoomSet = function () {
 		return this.mFhemMetaData.RoomSet;
-	}
+	};
 	
 	Model.prototype.getDeviceTypeSet = function () {
 		return this.mFhemMetaData.DeviceTypeSet;
-	}
+	};
 
 	Model.prototype.getDeviceSubTypeSet = function () {
 		return this.mFhemMetaData.DeviceTypeSet;
-	}
+	};
 	
 	Model.prototype.getDeviceSet = function () {
 		return this.mFhemMetaData.DeviceSet;
-	}
+	};
 	
 	Model.prototype.sendCommand = function () {
 		//TODO
@@ -279,7 +300,7 @@ fhem.model = (function fhemModel() {
 	};
 
 	Model.prototype.attachConnectionClosed = function(oData, fnFunction, oListener) {
-		this.attachEvent("connectionCloses", oData, fnFunction, oListener);
+		this.attachEvent("connectionClosed", oData, fnFunction, oListener);
 		return this;						
 	};
 	

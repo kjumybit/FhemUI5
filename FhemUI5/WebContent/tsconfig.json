@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "amd",
+        "experimentalDecorators": true,
+        "alwaysStrict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "sourceMap": true,
+        "baseUrl": "./",
+        "paths": {
+            "de/kjumybit/fhem/*": [ "./*" ],
+            "sap/*": [ "../ui5-exports/sap/*" ]
+        }
+    },
+    "files": [
+        "../node_modules/ui5ts/ui5ts.d.ts",
+        "../ui5-types/1.52/sap.d.ts",
+        "../ui5-types/1.52/jQuery.d.ts"
+    ],
+    "include": [
+        "./**/*",
+        "../node_modules/@types"
+    ],
+    "exclude": [
+        "../node_modules",
+        "**/*.spec.ts"
+    ]
+}

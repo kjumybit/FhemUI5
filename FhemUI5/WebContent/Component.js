@@ -1,10 +1,14 @@
 sap.ui.define([ 
 	"sap/ui/core/UIComponent", 
-	"sap/ui/Device",
-	"sap/ui/model/json/JSONModel", 
+	"sap/ui/Device", 
+	"jquery.sap.global",
+	"de/kjumybit/fhem/core",
 	"de/kjumybit/fhem/model/models",
-	"sap/ui/core/IconPool"	
-], function(UIComponent, Device, JSONModel, Models, IconPool) {
+	"sap/ui/model/json/JSONModel",	
+	"sap/ui/core/IconPool",
+	"de/kjumybit/fhem/libs/Settings",
+	"de/kjumybit/fhem/service/FhemService"
+], function(UIComponent, Device, jQuery, fhem, Models, JSONModel, IconPool, Settings, FhemService) {
 	"use strict";
 
 	return UIComponent.extend("de.kjumybit.fhem.Component", {
@@ -28,144 +32,27 @@ sap.ui.define([
 			// create the views based on the url/hash
 			this.getRouter().initialize();
 
-			// initialize component runtime state and model
-			this.oState = {
-					fhemConnection : {
-						hasParameters : false,
-						isConnected : false,
-					}
-			};
-			var oStateModel = new JSONModel(this.oState);
-			this.setModel(oStateModel, "runtime");
+			// initialize component runtime state model
+			this.setModel(Models.createRuntimeModel(), "runtime");
 			
 			// set the device model
 			this.setModel(Models.createDeviceModel(), "device");
-
-			// set the initial side navigation model (level 1)
-			this.setModel(Models.createSideNavigationModel(), "sideNavigation");
 			
 			// set the local app configuration model
-			var oAppSettingsModel = Models.createAppSettingsModel();
-			this.setModel(oAppSettingsModel, "settings" );
-
-			// connect to Fhem backend server and get metadata model
-			if ( oAppSettingsModel.getProperty("/server/host") && 
-				 oAppSettingsModel.getProperty("/server/port") ) {
-				
-				this.oState.fhemConnection.hasParameters = true;
-				this._getFhemModel();
-			}
+			this.oSettings = new Settings(); 
+			this.setModel(this.oSettings.getModel(), "settings" );
 			
 			this._registerFhemIcons();
-		},
-
-		/**
-		 * The content density adapts itself based on the device type
-		 */
-		getContentDensityClass : function() {
-			if (!this._sContentDensityClass) {
-				if (!sap.ui.Device.support.touch) {
-					this._sContentDensityClass = "sapUiSizeCompact";
-				} else {
-					this._sContentDensityClass = "sapUiSizeCozy";
-				}
-			}
-			return this._sContentDensityClass;
+			
+			// initialize own library
+			fhem.init(this);		// TODO
+			
+			//TODO
+									
+			jQuery.sap.log.setLevel(jQuery.sap.log.Level.DEBUG);
 		},
 		
 						
-		/**
-		 * Establish connection to Fhem backend server 
-		 */
-		_getFhemModel : function () {
-			
-			jQuery.sap.require("fhem.model");
-					
-			this._fhemModel = new fhem.model.Model({
-				host: 'localhost', port: '8086',
-				onConnection: this._onFhemConnection.bind(this),
-				onMetaDataLoaded: this._onMetaDataLoaded.bind(this),
-				onConnectionFailed: this._onErrorFhemConnection.bind(this),
-				onDisconnected: this._onFhemDisconnect.bind(this)			
-			});
-			
-		},
-
-		_onFhemConnection : function(oEvent) {
-			this._setRuntimeFhemConnectionState(false);
-		},
-
-		
-		_onErrorFhemConnection : function(oEvent) {
-			this._setRuntimeFhemConnectionState(false);
-		},
-		
-		_onFhemDisconnect : function(oEvent) {
-			this._setRuntimeFhemConnectionState(false);
-		},
-
-		
-		/**
-		 * Handle Fhem metadata 
-		 * Set & update local models
-		 * - Fhem data model
-		 * - Side navigation model 
-		 */
-		_onMetaDataLoaded : function(oEvent) {
-			
-			this._setRuntimeFhemConnectionState(true);
-			var oModel = new JSONModel();
-			oModel.setData(this._fhemModel.getMetaData());
-			// oModel.loadData("model/fhemJsonList2.json"); // local testing
-			this.setModel(oModel, "fhemMetaData" );  
-			this._setSideNavModelfromFhem();
-		},
-		
-		
-		/**
-		 * update Fhem connection state in runtime model 
-		 */
-		_setRuntimeFhemConnectionState: function( bConnected ) {
-			
-			this.oState.fhemConnection.isConnected = bConnected;
-			var oModel = this.getModel("runtime");
-			oModel.setProperty("/fhemConnection/isConnected", bConnected);
-		},
-		
-		
-		/**
-		 * Set sideNavigation model with Fhem metadata
-		 * - Groups (TODO)
-		 * - Rooms
-		 * - Device Types
-		 * - Device Sub Types 
-		 */
-		_setSideNavModelfromFhem: function() {
-			
-			var oFhemData = this._fhemModel.getMetaData();
-			var oNavModel = this.getModel("sideNavigation");
-			var oNavItems = oNavModel.getProperty("/appNavTree/dynamicItems");
-			
-			// iterate over all main navigation items (Fhem categories) and
-			// add Fhem category items as sub item to the current main navigation item
-			for (var i=0, iL=oNavItems.length; i<iL; i++ ) {
-				if (oNavItems[i].fhemModelRef.setName) {
-					
-					oNavItems[i].items = [];	
-					var aFhemItems = oFhemData[oNavItems[i].fhemModelRef.setName];
-					if (!aFhemItems) continue;
-					
-					for (var j=0, jL=aFhemItems.length; j<jL; j++) {
-						oNavItems[i].items.push({
-							"itemId": (oNavItems[i].fhemModelRef.nameProperty ? aFhemItems[j][oNavItems[i].fhemModelRef.nameProperty] : aFhemItems[j] ) 
-						});
-					}
-				}
-			}
-			// update navigation model
-			oNavModel.setProperty("/appNavTree/dynamicItems", oNavItems);
-		},
-		
 		
 		/**
 		 * Register custom Fhem icon font at SAPUI5 core
@@ -188,7 +75,23 @@ sap.ui.define([
 			IconPool.addIcon("measure_voltage", "fhem", "fhem","\e93d");
 			IconPool.addIcon("measure_water_meter", "fhem", "fhem","\e93e");
 			IconPool.addIcon("message_light_intensity", "fhem", "fhem","\e93f");
+		},
+
+		/**
+		 * The content density adapts itself based on the device type
+		 * @returns {string} sContentDensityClass Content Density Class
+		 */
+		getContentDensityClass : function() {
+			if (!this._sContentDensityClass) {
+				if (!sap.ui.Device.support.touch) {
+					this._sContentDensityClass = "sapUiSizeCompact";
+				} else {
+					this._sContentDensityClass = "sapUiSizeCozy";
+				}
+			}
+			return this._sContentDensityClass;
 		}
+
 		
 	});
 })
