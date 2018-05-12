@@ -30,6 +30,7 @@
 				<!--
 					Device actions 
 				 -->
+				<!--
 				<OverflowToolbar width="100%" design="Solid">					
 				    <content>					
 				        <Text text="Aktionstasten" />					
@@ -37,6 +38,7 @@
 				        <Switch />
 				    </content>					
 				</OverflowToolbar>
+				-->
 
 				<!--
 					Device Details 

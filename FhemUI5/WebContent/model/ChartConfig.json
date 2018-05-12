@@ -10,6 +10,10 @@
 				"options": {
 					"responsive": true,
 					"maintainAspectRatio": true,
+					"title": {
+						"text": "Warmwasserspeicher",
+						"display": true
+					},
 					"layout": {
             			"padding": {
                 			"left": 5,
@@ -22,46 +26,50 @@
 						"xAxes": [{
                 			"type":	"time",
                 			"time": {
-                				"isoWeekday": true,
+								"isoWeekday": true,
+								"minUnit": "minute",
                     			"displayFormats": {
                     				"second": "H:mm:ss",
                     				"minute": "H:mm",
                         			"hour": "H",
-                        			"day": "MMM D"
+									"day": "MMM D",
+									"week": "ll", 
+									"month": "MMM YYYY", 
+									"quarter": "[Q]Q - YYYY",
+									"year": "YYYY"
                     			}
                     		},
-                			"distribution": "series",
-                			"bounds": "data"
+                			"distribution": "linear",
+							"bounds": "data",
+							"ticks": {
+								"source": "auto",
+								"major": {
+									 "enabled": true
+							 	}						   
+							}          								 
             			}],
             			"yAxes": [{
-            				"offset": true
-            			}],
-               			"ticks": {
-               				"source": "auto"
-               			}            			
+							"offset": true,
+							"scaleLabel": {
+								"display": true,
+								"labelString": "Temperatur"
+							}
+            			}]
         			}
 				},							
 				"chartData": {
     				"datasets": [{
       					"label": "Speichertemp. oben",
-      					"fillColor": "rgba(220,220,220,0.2)",
-      					"strokeColor": "rgba(220,220,220,1)",
+      					"fillColor": "rgba(154,132,132,0.2)",
+      					"strokeColor": "rgba(154,132,132,1)",
       					"pointRadius": 0,
-      					"pointColor": "rgba(220,220,220,1)",
-      					"pointStrokeColor": "#fff",
-      					"pointHighlightFill": "#fff",
-      					"pointHighlightStroke": "rgba(220,220,220,1)",
       					"data": [],
       					"fhemDataSource": "StorageTempUpper"
 					  },{
 						"label": "Speichertemp. unten",
 						"fillColor": "rgba(220,220,220,0.2)",
 						"strokeColor": "rgba(220,220,220,1)",
-						"pointRadius": 0,
-						"pointColor": "rgba(220,220,220,1)",
-						"pointStrokeColor": "#fff",
-						"pointHighlightFill": "#fff",
-						"pointHighlightStroke": "rgba(220,220,220,1)",
+						"pointRadius": 0,						
 						"data": [],
 						"fhemDataSource": "StorageTempLower"
 					}]

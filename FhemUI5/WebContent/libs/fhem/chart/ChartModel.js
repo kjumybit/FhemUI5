@@ -13,9 +13,10 @@ sap.ui.define([
 	'sap/ui/model/ClientModel',	
 	'sap/ui/model/Context', 
 	'de/kjumybit/fhem/core',
-	'./ChartPropertyBinding'	
+	'./ChartPropertyBinding',
+	'moment'
 ],
-	function(jQuery, ClientModel, Context, FhemCore, ChartPropertyBinding) {
+	function(jQuery, ClientModel, Context, FhemCore, ChartPropertyBinding, moment) {
 	"use strict";
 
 	// statics
@@ -146,6 +147,19 @@ sap.ui.define([
 	};
 
 
+	/** Returns definition for Fhem data source <code>sFhemDataSource</code> 
+	 * 
+	 * @param {string} sFhemDataSource Name of the data source
+	 * @return {object} Data source definition or undefined
+	 * @private
+	 */
+	ChartModel.prototype._getFhemDataSource = function(sFhemDataSource) {
+		//TODO check valid Fhem data source
+		//TODO use DbLogModel
+		return _oDataSources[sFhemDataSource];
+	};
+
+
 	/**
 	 * Retrieve data sets from Fhem backend for a Chart {oChart} and inform all bound UI controls.
 	 * 
@@ -153,52 +167,29 @@ sap.ui.define([
 	 * @private 
 	 */
 	ChartModel.prototype._loadDataSets = function(oChart) {
-		//TODO: replace POC
-		//TODO: use promises
+						
+		// retrieve time series data (datasets) from backend
+		let that = this;
+		let pDataLoaded = oChart.chartData.datasets.map(that._loadDataSet.bind(that));
 		
-		//var oThatChart = oChart; hint: not visible within getFnSuccess()
+		Promise.all(pDataLoaded).then(function (aData) {
 
-		// on success DBLog query
-		var getFnSuccess = function (oDataSet) {
-			
-			let oMyDataSet = oDataSet;
+			//jQuery.sap.require("moment");
 
-			return function (oData) {
-				//let oChartData = this.oData[oThatChart.chartName].chartData; 
-			
-				// get data set 
-				//oChartData.datasets[0].data = oData.data.map( function(oReading) { 
-				oMyDataSet.data = oData.data.map( function(oReading) { 
+			aData.forEach(function(oData) {
+				oData.dataSet.data = oData.dbLogData.data.map( function(oReading) { 
 					return { "t": oReading.TIMESTAMP, "y": Number(oReading.VALUE) };
-				});
-										
-				// update bindings
-				this.checkUpdate();
-			}.bind(this);
-			
-		}.bind(this);
-				
-		
-		let oFhem = FhemCore.getFhemService();
-		let oDataSet = this.oData[oChart.chartName].chartData.datasets[0]; 
+				});										
+			})
 
-		oFhem.callDbLogQuery("DB_Log_MariaDB", {
-			from: { 
-				date: "2018-03-03",
-				time: "00:00:00"
-			 },
-			 to: {
-					date: "2018-03-03",
-					time: "23:59:59"
-			 },
-			 device: "KG_IZ_StromZaehler", 
-			 reading: "energyTagesVerbrauch",
-			 success: getFnSuccess.call(this, oDataSet),
-			 error: function(oError) {
-				 //TODO
-			 }.bind(this)                      				
+		}).catch(function(error) {
+			// TODO: raise Error
+			// update bindings
+			that.checkUpdate();
+		}).then(function() {
+			// update bindings
+			that.checkUpdate();
 		});
-		
 								
 	};
 	
@@ -207,13 +198,37 @@ sap.ui.define([
 	 * Retrieve date from backend for data set <code>oDataSet</code>
 	 * 
 	 * @param {object} oDataSet Dataset of a chart 
-	 * @returns {promises} DBLog backend request
+	 * @returns {promises} DbLog backend request
 	 * @private 
 	 */
 	ChartModel.prototype._loadDataSet = function(oDataSet) {
 
+		let oMyDataSet = oDataSet;
+		let oFhem = FhemCore.getFhemService();
+		let oFhemDS = this._getFhemDataSource(oDataSet.fhemDataSource);
 
-		return undefined;
+		return new Promise(function(resolve, reject) {
+
+			//jQuery.sap.require("moment");
+
+			oFhem.callDbLogQuery(oFhemDS.logDevice, {
+				from: { 
+					date: moment().format("YYYY-MM-DD"),
+					time: "00:00:00"
+				},
+				to: {
+						date: moment().format("YYYY-MM-DD"),
+						time: moment().format("HH:MM:SS")
+				},
+				device: oFhemDS.device, 
+				reading: oFhemDS.reading,
+				success: function(oDbLogData) { 
+					//TODO: use new class
+					resolve( { dataSet: oMyDataSet, dbLogData: oDbLogData } ) 
+				},
+				error: reject
+			});
+		});
 	};
 
 	
@@ -290,14 +305,14 @@ sap.ui.define([
 		// TODO: check type of oData or use specific data type
 		switch (sProperty) {
 		case "chartType":
-			this.oData[sChart].chartType = oValue;
+			oChart.chartType = oValue;
 			break;
 		case "chartOptions":
-			this.oData[sChart].chartOptions = oValue;
+			oChart.chartOptions = oValue;
 			break;			
 		case "chartData":
 			// TODO: check type of oData or use specific data type
-			this.oData[sChart].chartData = oValue;
+			oChart.chartData = oValue;
 			break;
 		default:
 			return false;

@@ -49,7 +49,7 @@ sap.ui.define([
      * 
      */
     init: function() {
-      var _newCustomChart;
+      this._newCustomChart = null;
     },
 
     
@@ -84,7 +84,7 @@ sap.ui.define([
         var chartType = this.getChartType().charAt(0).toLowerCase() + this.getChartType().slice(1);
         var chartData = this.getData();
         var chartOptions = this.getOptions();
-
+       
         this._newCustomChart = new Chart(ctx, {
                 type: chartType,
                 data: chartData,
