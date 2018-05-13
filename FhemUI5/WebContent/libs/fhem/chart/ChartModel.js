@@ -14,13 +14,17 @@ sap.ui.define([
 	'sap/ui/model/Context', 
 	'de/kjumybit/fhem/core',
 	'./ChartPropertyBinding',
+	'../dblog/DbLogModel',
+	'./TimeLine',
 	'moment'
 ],
-	function(jQuery, ClientModel, Context, FhemCore, ChartPropertyBinding, moment) {
+	function(jQuery, ClientModel, Context, FhemCore, ChartPropertyBinding, DbLogModel, TimeLine, moment) {
 	"use strict";
 
 	// statics
 	
+	var _sComponent = "de.kjumybit.fhem.chart.ChartModel";
+
 	/**
 	 * the chart configuration 
 	 */
@@ -115,6 +119,14 @@ sap.ui.define([
 	 *     chartType: string,
 	 *     chartOptions: object,
 	 *     chartData: object
+	 * 	   chartCtrl: {
+	 *        time: {
+	 *           from: Date (Moment),
+	 *           to: Date (Moment),
+	 *           resolution: hour, day, week, month
+	 *           level: 
+	 * 		  }
+	 *     } 
 	 * }
 	 * </code>
 	 * @param {string} sChart Chart ID
@@ -131,16 +143,21 @@ sap.ui.define([
 		let oChartConf = _oCharts[sChart];
 
 		// initialize new oChart from configuration
+		//TODO; use own Class <code>DataSourceBinding</code> to DbLogModel
 		oChart = {
 			chartName: sChart,
 			chartType: oChartConf.chartjs.chartType,
 			chartOptions: oChartConf.chartjs.options,
-			chartData: oChartConf.chartjs.chartData
+			chartData: oChartConf.chartjs.chartData,
+			chartCtrl: {
+				time: new TimeLine(oChartConf.control.time)
+			},
+			dataSourceBinding: []
 		}
 		
 		this.oData[sChart] = oChart;
 		
-		//TODO retrieve initial data			
+		//TODO retrieve initial data
 		this._loadDataSets(oChart);
 
 		return oChart;
@@ -168,13 +185,14 @@ sap.ui.define([
 	 */
 	ChartModel.prototype._loadDataSets = function(oChart) {
 						
-		// retrieve time series data (datasets) from backend
+		// retrieve time series data (datasets) from backend for all data sets 
 		let that = this;
-		let pDataLoaded = oChart.chartData.datasets.map(that._loadDataSet.bind(that));
+		let pDataLoaded = oChart.chartData.datasets.map(function(oDataSet) {
+			// return promise
+			return that._loadDataSet(oDataSet, oChart.chartCtrl.time);
+		}.bind(that));
 		
 		Promise.all(pDataLoaded).then(function (aData) {
-
-			//jQuery.sap.require("moment");
 
 			aData.forEach(function(oData) {
 				oData.dataSet.data = oData.dbLogData.data.map( function(oReading) { 
@@ -183,9 +201,9 @@ sap.ui.define([
 			})
 
 		}).catch(function(error) {
+			jQuery.sap.log.error("loadDataSets: " + error, null, _sComponent);			
 			// TODO: raise Error
-			// update bindings
-			that.checkUpdate();
+
 		}).then(function() {
 			// update bindings
 			that.checkUpdate();
@@ -198,19 +216,46 @@ sap.ui.define([
 	 * Retrieve date from backend for data set <code>oDataSet</code>
 	 * 
 	 * @param {object} oDataSet Dataset of a chart 
+	 * @param {de.kjumybit.fhem.chart.TimeLine} oTimeLine Time intervall for data points
 	 * @returns {promises} DbLog backend request
 	 * @private 
 	 */
-	ChartModel.prototype._loadDataSet = function(oDataSet) {
+	ChartModel.prototype._loadDataSet = function(oDataSet, oTimeLine) {
 
 		let oMyDataSet = oDataSet;
-		let oFhem = FhemCore.getFhemService();
+		let oMyTimeLine = oTimeLine;
+
+		// let oFhem = FhemCore.getFhemService();
+		//TODO: create & save DataSourceBinding
 		let oFhemDS = this._getFhemDataSource(oDataSet.fhemDataSource);
+		let oDbLog = new DbLogModel({
+			"logDevice": oFhemDS.logDevice,
+			"device": oFhemDS.device,
+	        "reading": oFhemDS.reading
+		});
 
 		return new Promise(function(resolve, reject) {
 
-			//jQuery.sap.require("moment");
+			let oFromDate = oMyTimeLine.getFromDate();
+			let oToDate = oMyTimeLine.getToDate();
 
+			oDbLog.load({
+				from: { 
+					date: oFromDate.format("YYYY-MM-DD"),
+					time: oFromDate.format("HH:mm:ss")
+				},
+				to: {
+						date: oToDate.format("YYYY-MM-DD"),
+						time: oToDate.format("HH:mm:ss")
+				},
+				success: function(oDbLogData) { 
+					//TODO: use new class
+					resolve( { dataSet: oMyDataSet, dbLogData: oDbLogData } ) 
+				},
+				error: reject				
+			});
+
+			/*
 			oFhem.callDbLogQuery(oFhemDS.logDevice, {
 				from: { 
 					date: moment().format("YYYY-MM-DD"),
@@ -228,6 +273,7 @@ sap.ui.define([
 				},
 				error: reject
 			});
+			*/
 		});
 	};
 

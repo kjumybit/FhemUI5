@@ -74,6 +74,14 @@
 						"fhemDataSource": "StorageTempLower"
 					}]
       			}										
+			},
+			"control": {
+				"time": {
+					"fromKey": "todayStart",
+					"toKey": "todayNow",
+					"resolution": "day",
+					"size": 1
+				}
 			}
 		}
 	},

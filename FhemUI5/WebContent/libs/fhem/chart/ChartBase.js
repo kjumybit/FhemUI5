@@ -14,7 +14,7 @@ sap.ui.define([
           defaultValue: 400
         },
         height: {
-          tyoe: 'int',
+          type: 'int',
           defaultValue: 400
         },
         responsive: {
@@ -31,10 +31,12 @@ sap.ui.define([
           bindable : "bindable"
         },
         data: {
-          type: 'object', bindable : "bindable"
+          type: 'object', 
+          bindable : "bindable"
         },
         options: {
-          type: 'object', bindable : "bindable"
+          type: 'object', 
+          bindable : "bindable"
         }
       },
       events: {
