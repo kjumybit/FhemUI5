@@ -94,7 +94,7 @@ sap.ui.define([
 		metadata: {			
 			// methods
 			publicMethods : [
-				"getType", "getData", "getOptions", "getChartsForDevice"
+				"getType", "getData", "getOptions", "getChartsForDevice", "getChart", "shiftBack", "shiftForth", "shiftBackLong", "shiftForthLong"
 			],					
 		},
 		
@@ -120,12 +120,7 @@ sap.ui.define([
 	 *     chartOptions: object,
 	 *     chartData: object
 	 * 	   chartCtrl: {
-	 *        time: {
-	 *           from: Date (Moment),
-	 *           to: Date (Moment),
-	 *           resolution: hour, day, week, month
-	 *           level: 
-	 * 		  }
+	 *        time: TimeLine
 	 *     } 
 	 * }
 	 * </code>
@@ -193,8 +188,10 @@ sap.ui.define([
 		}.bind(that));
 		
 		Promise.all(pDataLoaded).then(function (aData) {
+			jQuery.sap.log.info("loadDataSets: processing " + aData.length + " data sets", null, _sComponent);
 
 			aData.forEach(function(oData) {
+				//Hint: Use setProperty Or force update
 				oData.dataSet.data = oData.dbLogData.data.map( function(oReading) { 
 					return { "t": oReading.TIMESTAMP, "y": Number(oReading.VALUE) };
 				});										
@@ -205,8 +202,17 @@ sap.ui.define([
 			// TODO: raise Error
 
 		}).then(function() {
-			// update bindings
-			that.checkUpdate();
+			// force update bindings
+
+			let oAxes = oChart.chartOptions.scales.xAxes[0];
+			oAxes.scaleLabel = oAxes.scaleLabel || { };
+			let oFromDate = oChart.chartCtrl.time.getFromDate();
+			let oToDate = oChart.chartCtrl.time.getToDate();
+
+			oAxes.scaleLabel.display = true;
+			oAxes.scaleLabel.labelString = oFromDate.format("DD.MM. HH:mm:ss") + " - " + oToDate.format("DD.MM. HH:mm:ss");
+
+			that.checkUpdate(true);
 		});
 								
 	};
@@ -277,7 +283,60 @@ sap.ui.define([
 		});
 	};
 
+	/**
+	 * Get chart 
+	 * @param {string} sChart Chart ID
+	 * @returns {object} Chart object
+	 */
+	ChartModel.prototype.getChart = function(sChart) {
+		return this._getChart(sChart);
+	};
 	
+
+	/**
+	 * Shift time interval back
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftBack = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.BackShort);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval forth
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftForth = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.ForthShort);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval back using a long distance
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftBackLong = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.BackLong);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval forth using a long distance
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftForthLong = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.BackForth);
+		this._loadDataSets(oChart);
+	};
+
+
 	/**
 	 * Get chart type for chart {Chart ID}.
 	 * 

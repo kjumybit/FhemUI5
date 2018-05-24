@@ -107,7 +107,7 @@ sap.ui.define([
      * 
      */
     renderer: function(oRm, oControl) {
-      var oBundle = oControl.getModel('i18n').getResourceBundle();
+      //var oBundle = oControl.getModel('i18n').getResourceBundle();
       var width = oControl.getWidth();
       var height = oControl.getHeight();
 
@@ -146,6 +146,7 @@ sap.ui.define([
      */
     setOptions: function(oOptions) {
       this.setProperty("options", oOptions, true);    	
+      this._update();    	//TODO
     },
     
     
@@ -154,7 +155,7 @@ sap.ui.define([
      */
     setData: function(oData) {
       this.setProperty("data", oData, true);
-        this._update();    	
+      this._update();    	
     },
 
    /**

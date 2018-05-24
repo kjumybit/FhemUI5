@@ -63,13 +63,24 @@ sap.ui.define([
 	/**
 	 * Get Fhem Service
 	 *  
-	 * @returns {de.kjumybit.fhem.service.FhemService} oFhemService Fhem backend service
+	 * @returns {de.kjumybit.fhem.service.FhemService} Fhem backend service
 	 * @public
 	 */
-	 core.getFhemService = function () {
+	core.getFhemService = function () {
 		return _oMyComponent.fhemModel;
 	};
 	
+
+	/**
+	 * Get Chart Model
+	 *  
+	 * @returns {de.kjumybit.fhem.chart.ChartModel} Chart Model
+	 * @public
+	 */
+	core.getChartModel = function () {
+		return _oMyComponent.getModel("Charts");		
+	};
+
 	
 	/**
 	 * Get Chart configuration Model (Meta Model)
@@ -78,7 +89,7 @@ sap.ui.define([
 	 * @returns {sap.ui.model.JSONModel} oModel Chart configuration model
 	 * @public
 	 */
-	 core.getChartMetaModel = function (sName) {
+	core.getChartMetaModel = function (sName) {
 		return _oChartModel;
 	};
 			

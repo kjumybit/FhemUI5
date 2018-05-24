@@ -21,6 +21,41 @@ sap.ui.define([
 		MONTH: "month"
 	};
 
+	var UNIT = {
+		hour : {
+			short: "h",
+			plural: "hours",
+			shiftDistance: {
+				short: { value: 30, unit: "minutes"},
+				long:  { value: 1, unit: "hours"}
+			}
+		},
+		day : {
+			"short": "d",
+			"plural": "days", 
+			shiftDistance: {
+				short: { value: 12, unit: "hours"},
+				long:  { value: 1, unit: "days"}
+			}
+		},
+		week : {
+			short: "w",
+			plural: "weeks",
+			shiftDistance: {
+				short: { value: 4, unit: "days"},
+				long:  { value: 1, unit: "week"}
+			}
+		},
+		month : {
+			short: "M",
+			plural: "months",
+			shiftDistance: {
+				short: { value: 15, unit: "days"},
+				long:  { value: 1, unit: "months"}
+			}
+		}		
+	};
+
 
 	/** 
 	 * Parse date specification <code>sDateSpec</code> and return a date value as <code>moments<code> object.
@@ -72,19 +107,19 @@ sap.ui.define([
 
 
 	var adjustToDate = function(oFromDate, oToDate, sResolution, nSize) {
-		let oAllignedDate = oToDate;
+		let oAllignedDate = oFromDate.clone();
 		switch (sResolution) {
 			case unit.HOUR:
-				oAllignedDate = oToDate.add(nSize, 'h').endOf('hour');
+				oAllignedDate.add(nSize, 'h');
 				break;
 			case unit.DAY:
-				oAllignedDate = oToDate.add(nSize, 'd').endOf('day');
+				oAllignedDate.add(nSize, 'd');
 				break;
 			case unit.WEEK:
-				oAllignedDate = oToDate.add(nSize, 'w').endOf('isoWeek');
+				oAllignedDate.add(nSize, 'w');
 				break;
 			case unit.MONTH:
-				oAllignedDate = oToDate.add(nSize, 'M').endOf('month');
+				oAllignedDate.add(nSize, 'M');
 				break;
 			default:
 				break;
@@ -132,13 +167,12 @@ sap.ui.define([
 
 			this.oFromDateOrig = getDate(mSettings.fromKey);
 			this.oToDateOrig = getDate(mSettings.toKey);
+			this.sResolutionOrig = mSettings.resolution;
+			this.nSizeOrig = mSettings.size;
 
-			// set properties
-			//this.setResolution(mSettings.resolution);
-			//this.setSize(mSettings.size);
-
-			this.setFromDate(adjustStartDate(this.oFromDateOrig, this.resolution));
-			this.setToDate(adjustToDate(this.oFromDate, this.oToDateOrig, this.resolution, this.size));
+			let oFromDate = adjustStartDate(this.oFromDateOrig, this.sResolutionOrig);
+			this.setFromDate(oFromDate);
+			this.setToDate(adjustToDate(oFromDate, this.oToDateOrig, this.sResolutionOrig, this.nSizeOrig));
 		},
 
 		metadata: {			
@@ -162,13 +196,75 @@ sap.ui.define([
 
 			// methods
 			publicMethods : [
-				"reset"
-			],					
+				"reset", "shift", "zoomIn", "zoomOut"
+			]
 		}
 
 	});
 
 	
+	/**
+	 * Move the time interval back or forth depending on direction <code>sDirection</code>.
+	 * The distance half of the current interval size. The resolution and size of the time 
+	 * intervall is not changed.
+	 * 
+	 * @param {TimeLine.ShiftAction} sShiftAction Direction an distance for interval shift:
+	 * @public
+	 */
+	TimeLine.prototype.shift = function(sShiftAction ) {
+
+		let oFromDate = this.getFromDate();
+		let nSize = this.getSize();
+		let sResolution = this.getResolution();
+		let oShiftDistance = UNIT[sResolution].shiftDistance;
+		
+		// shift start date of intervall
+		switch (sShiftAction) {
+			case TimeLine.ShiftAction.BackShort:
+				// half interval size back 
+				oFromDate.subtract(oShiftDistance.short.value, oShiftDistance.short.unit);							
+				break;
+			case TimeLine.ShiftAction.BackLong:
+				// one interval size back
+				oFromDate.subtract(oShiftDistance.long.value, oShiftDistance.long.unit);			
+				break;
+			case TimeLine.ShiftAction.ForthShort:
+				// half interval size forth 			
+				oFromDate.add(oShiftDistance.short.value, oShiftDistance.short.unit);							
+				break;
+			case TimeLine.ShiftAction.ForthLong:
+				// one interval size forth			
+				oFromDate.add(oShiftDistance.long.value, oShiftDistance.long.unit);			
+				break;				
+			default:
+				break;
+		}
+		
+		// add current interval size to new start date to get new end date of intervall
+		let oToDate = oFromDate.clone();
+		oToDate.add(nSize, UNIT[sResolution].plural);
+		
+		jQuery.sap.log.info(this + " - shift: [" + oFromDate.format("DD.MM. HH:mm:ss") + "," + oToDate.format("DD.MM. HH:mm:ss") + "]");
+
+		this.setFromDate(oFromDate);
+		this.setToDate(oToDate);
+	};
+
+
+	/** 
+	 * Direction and distance for shifting the interval
+	 * 
+	 * @enum {string}
+	 * @public
+	 */
+	TimeLine.ShiftAction = {
+		BackShort: "backShort",
+		BackLong: "backLong",
+		ForthShort: "forthShort",
+		ForthLong: "forthLong"
+	};
+
+
 	return TimeLine;
 	
 }, /* bExport= */ true);

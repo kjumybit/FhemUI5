@@ -79,13 +79,6 @@ sap.ui.define([
 		// Fhem Websocket events send to the Fhem backend service
 		FhemWebSocket.M_PUBLISH_EVENTS = {
 				getMetaData : "getMetaData",
-				// getValueOnce : "getValueOnce",  
-				// getValueOnChange : "getValueOnChange",
-				// getDeviceOnChange : "getDeviceOnChange",
-				// getAllValuesOnChange : "getAllValuesOnChange",
-				// getAllDevicesOnChange : "getAllDevicesOnChange",
-				// getAllValues : "getAllValues",
-				// refreshValues : "refreshValues",
 				dbLog: "dbLog"                           
 		};
 		
@@ -93,11 +86,6 @@ sap.ui.define([
 		FhemWebSocket.M_SUBSCRIBE_EVENTS = {
 				getMetaData : "metaData",
 				getMetaDataError : "metaDataError",
-				// getValueOnce : "value",
-				// getValueOnChange : "value",
-				// getAllValuesOnChange : "value",
-				// getDeviceOnChange : "device",
-				// getAllDevicesOnChange : "device",
 				dbLogError: "dbLogError"
 		};		
 		
@@ -189,7 +177,7 @@ sap.ui.define([
 			// submit event with callback
 			this._socket.emit(FhemWebSocket.M_PUBLISH_EVENTS.getMetaData, null, function(mData) {
 				this.fireMetaDataLoaded(mData);
-				jQuery.sap.log.debug(this + " - metaDataLoaded was fired");
+				jQuery.sap.log.info(this + " - metaDataLoaded was fired");
 				return this;				
 			}.bind(this));
 			
@@ -217,25 +205,21 @@ sap.ui.define([
 				mSettings.error({
 					sMessage: "Unknown Fhem event " + mSettings.event
 				});
+				return;
 			}
 			
 			// submit event
+			//TODO: logging, local success hander function
+			jQuery.sap.log.info(this + " - request sent: " + mSettings.event);
+
 			this._socket.emit(mSettings.event, mSettings.data, mSettings.success);
-			
+
 			return true;			
 		};
 
 		
 		// Private method section
-		
-		/**
-		 * Template
-		 */
-		FhemWebSocket._fooBar = function () {
-			
-		};
-				
-				
+						
 		return FhemWebSocket;
 
 	}, /* bExport= */ true);

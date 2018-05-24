@@ -6,8 +6,9 @@ sap.ui.define([
 	'sap/ui/model/json/JSONModel',
 	'sap/ui/layout/form/FormElement',
 	'sap/m/Text',
+	'de/kjumybit/fhem/core',	
 	'de/kjumybit/fhem/chart/ChartBase'	
-], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, Chart) {
+], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, FhemCore, Chart) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceDetail", {
@@ -105,12 +106,50 @@ sap.ui.define([
 		
 		
 		/** ================================================================================
-		 *  App event handler
+		 *  Control event handler
 		 ** ================================================================================ */
-	
 		
+		/** 
+		 * Handle press on button Chart Backward
+		 * @function
+		 * @param {sap.ui.base.Event} oEvent Button press event
+		 * @public
+		 */
+		onChartBack: function( oEvent ) {
+			FhemCore.getChartModel().shiftBack("HwcStorageTemp");  //TODO: POC
+		},
 		
-		
+		onChartBackLong: function( oEvent ) {
+			FhemCore.getChartModel().shiftBackLong("HwcStorageTemp");  //TODO: POC
+		},
+
+
+		/** 
+		 * Handle press on button Chart Forward
+		 * @function
+		 * @param {sap.ui.base.Event} oEvent Button press event
+		 * @public
+		 */
+		onChartForth: function( oEvent ) {
+			FhemCore.getChartModel().shiftForth("HwcStorageTemp");  //TODO: POC
+		},
+
+		onChartForthLong: function( oEvent ) {
+			FhemCore.getChartModel().shiftForthLong("HwcStorageTemp");  //TODO: POC
+		},
+
+
+		/** 
+		 * Handle press on button Chart Zoom
+		 * @function
+		 * @param {sap.ui.base.Event} oEvent Button press event
+		 * @public
+		 */
+		onChartZoom: function( oEvent ) {
+
+		},
+
+
 		/** ================================================================================
 		 *  Private functions
 		 ** ================================================================================ */
@@ -167,6 +206,7 @@ sap.ui.define([
 			}
 		},
 
+
 		_createAttributes: function(oFormContainer, aAttributes) {
 			oFormContainer.destroyFormElements();
 			if (!aAttributes) return;
@@ -180,6 +220,7 @@ sap.ui.define([
 				oFormContainer.addFormElement(oFormElement);				
 			}			
 		},
+
 
 		_createInternals: function(oFormContainer, aInternals) {
 			oFormContainer.destroyFormElements();
@@ -196,15 +237,15 @@ sap.ui.define([
 		},
 		
 
-		//TODO: POC only
-		// implement "load" Method in ChartModel class
+		/** 
+		 * Create charting controlls for device
+		 */
 		_createChart: function(oVBoxIn) {
 			
 			let oVBox = oVBoxIn;
 			oVBox.destroyItems();
 			
 			let aCharts = this.getModel("Charts").getChartsForDevice(this.sDeviceId);
-			//let aCharts = ["HwcStorageTemp"];
 
 			aCharts.forEach(device => {
 				// create chart control with data set binding
@@ -215,9 +256,6 @@ sap.ui.define([
 					chartType: "{Charts>/" + device + "/chartType}",
 					options: "{Charts>/" + device + "/chartOptions}",
 					data: "{Charts>/" + device + "/chartData}"  
-					//chartType: "{Charts>/HwcStorageTemp/chartType}",
-					//options: "{Charts>/HwcStorageTemp/chartOptions}",
-					//data: "{Charts>/HwcStorageTemp/chartData}"  					
 				});				
 
 				oVBox.addItem(oChart);																		

@@ -142,6 +142,19 @@
 				        
 				    	<!-- Charts -->				        
 				        <IconTabFilter text="Charts" icon="sap-icon://line-chart">
+	                
+							<OverflowToolbar width="100%">					
+				                <content>					
+				                    <Button width="auto" press="onChartBackLong" icon="sap-icon://navigation-left-arrow"/>								
+				                    <Button width="auto" press="onChartBack" icon="sap-icon://slim-arrow-left"/>					
+				                    <ToolbarSpacer />					
+				                    <PagingButton count="5" position="3" positionChange="onChartZoom" />
+				                    <ToolbarSpacer />					
+				                    <Button width="auto" press="onChartForth" icon="sap-icon://slim-arrow-right"/>					
+				                    <Button width="auto" press="onChartForthLong" icon="sap-icon://navigation-right-arrow"/>														
+				            	</content>					
+				            </OverflowToolbar>						
+
 				        	<VBox id="chart_test">
             					<!-- width & height only used for ratio of the chart, but not used if control is set to responsive -->
           					</VBox>				                  							        
