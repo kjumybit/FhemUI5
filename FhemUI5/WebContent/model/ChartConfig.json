@@ -46,7 +46,11 @@
 								"major": {
 									 "enabled": true
 							 	}						   
-							}          								 
+							},
+							"scaleLabel": {
+								"display": true,
+								"labelString": "Time Perdiod"
+							}							
             			}],
             			"yAxes": [{
 							"offset": true,

@@ -148,7 +148,11 @@
 				                    <Button width="auto" press="onChartBackLong" icon="sap-icon://navigation-left-arrow"/>								
 				                    <Button width="auto" press="onChartBack" icon="sap-icon://slim-arrow-left"/>					
 				                    <ToolbarSpacer />					
-				                    <PagingButton count="5" position="3" positionChange="onChartZoom" />
+				                    <PagingButton count="{Charts>/chartCtrl/zoomLevel/count}" 
+										position="{= ${Charts>/chartCtrl/zoomLevel/count} - ${Charts>/chartCtrl/zoomLevel/position} }" 
+										previousButtonTooltip="{i18n>chartZoomOutBtn}"
+										nextButtonTooltip="{i18n>chartZoomInBtn}"
+										positionChange="onChartZoom" />
 				                    <ToolbarSpacer />					
 				                    <Button width="auto" press="onChartForth" icon="sap-icon://slim-arrow-right"/>					
 				                    <Button width="auto" press="onChartForthLong" icon="sap-icon://navigation-right-arrow"/>														

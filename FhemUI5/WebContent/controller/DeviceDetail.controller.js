@@ -146,7 +146,15 @@ sap.ui.define([
 		 * @public
 		 */
 		onChartZoom: function( oEvent ) {
+			let oPagingButton = oEvent.getSource();
+			let iNewPos = oPagingButton.getCount() - oEvent.getParameter("newPosition");
+			let iOldPos = oPagingButton.getCount() - oEvent.getParameter("oldPosition");
 
+			if (iNewPos > iOldPos) {
+				FhemCore.getChartModel().zoomOut("HwcStorageTemp");	//TODO: POC
+			} else if (iNewPos < iOldPos) {
+				FhemCore.getChartModel().zoomIn("HwcStorageTemp");	//TODO: POC
+			}
 		},
 
 

@@ -87,6 +87,7 @@ sap.ui.define([
         var chartData = this.getData();
         var chartOptions = this.getOptions();
        
+        // hint: the Chart object stores a reference of chartData, but not for the chartOptions
         this._newCustomChart = new Chart(ctx, {
                 type: chartType,
                 data: chartData,
@@ -143,10 +144,14 @@ sap.ui.define([
     
     /**
      * Set chart options.
+     * Hint: update the options member in the chart.js object.
      */
     setOptions: function(oOptions) {
       this.setProperty("options", oOptions, true);    	
-      this._update();    	//TODO
+      if (this._newCustomChart) {
+        this._newCustomChart.options = oOptions;
+      };
+      this._update();  
     },
     
     
