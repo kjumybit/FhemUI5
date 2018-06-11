@@ -378,6 +378,7 @@ sap.ui.define([
 			oZoomLevel.position++;
 		}
 
+		this.setProperty('/chartCtrl/zoomLevel', oZoomLevel);		
 		this._loadDataSets(oChart);
 	};
 
