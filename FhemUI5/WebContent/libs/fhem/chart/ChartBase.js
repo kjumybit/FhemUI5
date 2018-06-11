@@ -5,8 +5,33 @@ sap.ui.define([
 
   var CHART_CANVAS_NAME_PREFIX = 'chartJSCanvas';
 
+ 	/**
+	 * Constructor for a new Base Chart control.
+	 *  
+	 * @class
+	 * Model implementation for a Base Chart control.
+	 *
+	 * A Base Chart control wraps a Chart.js chart object. It privides bindable properties of the
+	 * native Chart.js API.
+	 * 
+	 * 
+	 * @extends sap.ui.core.Control
+	 *
+	 * @author 
+	 * @version 
+	 *
+	 * @param {string} sId Unique name of the chart in the chart configuration 
+	 * @constructor
+	 * @public
+	 * @alias de.kjumybit.fhem.chart.ChartBase
+	 */
   return Control.extend('de.kjumybit.fhem.chart.ChartBase', {
-	  
+    
+    constructor: function(sId) {
+      Control.apply(this, arguments);
+    },
+
+
     metadata: {
       properties: {
         width: {

@@ -159,7 +159,7 @@
 				            	</content>					
 				            </OverflowToolbar>						
 
-				        	<VBox id="chart_test">
+				        	<VBox id="chartContainer">
             					<!-- width & height only used for ratio of the chart, but not used if control is set to responsive -->
           					</VBox>				                  							        
 						</IconTabFilter>

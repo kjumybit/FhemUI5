@@ -99,8 +99,8 @@ sap.ui.define([
 //			this.oDeviceDetailModel.setProperty("/Attributes", aAttributes);  // via binding
 			this._createAttributes(this.byId("formAttributes"), aAttributes);    // via JScript			
 			
-			//TODO: Prototyp charts
-			this._createChart(this.byId("chart_test"));    // via JScript
+			// charts
+			this._createChart(this.byId("chartContainer"));    // via JScript
 			
 		},
 		
@@ -116,11 +116,17 @@ sap.ui.define([
 		 * @public
 		 */
 		onChartBack: function( oEvent ) {
-			FhemCore.getChartModel().shiftBack("HwcStorageTemp");  //TODO: POC
+			this._getChartControlls().forEach(oChart => {
+				//FhemCore.getChartModel().shiftBack("HwcStorageTemp");  //TODO: POC
+				FhemCore.getChartModel().shiftBack(oChart.getId()); 
+			})
+
 		},
 		
 		onChartBackLong: function( oEvent ) {
-			FhemCore.getChartModel().shiftBackLong("HwcStorageTemp");  //TODO: POC
+			this._getChartControlls().forEach(oChart => {			
+				FhemCore.getChartModel().shiftBackLong(oChart.getId());
+			})			
 		},
 
 
@@ -131,11 +137,15 @@ sap.ui.define([
 		 * @public
 		 */
 		onChartForth: function( oEvent ) {
-			FhemCore.getChartModel().shiftForth("HwcStorageTemp");  //TODO: POC
+			this._getChartControlls().forEach(oChart => {			
+				FhemCore.getChartModel().shiftForth(oChart.getId());  
+			})							
 		},
 
 		onChartForthLong: function( oEvent ) {
-			FhemCore.getChartModel().shiftForthLong("HwcStorageTemp");  //TODO: POC
+			this._getChartControlls().forEach(oChart => {			
+				FhemCore.getChartModel().shiftForthLong(oChart.getId()); 
+			})							
 		},
 
 
@@ -150,11 +160,13 @@ sap.ui.define([
 			let iNewPos = oPagingButton.getCount() - oEvent.getParameter("newPosition");
 			let iOldPos = oPagingButton.getCount() - oEvent.getParameter("oldPosition");
 
-			if (iNewPos > iOldPos) {
-				FhemCore.getChartModel().zoomOut("HwcStorageTemp");	//TODO: POC
-			} else if (iNewPos < iOldPos) {
-				FhemCore.getChartModel().zoomIn("HwcStorageTemp");	//TODO: POC
-			}
+			this._getChartControlls().forEach(oChart => {						
+				if (iNewPos > iOldPos) {
+					FhemCore.getChartModel().zoomOut(oChart.getId());	
+				} else if (iNewPos < iOldPos) {
+					FhemCore.getChartModel().zoomIn(oChart.getId());	
+				}
+			})										
 		},
 
 
@@ -247,6 +259,8 @@ sap.ui.define([
 
 		/** 
 		 * Create charting controlls for device
+		 * 
+		 * @param {sap.m.VBox} oVBoxIn Chart container
 		 */
 		_createChart: function(oVBoxIn) {
 			
@@ -257,7 +271,7 @@ sap.ui.define([
 
 			aCharts.forEach(device => {
 				// create chart control with data set binding
-				let oChart = new Chart( {
+				let oChart = new Chart(device, {
 					witdh: 400,
 					height: 100,
 					responsive: "true",
@@ -270,7 +284,27 @@ sap.ui.define([
 			});
 
 		},
-				
+			
+		
+		/**
+		 * Return a list of chart controlls inside the parent container <code>oVBox</code>.
+		 * 
+		 * @returns {de.kjumybit.fhem.chart.ChartBase[]} chart controlls
+		 */
+		_getChartControlls: function() {
+
+			let aCharts = [];
+			let oContainer = this.byId("chartContainer");
+			let oItems = oContainer.getItems();
+
+			oItems.forEach(item => {
+				if (item instanceof Chart) {
+					aCharts.push(item);
+				}
+			});
+
+			return aCharts;
+		}
 		
 	});
 });

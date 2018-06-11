@@ -341,8 +341,6 @@ sap.ui.define([
 	ChartModel.prototype.shiftForthLong = function(sChart) {
 		let oChart = this._getChart(sChart);
 		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.ForthLong);
-
-		this.setProperty('/chartCtrl/zoomLevel', oZoomLevel);
 		this._loadDataSets(oChart);
 	};
 
