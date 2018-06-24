@@ -3,28 +3,24 @@
  */
 sap.ui.define([
 	"jquery.sap.global",
-	"sap/ui/base/ManagedObject",
+	'sap/ui/model/ClientModel',
 	"./FhemWebSocket",
 	'../base/Helper'
 ],
-	function(jQuery, ManagedObject, FhemWebSocket, Helper) {
+	function(jQuery, ClientModel, FhemWebSocket, Helper) {
 		"use strict";
 										
-		var FhemService = ManagedObject.extend("de.kjumybit.fhem.service.FhemService", /** @lends de.kjumybit.fhem.service.FhemService.prototype */ {
+		var FhemService = ClientModel.extend("de.kjumybit.fhem.service.FhemService", /** @lends de.kjumybit.fhem.service.FhemService.prototype */ {
 									
 			/**
 			 * 
 			 */
 			//TODO: document mSettings 
-			constructor: function(sId, mSettings) {
-				ManagedObject.apply(this, arguments);
+			constructor: function(mSettings) {
+				ClientModel.apply(this, arguments);
 
-				// identify how the constructor has been used to extract the settings
-				if (typeof sId !== "string") {
-					mSettings = sId;
-					sId = undefined;
-				}
-				
+				// var that = this;
+
 				this.bMetaDataLoaded = false;
 				this.bMetaDataFailed = false;
 				
@@ -35,14 +31,11 @@ sap.ui.define([
 						DeviceSubTypeSet: [] 
 				};
 
+				this.oData = {};
+
 				// create new connection
 				this._fhemWebSocket = new FhemWebSocket();
 				
-				// register client handler
-				this.attachMetaDataLoaded(null, mSettings.onMetaDataLoaded, mSettings.oListener);
-				this.attachMetaDataLoadFailed(null, mSettings.onMetaDataLoadFailed, mSettings.oListener);
-				this.attachConnectionClosed(null, mSettings.onDisconnected, mSettings.oListener);
-							
 				// connect to Fhem
 				this._fhemWebSocket.connect({ 
 					host: mSettings.host , port: mSettings.port,
@@ -82,12 +75,10 @@ sap.ui.define([
 				// events
 				events: {
 					"connectionFailed": {},
-					"connectionClosed" : {},
-					"metaDataLoaded" : {},				
-					"metaDataLoadFailed" : {},
-					"requestFailed" : {},
-					"requestSent" : {},
-					"requestCompleted" : {}				
+					"connectionClosed": {},
+					"metaDataLoaded": {},				
+					"metaDataLoadFailed": {},
+					"deviceEvents": {}
 				}								
 			},
 
@@ -100,6 +91,324 @@ sap.ui.define([
 			}
 			
 		});
+
+
+		/**
+		 * Fired, when the connection to the backend service could not be established.
+		 *
+		 * @name de.kjumybit.fhem.service.FhemService#connectionFailed
+		 * @event
+		 * @param {sap.ui.base.Event} oEvent
+		 * @param {sap.ui.base.EventProvider} oEvent.getSource
+		 * @param {object} oEvent.getParameters
+		 * @public
+		 */
+
+		/**
+		 * Fired, when the connection to the backend service has been closed.
+		 *
+		 * @name de.kjumybit.fhem.service.FhemService#connectionClosed
+		 * @event
+		 * @param {sap.ui.base.Event} oEvent
+		 * @param {sap.ui.base.EventProvider} oEvent.getSource
+		 * @param {object} oEvent.getParameters
+		 * @public
+		 */
+
+
+		/**
+		 * Fired, when the metadata document was successfully loaded.
+		 *
+		 * @name de.kjumybit.fhem.service.FhemService#metaDataLoaded
+		 * @event
+		 * @param {sap.ui.base.Event} oEvent
+		 * @param {sap.ui.base.EventProvider} oEvent.getSource
+		 * @param {object} oEvent.getParameters
+		 * @param {object[]} oEvent.getParameters.DeviceSet
+		 * @param {object[]} oEvent.getParameters.RoomSet
+		 * @param {object[]} oEvent.getParameters.DeviceTypeSet
+		 * @param {object[]} oEvent.getParameters.DeviceTypeSet
+		 * @public
+		 */
+
+
+		/**
+		 * Fired, when the metadata document fails to load.
+		 *
+		 * @name de.kjumybit.fhem.service.FhemService#metaDataLoadFailed
+		 * @event
+		 * @param {sap.ui.base.Event} oEvent
+		 * @param {sap.ui.base.EventProvider} oEvent.getSource
+		 * @param {object} oEvent.getParameters
+		 * @public
+		 */
+
+
+		/**
+		 * Fired, when one or more events for fhem devices has been triggerd by the backend service.
+		 *
+		 * @name de.kjumybit.fhem.service.FhemService#deviceEvents
+		 * @event
+		 * @param {sap.ui.base.Event} oEvent
+		 * @param {sap.ui.base.EventProvider} oEvent.getSource
+		 * @param {object} oEvent.getParameters
+		 * @public
+		 */
+
+
+		/**
+		 * Fire event <code>metadataLoaded</code> to attached listeners.
+		 *
+		 * @param {object} [mArguments] the arguments to pass along with the event.
+		 * @param {object} [mArguments.metadata]  the metadata object.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @protected
+		 */
+		FhemService.prototype.fireMetaDataLoaded = function(mArguments) {
+			this.fireEvent("metaDataLoaded", mArguments);
+			return this;
+		};
+
+		/**
+		 * Attach event-handler <code>fnFunction</code> to the <code>metadataLoaded</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * @param {object}
+		 *            [oData] The object, that should be passed along with the event-object when firing the event.
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs. This function will be called on the
+		 *            oListener-instance (if present) or in a 'static way'.
+		 * @param {object}
+		 *            [oListener] Object on which to call the given function. If empty, the global context (window) is used.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.attachMetaDataLoaded = function(oData, fnFunction, oListener) {
+			this.attachEvent("metaDataLoaded", oData, fnFunction, oListener);
+			return this;
+		};
+
+		/**
+		 * Detach event-handler <code>fnFunction</code> from the <code>metadataLoaded</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * The passed function and listener object must match the ones previously used for event registration.
+		 *
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs.
+		 * @param {object}
+		 *            oListener Object on which the given function had to be called.
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.detachMetaDataLoaded = function(fnFunction, oListener) {
+			this.detachEvent("metaDataLoaded", fnFunction, oListener);
+			return this;
+		};
+
+
+		/**
+		 * Fire event <code>metaDataLoadFailed</code> to attached listeners.
+		 *
+		 * @param {object} [mArguments] the arguments to pass along with the event.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @protected
+		 */
+		FhemService.prototype.fireMetaDataLoadFailed = function(mArguments) {
+			this.fireEvent("metaDataLoadFailed", mArguments);
+			return this;
+		};
+
+		/**
+		 * Attach event-handler <code>fnFunction</code> to the <code>metaDataLoadFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * @param {object}
+		 *            [oData] The object, that should be passed along with the event-object when firing the event.
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs. This function will be called on the
+		 *            oListener-instance (if present) or in a 'static way'.
+		 * @param {object}
+		 *            [oListener] Object on which to call the given function. If empty, the global context (window) is used.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.attachMetaDataLoadFailed = function(oData, fnFunction, oListener) {
+			this.attachEvent("metaDataLoadFailed", oData, fnFunction, oListener);
+			return this;
+		};
+
+		/**
+		 * Detach event-handler <code>fnFunction</code> from the <code>metaDataLoadFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * The passed function and listener object must match the ones previously used for event registration.
+		 *
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs.
+		 * @param {object}
+		 *            oListener Object on which the given function had to be called.
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.detachMetaDataLoadFailed = function(fnFunction, oListener) {
+			this.detachEvent("metaDataLoadFailed", fnFunction, oListener);
+			return this;
+		};
+
+		/**
+		 * Fire event <code>connectionFailed</code> to attached listeners.
+		 *
+		 * @param {object} [mArguments] the arguments to pass along with the event.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @protected
+		 */
+		FhemService.prototype.fireConnectionFailed = function(mArguments) {
+			this.fireEvent("connectionFailed", mArguments);
+			return this;
+		};
+
+		/**
+		 * Attach event-handler <code>fnFunction</code> to the <code>connectionFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * @param {object}
+		 *            [oData] The object, that should be passed along with the event-object when firing the event.
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs. This function will be called on the
+		 *            oListener-instance (if present) or in a 'static way'.
+		 * @param {object}
+		 *            [oListener] Object on which to call the given function. If empty, the global context (window) is used.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.attachConnectionFailed = function(oData, fnFunction, oListener) {
+			this.attachEvent("connectionFailed", oData, fnFunction, oListener);
+			return this;
+		};
+
+		/**
+		 * Detach event-handler <code>fnFunction</code> from the <code>connectionFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * The passed function and listener object must match the ones previously used for event registration.
+		 *
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs.
+		 * @param {object}
+		 *            oListener Object on which the given function had to be called.
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.detachConnectionFailed = function(fnFunction, oListener) {
+			this.detachEvent("connectionFailed", fnFunction, oListener);
+			return this;
+		};
+
+		/**
+		 * Fire event <code>connectionClosed</code> to attached listeners.
+		 *
+		 * @param {object} [mArguments] the arguments to pass along with the event.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @protected
+		 */
+		FhemService.prototype.fireConnectionClosed = function(mArguments) {
+			this.fireEvent("connectionClosed", mArguments);
+			return this;
+		};
+
+		/**
+		 * Attach event-handler <code>fnFunction</code> to the <code>connectionClosed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * @param {object}
+		 *            [oData] The object, that should be passed along with the event-object when firing the event.
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs. This function will be called on the
+		 *            oListener-instance (if present) or in a 'static way'.
+		 * @param {object}
+		 *            [oListener] Object on which to call the given function. If empty, the global context (window) is used.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.attachConnectionClosed = function(oData, fnFunction, oListener) {
+			this.attachEvent("connectionClosed", oData, fnFunction, oListener);
+			return this;
+		};
+
+		/**
+		 * Detach event-handler <code>fnFunction</code> from the <code>connectionClosed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * The passed function and listener object must match the ones previously used for event registration.
+		 *
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs.
+		 * @param {object}
+		 *            oListener Object on which the given function had to be called.
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.detachConnectionClosed = function(fnFunction, oListener) {
+			this.detachEvent("connectionClosed", fnFunction, oListener);
+			return this;
+		};
+
+		/**
+		 * Fire event <code>deviceEvents</code> to attached listeners.
+		 *
+		 * @param {object} [mArguments] the arguments to pass along with the event.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @protected
+		 */
+		FhemService.prototype.fireDeviceEvents = function(mArguments) {
+			this.fireEvent("deviceEvents", mArguments);
+			return this;
+		};
+
+		/**
+		 * Attach event-handler <code>fnFunction</code> to the <code>deviceEvents</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * @param {object}
+		 *            [oData] The object, that should be passed along with the event-object when firing the event.
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs. This function will be called on the
+		 *            oListener-instance (if present) or in a 'static way'.
+		 * @param {object}
+		 *            [oListener] Object on which to call the given function. If empty, the global context (window) is used.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.attachDeviceEvents = function(oData, fnFunction, oListener) {
+			this.attachEvent("deviceEvents", oData, fnFunction, oListener);
+
+			// subscribe to Fhem device events 
+			this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
+				this.fireDeviceEvents(oEvent);
+			}, this);			
+			this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents);
+
+			return this;
+		};
+
+		/**
+		 * Detach event-handler <code>fnFunction</code> from the <code>deviceEvents</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * The passed function and listener object must match the ones previously used for event registration.
+		 *
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs.
+		 * @param {object}
+		 *            oListener Object on which the given function had to be called.
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemService.prototype.detachDeviceEvents = function(fnFunction, oListener) {
+			this.detachEvent("deviceEvents", fnFunction, oListener);
+			return this;
+		};
 
 
 		/**
@@ -204,7 +513,8 @@ sap.ui.define([
 		 * Retrieve log entries from a DbLog Device {sDevice} applying the command in 
 		 * {mQuery.command} 
 		 * 
-		 * @param {Object} mQuery         Query parameters
+		 * @param {String} sDevice Fhem device name
+		 * @param {Object} mQuery  Query parameters
 		 * 
 		 * 				   mQuery.from    DateTime
 		 *                 mQuery.from.date "YYYY-MM-DD"
@@ -228,13 +538,13 @@ sap.ui.define([
 			jQuery.sap.assert(oDbLogDevice, "DbLog Device " + sDevice + " not found in the metadata!");
 			
 			if (!oDbLogDevice) {
-				return false;
+				return;
 			} 			
 			
 			jQuery.sap.assert((oDbLogDevice.Internals.TYPE === "DbLog"), "Device " + sDevice + " is not a Fhem DbLog device!");
 
 			if (oDbLogDevice.Internals.TYPE !== "DbLog") {
-				return false;
+				return;
 			} 
 			
 			var fnSuccess = mQuery.success;
@@ -278,44 +588,21 @@ sap.ui.define([
 		 * 
 		 * Called by fhem.core.Service ws connection handler.
 		 * 
-		 * @params {oEvent} oEvent Event
+		 * @param {object} oEvent Event
 		 * 					oEvent.getParameters() {de.kjumybit.fhem.service.Metadata}
 		 */
 		function _onMetaData(oEvent) {
 			this.mFhemMetaData = oEvent.getParameters(); // { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };
 			this.bMetaDataLoaded = true;
 			this.fireMetaDataLoaded(this.mFhemMetaData);
-
 		};
 
 		
-		/**
-		 * 
-		 * @param {Object} oData 
-		 */
-		function _onValueData(oData) {
-			//TODO: evaluate Fhem data type
-			if (oData) {
-				
-			}
-		};
-		
-		
-		/**
-		 * 
-		 * @param {Object} Data 
-		 */
-		function _onDeviceData(Data) {
-			//TODO: evaluate Fhem data type
-			if (oData) {
-				
-			}
-		};
-		
-
 		/**
 		 * Handle successful Fhem connection
 		 * Retrieve Fhem metadata via web socket connection.
+		 * 
+		 * @param {de.kjumybit.fhem.service.FhemService} oFhemService Service Model
 		 */
 		function _onSuccessFhemConnection(oFhemService) {
 			//TODO: evaluate Fhem data type
@@ -329,12 +616,25 @@ sap.ui.define([
 			oFhemService._fhemWebSocket.sendMetaDataRequest();
 		};
 		
-		
+
+		/**
+		 * Handle failed Fhem connection
+		 * Retrieve Fhem metadata via web socket connection.
+		 * 
+		 * @param {de.kjumybit.fhem.service.FhemService} oFhemService Service Model
+		 */
+
 		function _onErrorFhemConnection(oFhemService) {
-			//TODO: evaluate Fhem data type
 			oFhemService.fireConnectionFailed(null);
 		};
+
 		
+		/**
+		 * Handle disconnect from Fhem service
+		 * Retrieve Fhem metadata via web socket connection.
+		 * 
+		 * @param {de.kjumybit.fhem.service.FhemService} oFhemService Service Model
+		 */
 
 		function _onFhemDisconnect(oFhemService) {
 			oFhemService.fireConnectionClosed(null);
