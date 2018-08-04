@@ -384,11 +384,13 @@ sap.ui.define([
 		FhemService.prototype.attachDeviceEvents = function(oData, fnFunction, oListener) {
 			this.attachEvent("deviceEvents", oData, fnFunction, oListener);
 
-			// subscribe to Fhem device events 
+			// register local event handler for Fhem device events 
 			this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
 				this.fireDeviceEvents(oEvent);
 			}, this);			
-			this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents);
+
+			// subscribe to Fhem device events 
+			this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents.onEvent);
 
 			return this;
 		};
@@ -595,6 +597,15 @@ sap.ui.define([
 			this.mFhemMetaData = oEvent.getParameters(); // { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };
 			this.bMetaDataLoaded = true;
 			this.fireMetaDataLoaded(this.mFhemMetaData);
+
+			// register local event handler for Fhem device events 
+			this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
+				this.fireDeviceEvents(oEvent);
+				// TODO update local readings model for Device
+			}, this);			
+		
+			// subscribe to Fhem device events 
+			this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents.onEvent);
 		};
 
 		
@@ -614,6 +625,7 @@ sap.ui.define([
 			// register internal event handler
 			oFhemService._fhemWebSocket.attachMetaDataLoaded(_onMetaData, oFhemService);
 			oFhemService._fhemWebSocket.sendMetaDataRequest();
+
 		};
 		
 

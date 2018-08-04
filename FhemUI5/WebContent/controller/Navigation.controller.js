@@ -258,6 +258,7 @@ sap.ui.define([
 			fhemModel.attachMetaDataLoadFailed(null, this._onErrorFhemConnection.bind(this), this);
 			fhemModel.attachConnectionClosed(null, this._onFhemDisconnect.bind(this), this);
 
+
 			// local testing 
 			/*
 			oModel.loadData("model/fhemJsonList2.json");

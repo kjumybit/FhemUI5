@@ -11,7 +11,9 @@ sap.ui.define([
 		var FhemWebSocket = ManagedObject.extend("de.kjumybit.fhem.service.FhemWebSocket", /** @lends de.kjumybit.fhem.service.FhemWebSocket.prototype */ {
 									
 			/**
-			 * Initialize a Fhem WebSocket API
+			 * Initialize a Fhem WebSocket API.
+			 * @param {string} sId ID
+			 * @param {object} mSettings Settings
 			 */
 			constructor: function(sId, mSettings) {
 				ManagedObject.apply(this, arguments);
@@ -81,20 +83,24 @@ sap.ui.define([
 		// Fhem Websocket events send to the Fhem backend service
 		FhemWebSocket.M_PUBLISH_EVENTS = {
 				getMetaData : "getMetaData",
-				dbLog: "dbLog"                           
+				dbLog: "dbLog"
 		};
 		
 		// Fhem Websocket events received from the Fhem backend service
+		// TODO: assign event handler
 		FhemWebSocket.M_SUBSCRIBE_EVENTS = {
-				getMetaData : "metaData",
-				getMetaDataError : "metaDataError",
-				dbLogError: "dbLogError",
-				deviceEvents: "deviceEvents"
+				getMetaData : { onEvent: "metaData", fireEventFnName: "" }, 
+				getMetaDataError : { onEvent: "metaDataError", fireEventFnName: "" },
+				dbLogError: { onEvent: "dbLogError", fireEventFnName: "" },
+				deviceEvents: { onEvent: "deviceEvents", fireEventFnName: "fireDeviceEvents" }
 		};		
 		
 				
 		/**
+		 * Connect to the fhem backend service.
 		 * 
+		 * @param {object} args Connection parameters
+		 * @returns {de.kjumybit.fhem.service.FhemWebSocket} <code>this<code> to allow method chaining
 		 * @public
 		 */
 		FhemWebSocket.prototype.connect = function(args) {
@@ -141,14 +147,13 @@ sap.ui.define([
 					}
 				}.bind(this)
 			);
-
 									
-			//TODO: ???
 			return this;
 		};
 
 
 		/**
+		 * Disconnect from backend service.
 		 * 
 		 * @public
 		 */
@@ -160,7 +165,9 @@ sap.ui.define([
 
 
 		/**
+		 * Is client connected to the fhem backend service.
 		 * 
+		 * @returns {boolean} Is client connected to the fhem backend service.
 		 * @public
 		 */
 		FhemWebSocket.prototype.isConnected = function() {
@@ -190,12 +197,12 @@ sap.ui.define([
 		/**
 		 * Send a WebSocket event to the Fhem backend 
 		 * 
-		 * @param  {Object} mSettings
+		 * @param  {object} mSettings
 		 * 			        mSettings.event   {FhemWebSocket.M_PUBLISH_EVENTS}
 		 *                  mSettings.data    event data 
 		 *                  mSettings.success Success handler function fnSuccess(mData)
 		 *                  mSetiings.error   Error handler function fnError(oError)
-		 * @returns {Promise} Promise for Request
+		 * @returns {promise} Promise for Request
 		 */
 		//TODO: implement as promise
 		//TODO: implement error handler
@@ -223,7 +230,9 @@ sap.ui.define([
 		/**
 		 * Subscribe for a Fhem backend event
 		 * 
-		 * @param  {String} sEvent   FhemWebSocket.M_PUBLISH_EVENTS
+		 * @param  {string} sEvent   FhemWebSocket.M_PUBLISH_EVENTS
+		 * 
+		 * @returns {de.kjumybit.fhem.service.FhemWebSocket} <code>this</code> to allow method chaining
 		 * @public
 		 */
 		FhemWebSocket.prototype.subscribeEvent = function(sEvent) {							
@@ -231,15 +240,25 @@ sap.ui.define([
 			if (!FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent]) {
 				jQuery.sap.log.error(this + " - Unknown Fhem event " + sEvent);
 				//TODO Trigger exception
-				return;
+				return this;
 			};
 
-			this._socket.on(FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent], function(mData) {
-				this.fireDeviceEvents(mData);
-				jQuery.sap.log.info(this + " - deviceEvents was fired");
+			let sThatEvent = sEvent;
+
+			// subscribe to ws server event
+			this._socket.on(FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent].onEvent, function(mData) {
+				// fire client event by own local function
+				let fireFn = this[FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent].fireEventFnName].bind(this);
+				// is object a function?
+				if (typeof fireFn === "function") {
+					jQuery.sap.log.debug(this + " submit " + FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent].fireEventFnName);					
+					fireFn(mData);
+				} else {
+					jQuery.sap.log.info(this + " - " + sThatEvent + ": no client event fired");
+				}
 			}.bind(this));
 
-			return true;
+			return this;
 		};
 
 
