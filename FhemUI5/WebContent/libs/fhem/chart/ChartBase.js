@@ -5,8 +5,33 @@ sap.ui.define([
 
   var CHART_CANVAS_NAME_PREFIX = 'chartJSCanvas';
 
+ 	/**
+	 * Constructor for a new Base Chart control.
+	 *  
+	 * @class
+	 * Model implementation for a Base Chart control.
+	 *
+	 * A Base Chart control wraps a Chart.js chart object. It privides bindable properties of the
+	 * native Chart.js API.
+	 * 
+	 * 
+	 * @extends sap.ui.core.Control
+	 *
+	 * @author 
+	 * @version 
+	 *
+	 * @param {string} sId Unique name of the chart in the chart configuration 
+	 * @constructor
+	 * @public
+	 * @alias de.kjumybit.fhem.chart.ChartBase
+	 */
   return Control.extend('de.kjumybit.fhem.chart.ChartBase', {
-	  
+    
+    constructor: function(sId) {
+      Control.apply(this, arguments);
+    },
+
+
     metadata: {
       properties: {
         width: {
@@ -87,6 +112,7 @@ sap.ui.define([
         var chartData = this.getData();
         var chartOptions = this.getOptions();
        
+        // hint: the Chart object stores a reference of chartData, but not for the chartOptions
         this._newCustomChart = new Chart(ctx, {
                 type: chartType,
                 data: chartData,
@@ -107,7 +133,7 @@ sap.ui.define([
      * 
      */
     renderer: function(oRm, oControl) {
-      var oBundle = oControl.getModel('i18n').getResourceBundle();
+      //var oBundle = oControl.getModel('i18n').getResourceBundle();
       var width = oControl.getWidth();
       var height = oControl.getHeight();
 
@@ -143,9 +169,14 @@ sap.ui.define([
     
     /**
      * Set chart options.
+     * Hint: update the options member in the chart.js object.
      */
     setOptions: function(oOptions) {
       this.setProperty("options", oOptions, true);    	
+      if (this._newCustomChart) {
+        this._newCustomChart.options = oOptions;
+      };
+      this._update();  
     },
     
     
@@ -154,7 +185,7 @@ sap.ui.define([
      */
     setData: function(oData) {
       this.setProperty("data", oData, true);
-        this._update();    	
+      this._update();    	
     },
 
    /**

@@ -250,13 +250,14 @@ sap.ui.define([
 			// create new Fhem model and connect to backend
 			fhemModel = new FhemService({
 				"host": mSettings.server.host, 
-				"port": mSettings.server.port,
-				"onConnection": this._onFhemConnection.bind(this),
-				"onMetaDataLoaded": this._onMetaDataLoaded.bind(this),
-				"onConnectionFailed": this._onErrorFhemConnection.bind(this),
-				"onDisconnected": this._onFhemDisconnect.bind(this),
-				"oListener": this
+				"port": mSettings.server.port
 			});
+
+			// register client handler
+			fhemModel.attachMetaDataLoaded(null, this._onMetaDataLoaded.bind(this), this);
+			fhemModel.attachMetaDataLoadFailed(null, this._onErrorFhemConnection.bind(this), this);
+			fhemModel.attachConnectionClosed(null, this._onFhemDisconnect.bind(this), this);
+
 
 			// local testing 
 			/*

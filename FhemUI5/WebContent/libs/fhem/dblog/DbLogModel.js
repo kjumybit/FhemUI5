@@ -107,12 +107,6 @@ sap.ui.define([
 			
 			// methods
 			publicMethods : [
-				"shiftBackward",
-				"shiftForward",
-				"extendBackward",
-				"extendForward",
-				"zoomIn",
-				"zoomOut",
 				"load"
 			],					
 			
@@ -137,6 +131,8 @@ sap.ui.define([
 	 */
 	DbLogModel.prototype.load = function(mSettings) {
 
+		jQuery.sap.log.info(this + " - DbLog request sent: " + this._mSettings.device + ":" + this._mSettings.reading);
+
 		let oFhemService = FhemCore.getFhemService();
 
 		oFhemService.callDbLogQuery(this._mSettings.logDevice, {
@@ -155,15 +151,6 @@ sap.ui.define([
 		});
 
 	};
-
-	
-	// =========
-	// statics
-	// =========
-	const DUR_M = 60 * 1000;  // Minute [ms]
-	const DUR_H = DUR_M * 60; // Hour [ms]
-	const DUR_D = DUR_H * 24; // Day [ms]
-	const DUR_W = DUR_D * 7;  // Week [ms]
 
 	return DbLogModel;
 	

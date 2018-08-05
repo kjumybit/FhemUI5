@@ -80,7 +80,14 @@ sap.ui.define([
 			ClientModel.apply(this, arguments);
 
 			// model data (defined in by superclass ClientModel)
-			this.oData = {};
+			this.oData = {
+				chartCtrl: {
+					zoomLevel: {
+						count: TimeLine.getNumberOfZoomLevels(),
+						position: 7
+					}		
+				}			
+			};
 
 			//TODO: a list of DbLog Models is required, depending on the number of Fhem data soruces
 			//TODO: initialize with default values: check binding update
@@ -94,7 +101,8 @@ sap.ui.define([
 		metadata: {			
 			// methods
 			publicMethods : [
-				"getType", "getData", "getOptions", "getChartsForDevice"
+				"getType", "getData", "getOptions", "getChartsForDevice", "getChart", "shiftBack", "shiftForth", "shiftBackLong", "shiftForthLong",
+				"zoomIn", "zoomOut"
 			],					
 		},
 		
@@ -120,12 +128,7 @@ sap.ui.define([
 	 *     chartOptions: object,
 	 *     chartData: object
 	 * 	   chartCtrl: {
-	 *        time: {
-	 *           from: Date (Moment),
-	 *           to: Date (Moment),
-	 *           resolution: hour, day, week, month
-	 *           level: 
-	 * 		  }
+	 *        time: TimeLine
 	 *     } 
 	 * }
 	 * </code>
@@ -150,7 +153,7 @@ sap.ui.define([
 			chartOptions: oChartConf.chartjs.options,
 			chartData: oChartConf.chartjs.chartData,
 			chartCtrl: {
-				time: new TimeLine(oChartConf.control.time)
+				time: new TimeLine(oChartConf.control.time),
 			},
 			dataSourceBinding: []
 		}
@@ -193,8 +196,10 @@ sap.ui.define([
 		}.bind(that));
 		
 		Promise.all(pDataLoaded).then(function (aData) {
+			jQuery.sap.log.info("loadDataSets: processing " + aData.length + " data sets", null, _sComponent);
 
 			aData.forEach(function(oData) {
+				//Hint: Use setProperty Or force update
 				oData.dataSet.data = oData.dbLogData.data.map( function(oReading) { 
 					return { "t": oReading.TIMESTAMP, "y": Number(oReading.VALUE) };
 				});										
@@ -205,8 +210,17 @@ sap.ui.define([
 			// TODO: raise Error
 
 		}).then(function() {
-			// update bindings
-			that.checkUpdate();
+			// force update bindings
+
+			let oAxes = oChart.chartOptions.scales.xAxes[0];
+			oAxes.scaleLabel = oAxes.scaleLabel || { };
+			let oFromDate = oChart.chartCtrl.time.getFromDate();
+			let oToDate = oChart.chartCtrl.time.getToDate();
+
+			oAxes.scaleLabel.display = true;
+			oAxes.scaleLabel.labelString = oFromDate.format("DD.MM. HH:mm") + " - " + oToDate.format("DD.MM. HH:mm");
+
+			that.checkUpdate(true);
 		});
 								
 	};
@@ -277,7 +291,98 @@ sap.ui.define([
 		});
 	};
 
+	/**
+	 * Get chart 
+	 * @param {string} sChart Chart ID
+	 * @returns {object} Chart object
+	 */
+	ChartModel.prototype.getChart = function(sChart) {
+		return this._getChart(sChart);
+	};
 	
+
+	/**
+	 * Shift time interval back
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftBack = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.BackShort);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval forth
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftForth = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.ForthShort);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval back using a long distance
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftBackLong = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.BackLong);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval forth using a long distance
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftForthLong = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.ForthLong);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Zoom in resp. scale down the time interval.
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.zoomIn = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.zoom(TimeLine.ZoomAction.In);
+
+		// update local model
+		let oZoomLevel = this.oData.chartCtrl.zoomLevel;
+		if (oZoomLevel.position > 0) {
+			oZoomLevel.position--;
+		}
+
+		this.setProperty('/chartCtrl/zoomLevel', oZoomLevel);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Zoom out resp. scale up the time interval.
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.zoomOut = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.zoom(TimeLine.ZoomAction.Out);
+
+		// update local model
+		let oZoomLevel = this.oData.chartCtrl.zoomLevel;
+		if (oZoomLevel.position < (oZoomLevel.count - 1)) {
+			oZoomLevel.position++;
+		}
+
+		this.setProperty('/chartCtrl/zoomLevel', oZoomLevel);		
+		this._loadDataSets(oChart);
+	};
+
+
 	/**
 	 * Get chart type for chart {Chart ID}.
 	 * 
@@ -326,10 +431,12 @@ sap.ui.define([
 	 * 						"/<ChartID>/chartType"
 	 * 						"/<ChartID>/chartOptions"
 	 * 						"/<ChartID>/chartData"
+	 * 						"/chartCtrl/zoomLevel"
 	 * @param {object} oValue an object in the format expected by the supported path
 	 * 						"/<ChartID>/chartType"
 	 * 						"/<ChartID>/chartOptions"
 	 * 						"/<ChartID>/chartData"
+	 * 						"/chartCtrl/zoomLevel" 
 	 * @param {object} [oContext=null] the context which will be used to set the property
 	 * 				   Not supported yet.
 	 * @param {boolean} [bAsyncUpdate] whether to update other bindings dependent on this property asynchronously
@@ -345,25 +452,41 @@ sap.ui.define([
 		let sChart = (bIsRelative ? aPath[0] : aPath[1])   
 		let sProperty = (bIsRelative ? aPath[1] : aPath[2])
 
-		let oChart = this._getChart(sChart);
-		//TODO: check valid chart
+		if ( sChart === "chartCtrl" ) {
+			
+			let sSubProperty = (bIsRelative ? aPath[2] : aPath[3])
 
-		// TODO: check type of oData or use specific data type
-		switch (sProperty) {
-		case "chartType":
-			oChart.chartType = oValue;
-			break;
-		case "chartOptions":
-			oChart.chartOptions = oValue;
-			break;			
-		case "chartData":
+			switch (sProperty) {
+			case "zoomLevel":
+				this.oData.chartCtrl.zoomLevel[sSubProperty] = oValue;
+				break;
+			default:
+				break;
+			}
+
+		} else {
+
+			let oChart = this._getChart(sChart);
+			//TODO: check valid chart
+
 			// TODO: check type of oData or use specific data type
-			oChart.chartData = oValue;
-			break;
-		default:
-			return false;
-		}
+			switch (sProperty) {
+			case "chartType":
+				oChart.chartType = oValue;
+				break;
+			case "chartOptions":
+				oChart.chartOptions = oValue;
+				break;			
+			case "chartData":
+				// TODO: check type of oData or use specific data type
+				oChart.chartData = oValue;
+				break;
+			default:
+				return false;
+			}
 		
+		}
+
 		// don't force binding update
 		this.checkUpdate(false, bAsyncUpdate);
 		return true;		
@@ -391,25 +514,40 @@ sap.ui.define([
 		let sProperty = (bIsRelative ? aPath[1] : aPath[2])
 		let oValue = null;
 
-		let oChart = this._getChart(sChart);
-		//TODO: check valid chart
+		if ( sChart === "chartCtrl" ) {
+			let sSubProperty = (bIsRelative ? aPath[2] : aPath[3])
+			switch (sProperty) {
+			case "zoomLevel":
+				oValue = this.oData.chartCtrl.zoomLevel[sSubProperty];
+				break;
+			default:
+				break;
+			}
+		} else {
 
-		// TODO: check type of oData or use specific data type
-		
-		switch (sProperty) {
-		case "chartType":
-			oValue = oChart.chartType;
-			break;
-		case "chartOptions":
-			oValue = oChart.chartOptions;
-			break;			
-		case "chartData":
-			oValue = oChart.chartData;
-			break;
-		default:
-			break
-		}
+			let oChart = this._getChart(sChart);
+			//TODO: check valid chart
+
+			// TODO: check type of oData or use specific data type
 			
+			switch (sProperty) {
+			case "chartType":
+				oValue = oChart.chartType;
+				break;
+			case "chartOptions":
+				oValue = oChart.chartOptions;
+				break;			
+			case "chartData":
+				oValue = oChart.chartData;
+				break;
+			case "chartCtrl":
+				//***TODO		
+				break;		
+			default:
+				break
+			}
+		}
+
 		return oValue;
 	};
 	

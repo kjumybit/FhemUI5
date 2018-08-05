@@ -1,4 +1,62 @@
 {
+	"global": {
+		"chart.js": {
+			"chartType": "Line",
+			"options": {
+				"responsive": true,
+				"maintainAspectRatio": true,
+				"title": {
+					"display": true
+				},
+				"layout": {
+					"padding": {
+						"left": 5,
+						"right": 0,
+						"top": 0,
+						"bottom": 0
+					}
+				},					
+				"scales": {
+					"xAxes": [{
+						"type":	"time",
+						"time": {
+							"isoWeekday": true,
+							"minUnit": "minute",
+							"displayFormats": {
+								"second": "H:mm:ss",
+								"minute": "H:mm",
+								"hour": "H",
+								"day": "MMM D",
+								"week": "ll", 
+								"month": "MMM YYYY", 
+								"quarter": "[Q]Q - YYYY",
+								"year": "YYYY"
+							}
+						},
+						"distribution": "linear",
+						"bounds": "data",
+						"ticks": {
+							"source": "auto",
+							"major": {
+								 "enabled": true
+							 }						   
+						},
+						"scaleLabel": {
+							"display": true,
+							"labelString": "Time Perdiod"
+						}							
+					}],
+					"yAxes": [{
+						"offset": true,
+						"scaleLabel": {
+							"display": true,
+							"labelString": "Temperature"
+						}
+					}]
+				}
+			}
+		}
+	},
 	"charts": {
 		"HwcStorageTemp": {
 			"title": "Warmwasserspeicher",
@@ -46,7 +104,11 @@
 								"major": {
 									 "enabled": true
 							 	}						   
-							}          								 
+							},
+							"scaleLabel": {
+								"display": true,
+								"labelString": "Time Perdiod"
+							}							
             			}],
             			"yAxes": [{
 							"offset": true,
@@ -60,18 +122,113 @@
 				"chartData": {
     				"datasets": [{
       					"label": "Speichertemp. oben",
-      					"fillColor": "rgba(154,132,132,0.2)",
-      					"strokeColor": "rgba(154,132,132,1)",
+      					"backgroundColor": "rgba(255,64,0,0.2)",
+      					"borderColor": "rgba(255,64,0,1)",
       					"pointRadius": 0,
       					"data": [],
       					"fhemDataSource": "StorageTempUpper"
 					  },{
 						"label": "Speichertemp. unten",
-						"fillColor": "rgba(220,220,220,0.2)",
-						"strokeColor": "rgba(220,220,220,1)",
+						"backgroundColor": "rgba(0,128,255,0.2)",
+						"borderColor": "rgba(0,128,255,1)",
 						"pointRadius": 0,						
 						"data": [],
 						"fhemDataSource": "StorageTempLower"
+					},{
+						"label": "Solarkollektor Temp.",
+						"borderColor": "rgba(255,191,0,1)",
+						"pointRadius": 0,
+						"fill": false,
+						"data": [],
+						"fhemDataSource": "SolarCollectorTemp"
+					}]
+      			}										
+			},
+			"control": {
+				"time": {
+					"fromKey": "todayStart",
+					"toKey": "todayNow",
+					"resolution": "day",
+					"size": 1
+				}
+			}
+		},
+		"PmElectricPower": {
+			"title": "Stromverbrauch",
+			"assignedDevices": ["KG_IZ_StromZaehler"],
+			"rooms": [],
+			"library": "chartjs",			
+			"chartjs": {
+				"chartType": "Line",
+				"options": {
+					"responsive": true,
+					"maintainAspectRatio": true,
+					"title": {
+						"text": "Stromverbrauch",
+						"display": true
+					},
+					"layout": {
+            			"padding": {
+                			"left": 5,
+                			"right": 0,
+                			"top": 0,
+                			"bottom": 0
+            			}
+        			},					
+					"scales": {
+						"xAxes": [{
+                			"type":	"time",
+                			"time": {
+								"isoWeekday": true,
+								"minUnit": "minute",
+                    			"displayFormats": {
+                    				"second": "H:mm:ss",
+                    				"minute": "H:mm",
+                        			"hour": "H",
+									"day": "MMM D",
+									"week": "ll", 
+									"month": "MMM YYYY", 
+									"quarter": "[Q]Q - YYYY",
+									"year": "YYYY"
+                    			}
+                    		},
+                			"distribution": "linear",
+							"bounds": "data",
+							"ticks": {
+								"source": "auto",
+								"major": {
+									 "enabled": true
+							 	}						   
+							},
+							"scaleLabel": {
+								"display": true,
+								"labelString": "Time Perdiod"
+							}							
+            			}],
+            			"yAxes": [{
+							"offset": true,
+							"scaleLabel": {
+								"display": true,
+								"labelString": "Leistung"
+							}
+            			}]
+        			}
+				},							
+				"chartData": {
+    				"datasets": [{
+      					"label": "Leistung",
+      					"backgroundColor": "rgba(255,128,0,0.2)",
+      					"borderColor": "rgba(255,128,0,1)",
+      					"pointRadius": 0,
+      					"data": [],
+      					"fhemDataSource": "PowerMeterPower"
+					  },{
+						"label": "Tagesverbrauch",
+						"backgroundColor": "rgba(0,128,255,0.2)",
+						"borderColor": "rgba(0,128,255,1)",
+						"pointRadius": 0,						
+						"data": [],
+						"fhemDataSource": "PowerMeterEnergy"
 					}]
       			}										
 			},
@@ -106,8 +263,22 @@
 		"StorageTempLower": {
 			"logDevice": "DB_Log_MariaDB", 
 			"device": "MQTT_D_EBUSD",
-			"reading": "StorageCylLowerTemp",
-			"localData": []
-		}																
+			"reading": "StorageCylLowerTemp"
+		},
+		"SolarCollectorTemp": {
+			"logDevice": "DB_Log_MariaDB", 
+			"device": "MQTT_D_EBUSD",
+			"reading": "SolarCollTemp"
+		},
+		"PowerMeterPower": {
+			"logDevice": "DB_Log_MariaDB", 
+			"device": "KG_IZ_StromZaehler",
+			"reading": "energyLeistung"
+		},
+		"PowerMeterEnergy": {
+			"logDevice": "DB_Log_MariaDB", 
+			"device": "KG_IZ_StromZaehler",
+			"reading": "energyTagesVerbrauch"
+		}
 	} 
 }

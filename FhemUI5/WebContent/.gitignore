@@ -1,6 +1,9 @@
 /META-INF/
 /WEB-INF/
 /resources/
+<<<<<<< HEAD
 /resources/
 /resources/
 /resources/
+=======
+>>>>>>> refs/heads/feature/Charting_UseTimeLineControl

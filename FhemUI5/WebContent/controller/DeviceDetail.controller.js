@@ -6,8 +6,9 @@ sap.ui.define([
 	'sap/ui/model/json/JSONModel',
 	'sap/ui/layout/form/FormElement',
 	'sap/m/Text',
+	'de/kjumybit/fhem/core',	
 	'de/kjumybit/fhem/chart/ChartBase'	
-], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, Chart) {
+], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, FhemCore, Chart) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceDetail", {
@@ -98,19 +99,77 @@ sap.ui.define([
 //			this.oDeviceDetailModel.setProperty("/Attributes", aAttributes);  // via binding
 			this._createAttributes(this.byId("formAttributes"), aAttributes);    // via JScript			
 			
-			//TODO: Prototyp charts
-			this._createChart(this.byId("chart_test"));    // via JScript
+			// charts
+			this._createChart(this.byId("chartContainer"));    // via JScript
 			
 		},
 		
 		
 		/** ================================================================================
-		 *  App event handler
+		 *  Control event handler
 		 ** ================================================================================ */
-	
 		
+		/** 
+		 * Handle press on button Chart Backward
+		 * @function
+		 * @param {sap.ui.base.Event} oEvent Button press event
+		 * @public
+		 */
+		onChartBack: function( oEvent ) {
+			this._getChartControlls().forEach(oChart => {
+				//FhemCore.getChartModel().shiftBack("HwcStorageTemp");  //TODO: POC
+				FhemCore.getChartModel().shiftBack(oChart.getId()); 
+			})
+
+		},
 		
-		
+		onChartBackLong: function( oEvent ) {
+			this._getChartControlls().forEach(oChart => {			
+				FhemCore.getChartModel().shiftBackLong(oChart.getId());
+			})			
+		},
+
+
+		/** 
+		 * Handle press on button Chart Forward
+		 * @function
+		 * @param {sap.ui.base.Event} oEvent Button press event
+		 * @public
+		 */
+		onChartForth: function( oEvent ) {
+			this._getChartControlls().forEach(oChart => {			
+				FhemCore.getChartModel().shiftForth(oChart.getId());  
+			})							
+		},
+
+		onChartForthLong: function( oEvent ) {
+			this._getChartControlls().forEach(oChart => {			
+				FhemCore.getChartModel().shiftForthLong(oChart.getId()); 
+			})							
+		},
+
+
+		/** 
+		 * Handle press on button Chart Zoom
+		 * @function
+		 * @param {sap.ui.base.Event} oEvent Button press event
+		 * @public
+		 */
+		onChartZoom: function( oEvent ) {
+			let oPagingButton = oEvent.getSource();
+			let iNewPos = oPagingButton.getCount() - oEvent.getParameter("newPosition");
+			let iOldPos = oPagingButton.getCount() - oEvent.getParameter("oldPosition");
+
+			this._getChartControlls().forEach(oChart => {						
+				if (iNewPos > iOldPos) {
+					FhemCore.getChartModel().zoomOut(oChart.getId());	
+				} else if (iNewPos < iOldPos) {
+					FhemCore.getChartModel().zoomIn(oChart.getId());	
+				}
+			})										
+		},
+
+
 		/** ================================================================================
 		 *  Private functions
 		 ** ================================================================================ */
@@ -167,6 +226,7 @@ sap.ui.define([
 			}
 		},
 
+
 		_createAttributes: function(oFormContainer, aAttributes) {
 			oFormContainer.destroyFormElements();
 			if (!aAttributes) return;
@@ -180,6 +240,7 @@ sap.ui.define([
 				oFormContainer.addFormElement(oFormElement);				
 			}			
 		},
+
 
 		_createInternals: function(oFormContainer, aInternals) {
 			oFormContainer.destroyFormElements();
@@ -196,35 +257,54 @@ sap.ui.define([
 		},
 		
 
-		//TODO: POC only
-		// implement "load" Method in ChartModel class
+		/** 
+		 * Create charting controlls for device
+		 * 
+		 * @param {sap.m.VBox} oVBoxIn Chart container
+		 */
 		_createChart: function(oVBoxIn) {
 			
 			let oVBox = oVBoxIn;
 			oVBox.destroyItems();
 			
 			let aCharts = this.getModel("Charts").getChartsForDevice(this.sDeviceId);
-			//let aCharts = ["HwcStorageTemp"];
 
 			aCharts.forEach(device => {
 				// create chart control with data set binding
-				let oChart = new Chart( {
+				let oChart = new Chart(device, {
 					witdh: 400,
-					height: 100,
+					height: 150,
 					responsive: "true",
 					chartType: "{Charts>/" + device + "/chartType}",
 					options: "{Charts>/" + device + "/chartOptions}",
 					data: "{Charts>/" + device + "/chartData}"  
-					//chartType: "{Charts>/HwcStorageTemp/chartType}",
-					//options: "{Charts>/HwcStorageTemp/chartOptions}",
-					//data: "{Charts>/HwcStorageTemp/chartData}"  					
 				});				
 
 				oVBox.addItem(oChart);																		
 			});
 
 		},
-				
+			
+		
+		/**
+		 * Return a list of chart controlls inside the parent container <code>oVBox</code>.
+		 * 
+		 * @returns {de.kjumybit.fhem.chart.ChartBase[]} chart controlls
+		 */
+		_getChartControlls: function() {
+
+			let aCharts = [];
+			let oContainer = this.byId("chartContainer");
+			let oItems = oContainer.getItems();
+
+			oItems.forEach(item => {
+				if (item instanceof Chart) {
+					aCharts.push(item);
+				}
+			});
+
+			return aCharts;
+		}
 		
 	});
 });
