@@ -11,7 +11,9 @@ sap.ui.define([
 		var FhemWebSocket = ManagedObject.extend("de.kjumybit.fhem.service.FhemWebSocket", /** @lends de.kjumybit.fhem.service.FhemWebSocket.prototype */ {
 									
 			/**
-			 * Initialize a Fhem WebSocket API
+			 * Initialize a Fhem WebSocket API.
+			 * @param {string} sId ID
+			 * @param {object} mSettings Settings
 			 */
 			constructor: function(sId, mSettings) {
 				ManagedObject.apply(this, arguments);
@@ -51,7 +53,8 @@ sap.ui.define([
 					"disconnect",
 					"isConnected",
 					"sendMetadataRequest",
-					"sendRequest"
+					"sendRequest",
+					"subscribeEvent"
 				],					
 				
 				// events
@@ -61,6 +64,7 @@ sap.ui.define([
 					"disconnected": {},
 					"metaDataLoaded" : {},				
 					"metaDataLoadFailed" : {},
+					"deviceEvents": {}
 				},
 
 			},
@@ -79,31 +83,24 @@ sap.ui.define([
 		// Fhem Websocket events send to the Fhem backend service
 		FhemWebSocket.M_PUBLISH_EVENTS = {
 				getMetaData : "getMetaData",
-				// getValueOnce : "getValueOnce",  
-				// getValueOnChange : "getValueOnChange",
-				// getDeviceOnChange : "getDeviceOnChange",
-				// getAllValuesOnChange : "getAllValuesOnChange",
-				// getAllDevicesOnChange : "getAllDevicesOnChange",
-				// getAllValues : "getAllValues",
-				// refreshValues : "refreshValues",
-				dbLog: "dbLog"                           
+				dbLog: "dbLog"
 		};
 		
 		// Fhem Websocket events received from the Fhem backend service
+		// TODO: assign event handler
 		FhemWebSocket.M_SUBSCRIBE_EVENTS = {
-				getMetaData : "metaData",
-				getMetaDataError : "metaDataError",
-				// getValueOnce : "value",
-				// getValueOnChange : "value",
-				// getAllValuesOnChange : "value",
-				// getDeviceOnChange : "device",
-				// getAllDevicesOnChange : "device",
-				dbLogError: "dbLogError"
+				getMetaData : { onEvent: "metaData", fireEventFnName: "" }, 
+				getMetaDataError : { onEvent: "metaDataError", fireEventFnName: "" },
+				dbLogError: { onEvent: "dbLogError", fireEventFnName: "" },
+				deviceEvents: { onEvent: "deviceEvents", fireEventFnName: "fireDeviceEvents" }
 		};		
 		
 				
 		/**
+		 * Connect to the fhem backend service.
 		 * 
+		 * @param {object} args Connection parameters
+		 * @returns {de.kjumybit.fhem.service.FhemWebSocket} <code>this<code> to allow method chaining
 		 * @public
 		 */
 		FhemWebSocket.prototype.connect = function(args) {
@@ -150,14 +147,13 @@ sap.ui.define([
 					}
 				}.bind(this)
 			);
-
 									
-			//TODO: ???
 			return this;
 		};
 
 
 		/**
+		 * Disconnect from backend service.
 		 * 
 		 * @public
 		 */
@@ -169,7 +165,9 @@ sap.ui.define([
 
 
 		/**
+		 * Is client connected to the fhem backend service.
 		 * 
+		 * @returns {boolean} Is client connected to the fhem backend service.
 		 * @public
 		 */
 		FhemWebSocket.prototype.isConnected = function() {
@@ -181,7 +179,7 @@ sap.ui.define([
 		 * Send a metadata request event to the Fhem backend 
 		 * 
 		 * @public
-		 * @returns {Promise}  
+		 * @returns {Promise}  Promise for meta data request
 		 */
 		FhemWebSocket.prototype.sendMetaDataRequest = function() {
 			//TODO: return promise
@@ -189,8 +187,7 @@ sap.ui.define([
 			// submit event with callback
 			this._socket.emit(FhemWebSocket.M_PUBLISH_EVENTS.getMetaData, null, function(mData) {
 				this.fireMetaDataLoaded(mData);
-				jQuery.sap.log.debug(this + " - metaDataLoaded was fired");
-				return this;				
+				jQuery.sap.log.info(this + " - metaDataLoaded was fired");
 			}.bind(this));
 			
 			return this;
@@ -205,7 +202,7 @@ sap.ui.define([
 		 *                  mSettings.data    event data 
 		 *                  mSettings.success Success handler function fnSuccess(mData)
 		 *                  mSetiings.error   Error handler function fnError(oError)
-		 * @returns {Promise} 
+		 * @returns {promise} Promise for Request
 		 */
 		//TODO: implement as promise
 		//TODO: implement error handler
@@ -217,25 +214,56 @@ sap.ui.define([
 				mSettings.error({
 					sMessage: "Unknown Fhem event " + mSettings.event
 				});
+				return;
 			}
 			
 			// submit event
-			this._socket.emit(mSettings.event, mSettings.data, mSettings.success);
-			
+			//TODO: logging, local success hander function
+			jQuery.sap.log.info(this + " - request sent: " + mSettings.event);
+
+			this._socket.emit(FhemWebSocket.M_PUBLISH_EVENTS[mSettings.event], mSettings.data, mSettings.success);
+
 			return true;			
 		};
 
 		
-		// Private method section
-		
 		/**
-		 * Template
+		 * Subscribe for a Fhem backend event
+		 * 
+		 * @param  {string} sEvent   FhemWebSocket.M_PUBLISH_EVENTS
+		 * 
+		 * @returns {de.kjumybit.fhem.service.FhemWebSocket} <code>this</code> to allow method chaining
+		 * @public
 		 */
-		FhemWebSocket._fooBar = function () {
-			
+		FhemWebSocket.prototype.subscribeEvent = function(sEvent) {							
+
+			if (!FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent]) {
+				jQuery.sap.log.error(this + " - Unknown Fhem event " + sEvent);
+				//TODO Trigger exception
+				return this;
+			};
+
+			let sThatEvent = sEvent;
+
+			// subscribe to ws server event
+			this._socket.on(FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent].onEvent, function(mData) {
+				// fire client event by own local function
+				let fireFn = this[FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent].fireEventFnName].bind(this);
+				// is object a function?
+				if (typeof fireFn === "function") {
+					jQuery.sap.log.debug(this + " submit " + FhemWebSocket.M_SUBSCRIBE_EVENTS[sEvent].fireEventFnName);					
+					fireFn(mData);
+				} else {
+					jQuery.sap.log.info(this + " - " + sThatEvent + ": no client event fired");
+				}
+			}.bind(this));
+
+			return this;
 		};
-				
-				
+
+
+		// Private method section
+						
 		return FhemWebSocket;
 
 	}, /* bExport= */ true);

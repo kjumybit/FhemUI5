@@ -1,4 +1,4 @@
-<core:View
+<mvc:View
 	controllerName="de.kjumybit.fhem.controller.App" 
 	displayBlock="true"
 	xmlns:html="http://www.w3.org/1999/xhtml" 
@@ -6,4 +6,4 @@
 	xmlns:mvc="sap.ui.core.mvc"  
 	xmlns="sap.m">
 	<SplitApp id="app" />
-</core:View>
+</mvc:View>

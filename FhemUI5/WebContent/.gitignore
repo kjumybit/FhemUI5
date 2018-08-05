@@ -1,7 +1,10 @@
 /META-INF/
 /WEB-INF/
 /resources/
+<<<<<<< HEAD
+<<<<<<< HEAD
 /resources/
+<<<<<<< HEAD
 <<<<<<< HEAD
 /resources/
 =======
@@ -13,3 +16,11 @@
 /resources/
 /.gitignore
 /resources/
+=======
+/resources/
+/resources/
+=======
+>>>>>>> refs/heads/feature/Charting_UseTimeLineControl
+=======
+>>>>>>> refs/heads/feature/Charting_UseTimeLineControl
+>>>>>>> refs/heads/develop

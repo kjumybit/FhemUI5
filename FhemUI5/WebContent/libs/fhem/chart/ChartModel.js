@@ -13,13 +13,18 @@ sap.ui.define([
 	'sap/ui/model/ClientModel',	
 	'sap/ui/model/Context', 
 	'de/kjumybit/fhem/core',
-	'./ChartPropertyBinding'	
+	'./ChartPropertyBinding',
+	'../dblog/DbLogModel',
+	'./TimeLine',
+	'moment'
 ],
-	function(jQuery, ClientModel, Context, FhemCore, ChartPropertyBinding) {
+	function(jQuery, ClientModel, Context, FhemCore, ChartPropertyBinding, DbLogModel, TimeLine, moment) {
 	"use strict";
 
 	// statics
 	
+	var _sComponent = "de.kjumybit.fhem.chart.ChartModel";
+
 	/**
 	 * the chart configuration 
 	 */
@@ -75,7 +80,14 @@ sap.ui.define([
 			ClientModel.apply(this, arguments);
 
 			// model data (defined in by superclass ClientModel)
-			this.oData = {};
+			this.oData = {
+				chartCtrl: {
+					zoomLevel: {
+						count: TimeLine.getNumberOfZoomLevels(),
+						position: 7
+					}		
+				}			
+			};
 
 			//TODO: a list of DbLog Models is required, depending on the number of Fhem data soruces
 			//TODO: initialize with default values: check binding update
@@ -89,7 +101,8 @@ sap.ui.define([
 		metadata: {			
 			// methods
 			publicMethods : [
-				"getType", "getData", "getOptions", "getChartsForDevice"
+				"getType", "getData", "getOptions", "getChartsForDevice", "getChart", "shiftBack", "shiftForth", "shiftBackLong", "shiftForthLong",
+				"zoomIn", "zoomOut"
 			],					
 		},
 		
@@ -114,6 +127,9 @@ sap.ui.define([
 	 *     chartType: string,
 	 *     chartOptions: object,
 	 *     chartData: object
+	 * 	   chartCtrl: {
+	 *        time: TimeLine
+	 *     } 
 	 * }
 	 * </code>
 	 * @param {string} sChart Chart ID
@@ -130,19 +146,37 @@ sap.ui.define([
 		let oChartConf = _oCharts[sChart];
 
 		// initialize new oChart from configuration
+		//TODO; use own Class <code>DataSourceBinding</code> to DbLogModel
 		oChart = {
 			chartName: sChart,
 			chartType: oChartConf.chartjs.chartType,
 			chartOptions: oChartConf.chartjs.options,
-			chartData: oChartConf.chartjs.chartData
+			chartData: oChartConf.chartjs.chartData,
+			chartCtrl: {
+				time: new TimeLine(oChartConf.control.time),
+			},
+			dataSourceBinding: []
 		}
 		
 		this.oData[sChart] = oChart;
 		
-		//TODO retrieve initial data			
+		//TODO retrieve initial data
 		this._loadDataSets(oChart);
 
 		return oChart;
+	};
+
+
+	/** Returns definition for Fhem data source <code>sFhemDataSource</code> 
+	 * 
+	 * @param {string} sFhemDataSource Name of the data source
+	 * @return {object} Data source definition or undefined
+	 * @private
+	 */
+	ChartModel.prototype._getFhemDataSource = function(sFhemDataSource) {
+		//TODO check valid Fhem data source
+		//TODO use DbLogModel
+		return _oDataSources[sFhemDataSource];
 	};
 
 
@@ -153,52 +187,41 @@ sap.ui.define([
 	 * @private 
 	 */
 	ChartModel.prototype._loadDataSets = function(oChart) {
-		//TODO: replace POC
-		//TODO: use promises
+						
+		// retrieve time series data (datasets) from backend for all data sets 
+		let that = this;
+		let pDataLoaded = oChart.chartData.datasets.map(function(oDataSet) {
+			// return promise
+			return that._loadDataSet(oDataSet, oChart.chartCtrl.time);
+		}.bind(that));
 		
-		//var oThatChart = oChart; hint: not visible within getFnSuccess()
+		Promise.all(pDataLoaded).then(function (aData) {
+			jQuery.sap.log.info("loadDataSets: processing " + aData.length + " data sets", null, _sComponent);
 
-		// on success DBLog query
-		var getFnSuccess = function (oDataSet) {
-			
-			let oMyDataSet = oDataSet;
-
-			return function (oData) {
-				//let oChartData = this.oData[oThatChart.chartName].chartData; 
-			
-				// get data set 
-				//oChartData.datasets[0].data = oData.data.map( function(oReading) { 
-				oMyDataSet.data = oData.data.map( function(oReading) { 
+			aData.forEach(function(oData) {
+				//Hint: Use setProperty Or force update
+				oData.dataSet.data = oData.dbLogData.data.map( function(oReading) { 
 					return { "t": oReading.TIMESTAMP, "y": Number(oReading.VALUE) };
-				});
-										
-				// update bindings
-				this.checkUpdate();
-			}.bind(this);
-			
-		}.bind(this);
-				
-		
-		let oFhem = FhemCore.getFhemService();
-		let oDataSet = this.oData[oChart.chartName].chartData.datasets[0]; 
+				});										
+			})
 
-		oFhem.callDbLogQuery("DB_Log_MariaDB", {
-			from: { 
-				date: "2018-03-03",
-				time: "00:00:00"
-			 },
-			 to: {
-					date: "2018-03-03",
-					time: "23:59:59"
-			 },
-			 device: "KG_IZ_StromZaehler", 
-			 reading: "energyTagesVerbrauch",
-			 success: getFnSuccess.call(this, oDataSet),
-			 error: function(oError) {
-				 //TODO
-			 }.bind(this)                      				
+		}).catch(function(error) {
+			jQuery.sap.log.error("loadDataSets: " + error, null, _sComponent);			
+			// TODO: raise Error
+
+		}).then(function() {
+			// force update bindings
+
+			let oAxes = oChart.chartOptions.scales.xAxes[0];
+			oAxes.scaleLabel = oAxes.scaleLabel || { };
+			let oFromDate = oChart.chartCtrl.time.getFromDate();
+			let oToDate = oChart.chartCtrl.time.getToDate();
+
+			oAxes.scaleLabel.display = true;
+			oAxes.scaleLabel.labelString = oFromDate.format("DD.MM. HH:mm") + " - " + oToDate.format("DD.MM. HH:mm");
+
+			that.checkUpdate(true);
 		});
-		
 								
 	};
 	
@@ -207,16 +230,159 @@ sap.ui.define([
 	 * Retrieve date from backend for data set <code>oDataSet</code>
 	 * 
 	 * @param {object} oDataSet Dataset of a chart 
-	 * @returns {promises} DBLog backend request
+	 * @param {de.kjumybit.fhem.chart.TimeLine} oTimeLine Time intervall for data points
+	 * @returns {promises} DbLog backend request
 	 * @private 
 	 */
-	ChartModel.prototype._loadDataSet = function(oDataSet) {
+	ChartModel.prototype._loadDataSet = function(oDataSet, oTimeLine) {
 
+		let oMyDataSet = oDataSet;
+		let oMyTimeLine = oTimeLine;
 
-		return undefined;
+		// let oFhem = FhemCore.getFhemService();
+		//TODO: create & save DataSourceBinding
+		let oFhemDS = this._getFhemDataSource(oDataSet.fhemDataSource);
+		let oDbLog = new DbLogModel({
+			"logDevice": oFhemDS.logDevice,
+			"device": oFhemDS.device,
+	        "reading": oFhemDS.reading
+		});
+
+		return new Promise(function(resolve, reject) {
+
+			let oFromDate = oMyTimeLine.getFromDate();
+			let oToDate = oMyTimeLine.getToDate();
+
+			oDbLog.load({
+				from: { 
+					date: oFromDate.format("YYYY-MM-DD"),
+					time: oFromDate.format("HH:mm:ss")
+				},
+				to: {
+						date: oToDate.format("YYYY-MM-DD"),
+						time: oToDate.format("HH:mm:ss")
+				},
+				success: function(oDbLogData) { 
+					//TODO: use new class
+					resolve( { dataSet: oMyDataSet, dbLogData: oDbLogData } ) 
+				},
+				error: reject				
+			});
+
+			/*
+			oFhem.callDbLogQuery(oFhemDS.logDevice, {
+				from: { 
+					date: moment().format("YYYY-MM-DD"),
+					time: "00:00:00"
+				},
+				to: {
+						date: moment().format("YYYY-MM-DD"),
+						time: moment().format("HH:MM:SS")
+				},
+				device: oFhemDS.device, 
+				reading: oFhemDS.reading,
+				success: function(oDbLogData) { 
+					//TODO: use new class
+					resolve( { dataSet: oMyDataSet, dbLogData: oDbLogData } ) 
+				},
+				error: reject
+			});
+			*/
+		});
 	};
 
+	/**
+	 * Get chart 
+	 * @param {string} sChart Chart ID
+	 * @returns {object} Chart object
+	 */
+	ChartModel.prototype.getChart = function(sChart) {
+		return this._getChart(sChart);
+	};
 	
+
+	/**
+	 * Shift time interval back
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftBack = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.BackShort);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval forth
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftForth = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.ForthShort);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval back using a long distance
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftBackLong = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.BackLong);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Shift time interval forth using a long distance
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.shiftForthLong = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.shift(TimeLine.ShiftAction.ForthLong);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Zoom in resp. scale down the time interval.
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.zoomIn = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.zoom(TimeLine.ZoomAction.In);
+
+		// update local model
+		let oZoomLevel = this.oData.chartCtrl.zoomLevel;
+		if (oZoomLevel.position > 0) {
+			oZoomLevel.position--;
+		}
+
+		this.setProperty('/chartCtrl/zoomLevel', oZoomLevel);
+		this._loadDataSets(oChart);
+	};
+
+
+	/**
+	 * Zoom out resp. scale up the time interval.
+	 * @param {string} sChart Chart ID
+	 */
+	ChartModel.prototype.zoomOut = function(sChart) {
+		let oChart = this._getChart(sChart);
+		oChart.chartCtrl.time.zoom(TimeLine.ZoomAction.Out);
+
+		// update local model
+		let oZoomLevel = this.oData.chartCtrl.zoomLevel;
+		if (oZoomLevel.position < (oZoomLevel.count - 1)) {
+			oZoomLevel.position++;
+		}
+
+		this.setProperty('/chartCtrl/zoomLevel', oZoomLevel);		
+		this._loadDataSets(oChart);
+	};
+
+
 	/**
 	 * Get chart type for chart {Chart ID}.
 	 * 
@@ -265,10 +431,12 @@ sap.ui.define([
 	 * 						"/<ChartID>/chartType"
 	 * 						"/<ChartID>/chartOptions"
 	 * 						"/<ChartID>/chartData"
+	 * 						"/chartCtrl/zoomLevel"
 	 * @param {object} oValue an object in the format expected by the supported path
 	 * 						"/<ChartID>/chartType"
 	 * 						"/<ChartID>/chartOptions"
 	 * 						"/<ChartID>/chartData"
+	 * 						"/chartCtrl/zoomLevel" 
 	 * @param {object} [oContext=null] the context which will be used to set the property
 	 * 				   Not supported yet.
 	 * @param {boolean} [bAsyncUpdate] whether to update other bindings dependent on this property asynchronously
@@ -284,25 +452,41 @@ sap.ui.define([
 		let sChart = (bIsRelative ? aPath[0] : aPath[1])   
 		let sProperty = (bIsRelative ? aPath[1] : aPath[2])
 
-		let oChart = this._getChart(sChart);
-		//TODO: check valid chart
+		if ( sChart === "chartCtrl" ) {
+			
+			let sSubProperty = (bIsRelative ? aPath[2] : aPath[3])
 
-		// TODO: check type of oData or use specific data type
-		switch (sProperty) {
-		case "chartType":
-			this.oData[sChart].chartType = oValue;
-			break;
-		case "chartOptions":
-			this.oData[sChart].chartOptions = oValue;
-			break;			
-		case "chartData":
+			switch (sProperty) {
+			case "zoomLevel":
+				this.oData.chartCtrl.zoomLevel[sSubProperty] = oValue;
+				break;
+			default:
+				break;
+			}
+
+		} else {
+
+			let oChart = this._getChart(sChart);
+			//TODO: check valid chart
+
 			// TODO: check type of oData or use specific data type
-			this.oData[sChart].chartData = oValue;
-			break;
-		default:
-			return false;
-		}
+			switch (sProperty) {
+			case "chartType":
+				oChart.chartType = oValue;
+				break;
+			case "chartOptions":
+				oChart.chartOptions = oValue;
+				break;			
+			case "chartData":
+				// TODO: check type of oData or use specific data type
+				oChart.chartData = oValue;
+				break;
+			default:
+				return false;
+			}
 		
+		}
+
 		// don't force binding update
 		this.checkUpdate(false, bAsyncUpdate);
 		return true;		
@@ -330,25 +514,40 @@ sap.ui.define([
 		let sProperty = (bIsRelative ? aPath[1] : aPath[2])
 		let oValue = null;
 
-		let oChart = this._getChart(sChart);
-		//TODO: check valid chart
+		if ( sChart === "chartCtrl" ) {
+			let sSubProperty = (bIsRelative ? aPath[2] : aPath[3])
+			switch (sProperty) {
+			case "zoomLevel":
+				oValue = this.oData.chartCtrl.zoomLevel[sSubProperty];
+				break;
+			default:
+				break;
+			}
+		} else {
 
-		// TODO: check type of oData or use specific data type
-		
-		switch (sProperty) {
-		case "chartType":
-			oValue = oChart.chartType;
-			break;
-		case "chartOptions":
-			oValue = oChart.chartOptions;
-			break;			
-		case "chartData":
-			oValue = oChart.chartData;
-			break;
-		default:
-			break
-		}
+			let oChart = this._getChart(sChart);
+			//TODO: check valid chart
+
+			// TODO: check type of oData or use specific data type
 			
+			switch (sProperty) {
+			case "chartType":
+				oValue = oChart.chartType;
+				break;
+			case "chartOptions":
+				oValue = oChart.chartOptions;
+				break;			
+			case "chartData":
+				oValue = oChart.chartData;
+				break;
+			case "chartCtrl":
+				//***TODO		
+				break;		
+			default:
+				break
+			}
+		}
+
 		return oValue;
 	};
 	
