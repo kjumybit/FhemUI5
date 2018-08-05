@@ -1,9 +1,14 @@
 /node_modules/
 <<<<<<< HEAD
+<<<<<<< HEAD
 /ui5-exports/
 /ui5-types/
 /ProductBacklog.txt
 /notizen.txt
+=======
+/notizen.txt
+/ProductBacklog.txt
+>>>>>>> refs/heads/feature/Charting_UseTimeLineControl
 =======
 /notizen.txt
 /ProductBacklog.txt
