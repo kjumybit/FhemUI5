@@ -4,12 +4,13 @@
 sap.ui.define([
 	'jquery.sap.global',
 	'sap/ui/model/ClientModel',
+	'sap/ui/model/Context',
 	'./FhemServicePropertyBinding',
 	'./FhemServiceListBinding',	
 	'./FhemWebSocket',
 	'../base/Helper'
 ],
-	function(jQuery, ClientModel, FhemServicePropertyBinding, FhemWebSocket, Helper) {
+	function(jQuery, ClientModel, Context, FhemServicePropertyBinding, FhemServiceListBinding, FhemWebSocket, Helper) {
 		"use strict";
 
 		/**
@@ -80,6 +81,8 @@ sap.ui.define([
 			 */
 			metadata: {
 				properties: {
+					host: "string",
+					port: "string"					
 				},
 				
 				// methods
@@ -603,6 +606,25 @@ sap.ui.define([
 				
 
 		/**
+		 * Sets the JSON encoded data to the model.
+		 *
+		 * @param {object} oData the data to set on the model
+		 * @param {boolean} [bMerge=false] whether to merge the data instead of replacing it
+		 *
+		 * @public
+		 */
+		FhemService.prototype.setData = function(oData, bMerge){
+			if (bMerge) {
+				// do a deep copy
+				this.oData = jQuery.extend(true, Array.isArray(this.oData) ? [] : {}, this.oData, oData);
+			} else {
+				this.oData = oData;
+			}
+			this.checkUpdate();
+		};
+
+
+		/**
 		 * Sets a new value for the given property <code>sPropertyName</code> in the model.
 		 * If the model value changed all interested parties are informed.
 		 *
@@ -616,18 +638,41 @@ sap.ui.define([
 		 * 
 		 * @param {object} oValue an object in the format expected by the supported path
 		 * @param {object} [oContext=null] the context which will be used to set the property
-		 * 				   Not supported yet.
 		 * @param {boolean} [bAsyncUpdate] whether to update other bindings dependent on 
 		 * 								   this property asynchronously
 		 * @return {boolean} true if the value was set correctly and false if errors occurred 
 		 * 					 like the entry was not found.
 		 * @public
 		 */
-		ChartModel.prototype.setProperty = function(sPath, oValue, oContext, bAsyncUpdate) {
+		FhemService.prototype.setProperty = function(sPath, oValue, oContext, bAsyncUpdate) {
 			
-			let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/");
+			// let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/");
 
-			//TODO: implement
+			var sResolvedPath = this.resolve(sPath, oContext),
+				iLastSlash, sObjectPath, sProperty;
+
+			// return if path / context is invalid
+			if (!sResolvedPath) {
+				return false;
+			}
+
+			// If data is set on root, call setData instead
+			if (sResolvedPath == "/") {
+				this.setData(oValue);
+				return true;
+			}
+
+			iLastSlash = sResolvedPath.lastIndexOf("/");
+			// In case there is only one slash at the beginning, sObjectPath must contain this slash
+			sObjectPath = sResolvedPath.substring(0, iLastSlash || 1);
+			sProperty = sResolvedPath.substr(iLastSlash + 1);
+	
+			var oObject = this._getObject(sObjectPath);
+			if (oObject) {
+				oObject[sProperty] = oValue;
+				this.checkUpdate(false, bAsyncUpdate);
+				return true;
+			}
 
 			return false;
 		};
@@ -641,17 +686,14 @@ sap.ui.define([
 		 * 						"/xxxx" 
 		 * @param {sap.ui.model.Context} [oContext=null] the context which will be used 
 		 *                 to retrieve the property
-		 * 				   Not supported yet. 
 		 * @return {any} the value of the property
 		 * @public
 		 */
-		FhemServiceprototype.getProperty = function(sPath, oContext) {
+		FhemService.prototype.getProperty = function(sPath, oContext) {
 
-			let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/")
+			// let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/")
 
-			//TODO: implement
-
-			return undefined;
+			return this._getObject(sPath, oContext);
 		};
 
 
@@ -677,7 +719,8 @@ sap.ui.define([
 
 		/**
 		 * @param {string} sPath Path to Fhem entity
-		 * @param {object|sap.ui.model.Context} [oContext] 
+		 * @param {object|sap.ui.model.Context} [oContext]  The Context is a pointer to an object in the model data, 
+		 * 			which is used to allow definition of relative bindings
 		 * @returns {any} the node of the specified path/context
 		 */
 		FhemService.prototype._getObject = function (sPath, oContext) {
@@ -708,7 +751,11 @@ sap.ui.define([
 			return oNode;
 		};
 
-		JSONModel.prototype.isList = function(sPath, oContext) {
+
+		/**
+		 * 
+		 */
+		FhemService.prototype.isList = function(sPath, oContext) {
 			var sAbsolutePath = this.resolve(sPath, oContext);
 			return Array.isArray(this._getObject(sAbsolutePath));
 		};

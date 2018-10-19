@@ -15,14 +15,8 @@ sap.ui.define([
 			 * @param {string} sId ID
 			 * @param {object} mSettings Settings
 			 */
-			constructor: function(sId, mSettings) {
+			constructor: function(mSettings) {
 				ManagedObject.apply(this, arguments);
-
-				// identify how the constructor has been used to extract the settings
-				if (typeof sId !== "string") {
-					mSettings = sId;
-					sId = undefined;
-				}
 				
 				jQuery.sap.require("socket.io");
 				this._io = io;
@@ -45,6 +39,8 @@ sap.ui.define([
 			metadata: {
 				
 				properties: {
+					host: "string",
+					port: "string"
 				},
 
 				// methods

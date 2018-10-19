@@ -154,7 +154,7 @@ sap.ui.define([
 			}
 
 			if (!this.bUseExtendedChangeDetection) {
-				var oList = this.oModel._getObject(this.sPath, this.oContext) || [];
+				let oList = this.oModel._getObject(this.sPath, this.oContext) || [];
 				if (!jQuery.sap.equal(this.oList, oList) || bForceupdate) {
 					this.update();
 					this._fireChange({reason: ChangeReason.Change});
@@ -164,7 +164,7 @@ sap.ui.define([
 				var that = this;
 
 				//If the list has changed we need to update the indices first
-				var oList = this.oModel._getObject(this.sPath, this.oContext) || [];
+				let oList = this.oModel._getObject(this.sPath, this.oContext) || [];
 				if (this.oList.length != oList.length) {
 					bChangeDetected = true;
 				}
