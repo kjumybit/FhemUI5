@@ -2,21 +2,48 @@
  *  
  */
 sap.ui.define([
-	"jquery.sap.global",
+	'jquery.sap.global',
 	'sap/ui/model/ClientModel',
-	"./FhemWebSocket",
+	'./FhemServicePropertyBinding',
+	'./FhemServiceListBinding',	
+	'./FhemWebSocket',
 	'../base/Helper'
 ],
-	function(jQuery, ClientModel, FhemWebSocket, Helper) {
+	function(jQuery, ClientModel, FhemServicePropertyBinding, FhemWebSocket, Helper) {
 		"use strict";
-										
+
+		/**
+		 * Constructor for a new Fhem Service.
+		 *  
+		 * @class
+		 * Model implementation for Fhem Backend Service.
+		 *
+		 * A FhemService class implements a server side model for services of the 
+		 * backend Fhem home automation server. I provides the following entities:
+		 * <li><code>/DeviceSet</code>device data for a device <code>DeviceId</code)> with
+		 *   <li><code>/DeviceSet/DeviceId/Internals</code> Internal properties list<li>
+		 *   <li><code>/DeviceSet/DeviceId/Readings</code> Value list</li>
+		 *   <li><code>/DeviceSet/DeviceId/Attributes</code> Configuration attributes list</li>
+		 * </li>
+		 * <li>historical device state values from a DB log device<
+		 * /li>
+		 * <li>propagation of device events to bound UI controls
+		 * </li>
+		 * 
+		 * @extends sap.ui.model.ClientModel
+		 *
+		 * @author 
+		 * @version 
+		 *
+		 * @param {object} mSettings Fhem service configuration 
+		 * @constructor
+		 * @public
+		 * @alias de.kjumybit.fhem.service.FhemService"
+		 */		
 		var FhemService = ClientModel.extend("de.kjumybit.fhem.service.FhemService", /** @lends de.kjumybit.fhem.service.FhemService.prototype */ {
 									
-			/**
-			 * 
-			 */
-			//TODO: document mSettings 
 			constructor: function(mSettings) {
+
 				ClientModel.apply(this, arguments);
 
 				// var that = this;
@@ -574,7 +601,120 @@ sap.ui.define([
 		
 		};
 				
-		
+
+		/**
+		 * Sets a new value for the given property <code>sPropertyName</code> in the model.
+		 * If the model value changed all interested parties are informed.
+		 *
+		 * @param {string}  sPath path of the property to set
+		 * 					Supported paths are: 
+		 *                  <li><code>/DeviceSet</code>device data for a device <code>DeviceId</code)> with
+		 *                  	<li><code>/DeviceSet/DeviceId/Internals</code> Internal properties list<li>
+		 *   					<li><code>/DeviceSet/DeviceId/Readings</code> Value list</li>
+		 *   					<li><code>/DeviceSet/DeviceId/Attributes</code> Configuration attributes list</li>
+		 * 					</li>
+		 * 
+		 * @param {object} oValue an object in the format expected by the supported path
+		 * @param {object} [oContext=null] the context which will be used to set the property
+		 * 				   Not supported yet.
+		 * @param {boolean} [bAsyncUpdate] whether to update other bindings dependent on 
+		 * 								   this property asynchronously
+		 * @return {boolean} true if the value was set correctly and false if errors occurred 
+		 * 					 like the entry was not found.
+		 * @public
+		 */
+		ChartModel.prototype.setProperty = function(sPath, oValue, oContext, bAsyncUpdate) {
+			
+			let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/");
+
+			//TODO: implement
+
+			return false;
+		};
+
+
+		/**
+		 * Returns the value for the property with the given <code>sPropertyName</code>
+		 *
+		 * @param {string} sPath the path to the property
+		 * 					Supported paths are: 
+		 * 						"/xxxx" 
+		 * @param {sap.ui.model.Context} [oContext=null] the context which will be used 
+		 *                 to retrieve the property
+		 * 				   Not supported yet. 
+		 * @return {any} the value of the property
+		 * @public
+		 */
+		FhemServiceprototype.getProperty = function(sPath, oContext) {
+
+			let bIsRelative = typeof sPath == "string" && !jQuery.sap.startsWith(sPath, "/")
+
+			//TODO: implement
+
+			return undefined;
+		};
+
+
+		/**
+		 * @see sap.ui.model.Model.prototype.bindProperty
+		 * The PropertyBinding is used to access single data values in the data model.
+		 */
+		FhemService.prototype.bindProperty = function(sPath, oContext, mParameters) {
+			var oBinding = new FhemServicePropertyBinding(this, sPath, oContext, mParameters);
+			return oBinding;
+		};
+
+
+		/**
+		 * @see sap.ui.model.Model.prototype.bindList
+		 *
+		 */
+		FhemService.prototype.bindList = function(sPath, oContext, aSorters, aFilters, mParameters) {
+			var oBinding = new FhemServiceListBinding(this, sPath, oContext, aSorters, aFilters, mParameters);
+			return oBinding;
+		};
+
+
+		/**
+		 * @param {string} sPath Path to Fhem entity
+		 * @param {object|sap.ui.model.Context} [oContext] 
+		 * @returns {any} the node of the specified path/context
+		 */
+		FhemService.prototype._getObject = function (sPath, oContext) {
+
+			//TODO:
+
+			var oNode = null;
+			
+			if (oContext instanceof Context) {
+				oNode = this._getObject(oContext.getPath());
+			} else if (oContext) {
+				oNode = oContext;
+			}
+			if (!sPath) {
+				return oNode;
+			}
+			var aParts = sPath.split("/"),
+				iIndex = 0;
+			if (!aParts[0]) {
+				// absolute path starting with slash
+				oNode = this.oData;
+				iIndex++;
+			}
+			while (oNode && aParts[iIndex]) {
+				oNode = oNode[aParts[iIndex]];
+				iIndex++;
+			}
+			return oNode;
+		};
+
+		JSONModel.prototype.isList = function(sPath, oContext) {
+			var sAbsolutePath = this.resolve(sPath, oContext);
+			return Array.isArray(this._getObject(sAbsolutePath));
+		};
+
+
+
 		// Static properties and methods
 		FhemService.dummyVar = "";
 		FhemService.fooBar = function() {};
@@ -594,7 +734,9 @@ sap.ui.define([
 		 * 					oEvent.getParameters() {de.kjumybit.fhem.service.Metadata}
 		 */
 		function _onMetaData(oEvent) {
-			this.mFhemMetaData = oEvent.getParameters(); // { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };
+			
+			// { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };
+			this.mFhemMetaData = oEvent.getParameters(); 
 			this.bMetaDataLoaded = true;
 			this.fireMetaDataLoaded(this.mFhemMetaData);
 
@@ -652,8 +794,7 @@ sap.ui.define([
 			oFhemService.fireConnectionClosed(null);
 			//TODO refresh internal data
 		};
-		
-				
+								
 		return FhemService;
 
 	}, /* bExport= */ true);
