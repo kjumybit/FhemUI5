@@ -46,10 +46,16 @@ sap.ui.define([
 			 */
 			getFhemModel: function () {
 				return this.getOwnerComponent().fhemModel;
+				//TODO: use model name <Fhem>
+				// return this.getComponentModel('Fhem');	
 			},
 			
+
 			setFhemModel: function (oFhemModel) {
-				return this.getOwnerComponent().fhemModel = oFhemModel;
+				this.getOwnerComponent().fhemModel = oFhemModel;
+				// (re)set Fhem Service Model
+				jQuery.sap.log.debug("Set Fhem service model", null, _sComponent);	
+				this.getOwnerComponent().setModel(oFhemModel, 'Fhem');
 			},
 
 			

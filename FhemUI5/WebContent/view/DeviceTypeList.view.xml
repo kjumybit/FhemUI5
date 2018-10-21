@@ -9,6 +9,51 @@
 		<content>
 
 		<!-- Tile List -->
+
+
+			<Table id="tblDeviceTypeList"	
+				   items="{ path: 'Fhem>/DeviceSet',
+				            sorter : {
+								path : 'Internals/TYPE',
+								group : true
+							},
+							groupHeaderFactory: '.grouper.getDeviceSetGroupHeader' 				   
+						  }"
+					growing="true"
+					growingScrollToLoad="true">
+					<!-- class="sapUiResponsiveMargin"> -->					
+				<columns>
+					<Column witdh="auto">	
+						<Text text="{i18n>device}" />
+					</Column>					
+					<Column>	
+						<Text text="{i18n>state}" />
+					</Column>
+					<Column minScreenWidth="Tablet">	
+						<Text text="{i18n>stateTime}" />
+					</Column>								
+				</columns>
+				<items>
+					<ColumnListItem type="Navigation" press="onItemPress">
+						<cells>
+							<ObjectIdentifier 
+								title="{ 
+									parts:[{path:'Fhem>Attributes/alias'},{path:'Fhem>Internals/NAME'}],
+	    						    formatter: '.formatter.getDeviceName'
+	    					    }"/>
+							<Text text="{Fhem>Internals/STATE}" />
+							<Text text="{ path: 'Fhem>Readings/state/Time',
+								          type: 'sap.ui.model.type.DateTime', 
+								          formatOptions: {
+											source: { pattern: 'yyyy-MM-dd HH:mm:ss' }
+										}
+							}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+
+
 	
 		</content> 
 

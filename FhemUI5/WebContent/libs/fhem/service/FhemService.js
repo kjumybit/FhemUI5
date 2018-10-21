@@ -1,6 +1,16 @@
-/*
+/*!
  *  
  */
+
+/**
+ * Fhem Model for Devices and Device Events
+ *
+ * @namespace
+ * @name de.kjumybit.fhem.service.FhemWebSocket
+ * @public
+ */
+
+// Provides WebSocket Connection to Fhem server
 sap.ui.define([
 	'jquery.sap.global',
 	'sap/ui/model/ClientModel',
@@ -16,24 +26,31 @@ sap.ui.define([
 		/**
 		 * Constructor for a new Fhem Service.
 		 *  
-		 * @class
-		 * Model implementation for Fhem Backend Service.
+		 * @class Model implementation for Fhem Backend Service.
 		 *
-		 * A FhemService class implements a server side model for services of the 
-		 * backend Fhem home automation server. I provides the following entities:
-		 * <li><code>/DeviceSet</code>device data for a device <code>DeviceId</code)> with
-		 *   <li><code>/DeviceSet/DeviceId/Internals</code> Internal properties list<li>
-		 *   <li><code>/DeviceSet/DeviceId/Readings</code> Value list</li>
-		 *   <li><code>/DeviceSet/DeviceId/Attributes</code> Configuration attributes list</li>
+		 * A FhemService class implements a server side model for entities of the 
+		 * backend Fhem home automation server. 
+		 * 
+		 * <li><code>/Device</code>device data for a device <code>DeviceId</code)> with
+		 *   <li><code>/Device/<DeviceId>/Internals[]</code> Internal properties list<li>
+		 *   <li><code>/Device/<DeviceId>/Readings[]</code> Value list</li>
+		 *   <li><code>/Device/<DeviceId>/Attributes[]</code> Configuration attributes list</li>
 		 * </li>
-		 * <li>historical device state values from a DB log device<
-		 * /li>
+		 * 
+		 * <li><code>/DeviceSet[]</code>device list> with
+		 *   <li><code>Internals[]</code> Internal properties list<li>
+		 *   <li><code>Readings[]</code> Value list</li>
+		 *   <li><code>Attributes[]</code> Configuration attributes list</li>
+		 * </li>
+		 * 
+		 * TODO: Room Set
+		 * TODO: 
 		 * <li>propagation of device events to bound UI controls
 		 * </li>
 		 * 
 		 * @extends sap.ui.model.ClientModel
 		 *
-		 * @author 
+		 * @author kjumybit
 		 * @version 
 		 *
 		 * @param {object} mSettings Fhem service configuration 
@@ -60,13 +77,15 @@ sap.ui.define([
 				};
 
 				this.oData = {};
+				this.setDefaultBindingMode("OneWay");
 
 				// create new connection
 				this._fhemWebSocket = new FhemWebSocket();
 				
 				// connect to Fhem
 				this._fhemWebSocket.connect({ 
-					host: mSettings.host , port: mSettings.port,
+					host: mSettings.host , 
+					port: mSettings.port,
 					onErrorFhemConnection: _onErrorFhemConnection,
 					onFhemDisconnect: _onFhemDisconnect,
 					onSuccessFhemConnection: _onSuccessFhemConnection,
@@ -157,7 +176,6 @@ sap.ui.define([
 		 * @param {object[]} oEvent.getParameters.DeviceSet
 		 * @param {object[]} oEvent.getParameters.RoomSet
 		 * @param {object[]} oEvent.getParameters.DeviceTypeSet
-		 * @param {object[]} oEvent.getParameters.DeviceTypeSet
 		 * @public
 		 */
 
@@ -200,6 +218,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Attach event-handler <code>fnFunction</code> to the <code>metadataLoaded</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
 		 *
@@ -218,6 +237,7 @@ sap.ui.define([
 			this.attachEvent("metaDataLoaded", oData, fnFunction, oListener);
 			return this;
 		};
+
 
 		/**
 		 * Detach event-handler <code>fnFunction</code> from the <code>metadataLoaded</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
@@ -250,6 +270,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Attach event-handler <code>fnFunction</code> to the <code>metaDataLoadFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
 		 *
@@ -269,6 +290,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Detach event-handler <code>fnFunction</code> from the <code>metaDataLoadFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
 		 *
@@ -286,6 +308,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Fire event <code>connectionFailed</code> to attached listeners.
 		 *
@@ -298,6 +321,7 @@ sap.ui.define([
 			this.fireEvent("connectionFailed", mArguments);
 			return this;
 		};
+
 
 		/**
 		 * Attach event-handler <code>fnFunction</code> to the <code>connectionFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
@@ -318,6 +342,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Detach event-handler <code>fnFunction</code> from the <code>connectionFailed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
 		 *
@@ -335,6 +360,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Fire event <code>connectionClosed</code> to attached listeners.
 		 *
@@ -347,6 +373,7 @@ sap.ui.define([
 			this.fireEvent("connectionClosed", mArguments);
 			return this;
 		};
+
 
 		/**
 		 * Attach event-handler <code>fnFunction</code> to the <code>connectionClosed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
@@ -367,6 +394,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Detach event-handler <code>fnFunction</code> from the <code>connectionClosed</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
 		 *
@@ -384,6 +412,7 @@ sap.ui.define([
 			return this;
 		};
 
+
 		/**
 		 * Fire event <code>deviceEvents</code> to attached listeners.
 		 *
@@ -396,6 +425,7 @@ sap.ui.define([
 			this.fireEvent("deviceEvents", mArguments);
 			return this;
 		};
+
 
 		/**
 		 * Attach event-handler <code>fnFunction</code> to the <code>deviceEvents</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
@@ -414,16 +444,9 @@ sap.ui.define([
 		FhemService.prototype.attachDeviceEvents = function(oData, fnFunction, oListener) {
 			this.attachEvent("deviceEvents", oData, fnFunction, oListener);
 
-			// register local event handler for Fhem device events 
-			this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
-				this.fireDeviceEvents(oEvent);
-			}, this);			
-
-			// subscribe to Fhem device events 
-			this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents.onEvent);
-
 			return this;
 		};
+
 
 		/**
 		 * Detach event-handler <code>fnFunction</code> from the <code>deviceEvents</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
@@ -439,6 +462,12 @@ sap.ui.define([
 		 */
 		FhemService.prototype.detachDeviceEvents = function(fnFunction, oListener) {
 			this.detachEvent("deviceEvents", fnFunction, oListener);
+
+			if ( !this.hasListeners("deviceEvents") ) {
+				// detach local event handler from FhemWebSocket connection
+				//TODO: detach private instance method
+			}
+
 			return this;
 		};
 
@@ -476,6 +505,7 @@ sap.ui.define([
 			return this.bMetaDataLoaded;
 		};
 
+
 		/**
 		 * Returns a promise for the loaded state of the metadata
 		 *
@@ -486,6 +516,7 @@ sap.ui.define([
 			//TODO: Instantiate promise & rework
 			return this.pLoaded;
 		};
+
 
 		/**
 		 * Checks whether metadata loading has already failed
@@ -631,9 +662,9 @@ sap.ui.define([
 		 * @param {string}  sPath path of the property to set
 		 * 					Supported paths are: 
 		 *                  <li><code>/DeviceSet</code>device data for a device <code>DeviceId</code)> with
-		 *                  	<li><code>/DeviceSet/DeviceId/Internals</code> Internal properties list<li>
-		 *   					<li><code>/DeviceSet/DeviceId/Readings</code> Value list</li>
-		 *   					<li><code>/DeviceSet/DeviceId/Attributes</code> Configuration attributes list</li>
+		 *                  	<li><code>/Device/DeviceId/Internals</code> Internal properties list<li>
+		 *   					<li><code>/Device/DeviceId/Readings</code> Value list</li>
+		 *   					<li><code>/Device/DeviceId/Attributes</code> Configuration attributes list</li>
 		 * 					</li>
 		 * 
 		 * @param {object} oValue an object in the format expected by the supported path
@@ -699,7 +730,7 @@ sap.ui.define([
 
 		/**
 		 * @see sap.ui.model.Model.prototype.bindProperty
-		 * The PropertyBinding is used to access single data values in the data model.
+		 * The PropertyBinding is used to access a value of a single entity in the Fhem data model.
 		 */
 		FhemService.prototype.bindProperty = function(sPath, oContext, mParameters) {
 			var oBinding = new FhemServicePropertyBinding(this, sPath, oContext, mParameters);
@@ -724,8 +755,6 @@ sap.ui.define([
 		 * @returns {any} the node of the specified path/context
 		 */
 		FhemService.prototype._getObject = function (sPath, oContext) {
-
-			//TODO:
 
 			var oNode = null;
 			
@@ -772,8 +801,7 @@ sap.ui.define([
 		/**
 		 * Handles successfully metadata request from Fhem backend.
 		 * 
-		 * Store metadata in the model instance and inform model change listeners 
-		 * via OpenUI5 events.
+		 * Store metadata in the model instance and inform model change listeners.
 		 * 
 		 * Called by fhem.core.Service ws connection handler.
 		 * 
@@ -784,17 +812,23 @@ sap.ui.define([
 			
 			// { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };
 			this.mFhemMetaData = oEvent.getParameters(); 
+			this.setData( _buildModel(this.mFhemMetaData) );
+
 			this.bMetaDataLoaded = true;
 			this.fireMetaDataLoaded(this.mFhemMetaData);
 
-			// register local event handler for Fhem device events 
-			this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
-				this.fireDeviceEvents(oEvent);
-				// TODO update local readings model for Device
-			}, this);			
-		
-			// subscribe to Fhem device events 
-			this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents.onEvent);
+			// register local event handler for Fhem device events (only once)
+			if ( this._fhemWebSocket.hasListeners("deviceEvents") ) {
+
+				//TODO: use private instance method
+				this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
+					this.fireDeviceEvents(oEvent);
+				}, this);			
+
+				// subscribe to Fhem device events (only once)
+				//TODO: move it to attachDeviceEvents() method of FhemWebSocket class
+				this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents.onEvent);
+			}
 		};
 
 		
@@ -841,7 +875,41 @@ sap.ui.define([
 			oFhemService.fireConnectionClosed(null);
 			//TODO refresh internal data
 		};
-								
+		
+
+		/**
+		 * Build model data from Fhem metadata
+		 * Retrieve Fhem metadata via web socket connection.
+		 * 
+		 * @param {object} oMetaData Fhem metadate
+		 * 					{ DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] }
+		 * 
+		 * @returns {object} FhemService model data
+		 * 					{
+		 * 						Device: {
+		 * 							"<DeviceId>": object
+		 * 						},
+		 * 						Room: {
+		 * 							"<RoomId>": object
+		 * 						},
+		 * 						DeviceSet: [ object ], 
+		 * 						RoomSet: [object ], 
+		 * 						DeviceTypeSet: [ object], 
+		 * 						DeviceSubTypeSet: [ object ]
+		 * 					}
+		 */
+		function _buildModel(oMetaData) {
+			let oModel = {};
+			
+			oModel.DeviceSet = oMetaData.DeviceSet;
+			oModel.RoomSet = oMetaData.RoomSet;
+			oModel.DeviceTypeSet = oMetaData.DeviceTypeSet;
+			oModel.DeviceSubTypeSet = oMetaData.DeviceSubTypeSet;
+
+			return oModel;
+		};
+		
+
 		return FhemService;
 
 	}, /* bExport= */ true);

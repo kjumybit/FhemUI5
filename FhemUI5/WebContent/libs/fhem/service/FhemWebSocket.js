@@ -1,18 +1,39 @@
-/*
+/*!
  *  
  */
+
+/**
+ * Fhem WebSocket Connection
+ *
+ * @namespace
+ * @name de.kjumybit.fhem.service.FhemWebSocket
+ * @public
+ */
+
+// Provides WebSocket Connection to Fhem server
 sap.ui.define([
 	"jquery.sap.global",
 	"sap/ui/base/ManagedObject",	
 ],
 	function(jQuery, ManagedObject) {
 		"use strict";
-															
+								
+		/**
+		 * Creates a new WebSocket connection to Fhem node.js server.
+		 *
+		 *
+		 * @class Fhem WebSocket Connection
+		 * @extends ap/ui/base/ManagedObject
+		 *
+		 * @author kjumybit
+		 * @version 
+		 * @public
+		 * @alias de.kjumybit.fhem.service.FhemWebSocket
+		 */		
 		var FhemWebSocket = ManagedObject.extend("de.kjumybit.fhem.service.FhemWebSocket", /** @lends de.kjumybit.fhem.service.FhemWebSocket.prototype */ {
 									
 			/**
 			 * Initialize a Fhem WebSocket API.
-			 * @param {string} sId ID
 			 * @param {object} mSettings Settings
 			 */
 			constructor: function(mSettings) {
