@@ -262,7 +262,7 @@ sap.ui.define([
 			// local testing 
 			/*
 			oModel.loadData("model/fhemJsonList2.json");
-			this.setModel(oModel, "fhemMetaData" );  
+			this.setModel(oModel, "Fhem" );  
 			this._setSideNavModelfromFhem();			
 			*/
 			
@@ -288,22 +288,23 @@ sap.ui.define([
 		/**
 		 * Handle Fhem metadata 
 		 * Set & update local models
-		 * - Fhem data model
 		 * - Side navigation model 
 		 */
-		//TODO: re-use JSON Model
 		//TODO create sideNavigation if required
 		_onMetaDataLoaded : function(oEvent) {
 			
 			this._setRuntimeFhemConnectionState(true);			
 			
+			/*
 			let oMetaModel = this.getFhemMetaModel();
 			let oFhem = this.getFhemModel(); 
 			oMetaModel.setData(oFhem.getServiceMetadata());
 			oMetaModel.refresh();
-			
+			*/
+
 			// oMetaModel.loadData("model/fhemJsonList2.json"); // local testing
   
+			let oFhem = this.getFhemModel();
 			this._setSideNavModelfromFhem(oFhem);
 		},
 		

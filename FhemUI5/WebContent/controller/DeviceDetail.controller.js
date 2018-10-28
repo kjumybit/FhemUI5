@@ -28,16 +28,6 @@ sap.ui.define([
 			// call the base component's init function
 			BaseController.prototype.onInit.apply(this, arguments);
 
-			
-			// Initialize view model for Fhem device details
-			var oDevDetailData = {
-					"Internals": [],
-					"Readings": [],
-					"Attributes": []
-			};
-			this.oDeviceDetailModel = new JSONModel(oDevDetailData);
-			this.setModel(this.oDevicevDetailModel, "DevicevDetail");
-			
 			this.getRouter().getRoute("DeviceDetail").attachPatternMatched(this._onDeviceMatched, this);
 		},
 	
@@ -77,29 +67,13 @@ sap.ui.define([
 			this.sDeviceId =  oEvent.getParameter("arguments").deviceId;
 			
 			// get path to device in Fhem JSON model
-			var aDeviceSet = this.getFhemMetaModel().getProperty('/DeviceSet');
+			var aDeviceSet = this.getFhemModel().getProperty('/DeviceSet');
 			var i = this.getArrayIndex('Name', this.sDeviceId, aDeviceSet);
 		
-			// bind the view to the concrete device
-			this.getView().bindElement('fhemMetaData>/DeviceSet/' + i);
-
+			// bind the view to the current device
+			this.getView().bindElement('Fhem>/DeviceSet/' + i);
 			
-			// map the device readings to the local view model
-			var aReadings = this._mapReadings(aDeviceSet[i].Readings);
-//			this.oDeviceDetailModel.setProperty("/Readings", aReadings);  // via binding
-			this._createReadings(this.byId("formReadings"), aReadings);    // via JScript
-			
-			// map the device internals to the local view model
-			var aInternals = this._mapInternals(aDeviceSet[i].Internals);
-//			this.oDeviceDetailModel.setProperty("/Internals", aInternals);  // via binding
-			this._createInternals(this.byId("formInternals"), aInternals);    // via JScript
-			
-			// map the device attributes to the local view model
-			var aAttributes = this._mapAttributes(aDeviceSet[i].Attributes);
-//			this.oDeviceDetailModel.setProperty("/Attributes", aAttributes);  // via binding
-			this._createAttributes(this.byId("formAttributes"), aAttributes);    // via JScript			
-			
-			// charts
+			// build charts
 			this._createChart(this.byId("chartContainer"));    // via JScript
 			
 		},
@@ -174,88 +148,6 @@ sap.ui.define([
 		 *  Private functions
 		 ** ================================================================================ */
 
-		
-		_mapInternals: function(oInternals) {
-			var aInternals = [];
-			for (var i in oInternals) {
-				aInternals.push({
-					"Name": i,
-					"Value": oInternals[i]
-				});
-			}
-			return aInternals;
-		},
-		
-		_mapReadings: function(oReadings) {
-			var aReadings = [];
-			for (var i in oReadings) {
-				aReadings.push({
-					"Name": i,
-					"Value": oReadings[i].Value,
-					"Time": oReadings[i].Time
-				});
-			}
-			return aReadings;
-		},
-
-		_mapAttributes: function(oAttributes) {
-			var aAttributes = [];
-			for (var i in oAttributes) {
-				aAttributes.push({
-					"Name": i,
-					"Value": oAttributes[i]
-				});
-			}
-			return aAttributes;
-		},
-		
-		
-		_createReadings: function(oFormContainer, aReadings) {
-			oFormContainer.destroyFormElements();
-			if (!aReadings) return;
-
-			for (var i=0, iL=aReadings.length; i<iL; i++) {
-				var oFormElement = new FormElement({
-					"label": aReadings[i].Name
-				}).addField( new Text({ 
-					"text": new String(aReadings[i].Value) 
-				})).addField( new Text({ 
-					"text": aReadings[i].Time 
-				}));
-				oFormContainer.addFormElement(oFormElement);
-			}
-		},
-
-
-		_createAttributes: function(oFormContainer, aAttributes) {
-			oFormContainer.destroyFormElements();
-			if (!aAttributes) return;
-			
-			for (var i=0, iL=aAttributes.length; i<iL; i++) {
-				var oFormElement = new FormElement({
-					"label": aAttributes[i].Name
-				}).addField( new Text({ 
-					"text": new String(aAttributes[i].Value)
-				}));
-				oFormContainer.addFormElement(oFormElement);				
-			}			
-		},
-
-
-		_createInternals: function(oFormContainer, aInternals) {
-			oFormContainer.destroyFormElements();
-			if (!aInternals) return;
-			
-			for (var i=0, iL=aInternals.length; i<iL; i++) {
-				var oFormElement = new FormElement({
-					"label": aInternals[i].Name
-				}).addField( new Text({ 
-					"text": new String(aInternals[i].Value)
-				}));
-				oFormContainer.addFormElement(oFormElement);											
-			}			
-		},
-		
 
 		/** 
 		 * Create charting controlls for device

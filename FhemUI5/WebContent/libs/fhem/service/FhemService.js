@@ -23,6 +23,8 @@ sap.ui.define([
 	function(jQuery, ClientModel, Context, FhemServicePropertyBinding, FhemServiceListBinding, FhemWebSocket, Helper) {
 		"use strict";
 
+		const _sComponent = "FhemService";	
+
 		/**
 		 * Constructor for a new Fhem Service.
 		 *  
@@ -38,9 +40,12 @@ sap.ui.define([
 		 * </li>
 		 * 
 		 * <li><code>/DeviceSet[]</code>device list> with
-		 *   <li><code>Internals[]</code> Internal properties list<li>
-		 *   <li><code>Readings[]</code> Value list</li>
-		 *   <li><code>Attributes[]</code> Configuration attributes list</li>
+		 *   <li><code>InternalSet</code> Internal properties<li>
+		 *   <li><code>InternalSet</code> Internal properties list<li>
+		 *   <li><code>Readings</code> Values</li>
+		 *   <li><code>ReadingSet</code> Values list</li>
+		 *   <li><code>Attributes</code> Configuration attributes</li>
+		 *   <li><code>AttributeSet</code> Configuration attributes list</li>
 		 * </li>
 		 * 
 		 * TODO: Room Set
@@ -662,6 +667,7 @@ sap.ui.define([
 		 * @param {string}  sPath path of the property to set
 		 * 					Supported paths are: 
 		 *                  <li><code>/DeviceSet</code>device data for a device <code>DeviceId</code)> with
+		 *                      <li><code>/Device/DeviceId/Internals</code> Internal properties list<li>
 		 *                  	<li><code>/Device/DeviceId/Internals</code> Internal properties list<li>
 		 *   					<li><code>/Device/DeviceId/Readings</code> Value list</li>
 		 *   					<li><code>/Device/DeviceId/Attributes</code> Configuration attributes list</li>
@@ -753,6 +759,7 @@ sap.ui.define([
 		 * @param {object|sap.ui.model.Context} [oContext]  The Context is a pointer to an object in the model data, 
 		 * 			which is used to allow definition of relative bindings
 		 * @returns {any} the node of the specified path/context
+		 * @private
 		 */
 		FhemService.prototype._getObject = function (sPath, oContext) {
 
@@ -790,6 +797,43 @@ sap.ui.define([
 		};
 
 
+		/**
+		 * Update device reading valuas from Fhem device events.
+		 * Trigger binding updates.
+		 * 
+ 		 * @param {object} oEvent Containter for Fhem device events
+		 * @private
+		 */
+		FhemService.prototype._updateModelForDeviceEvents = function(oEvent) {
+			
+			let aEvents = oEvent.getParameter("events");
+			let bUpdate = false;
+
+			jQuery.sap.assert(Array.isArray(aEvents), "FhemService._updateModelForDeviceEvents: unexpected data type for oEvent" );
+			
+			for (var i=0, iL=aEvents.length; i<iL; i++) {
+
+				let oDeviceEvent = aEvents[i];
+				// get model property for device
+				let oDevice = getArrayObjectByProperty("Name", oDeviceEvent.deviceName, this.oData.DeviceSet);
+
+				if (oDevice) {
+					// get or initialize device reading
+					_setReadingForDevice(oDevice, oDeviceEvent.reading, oDeviceEvent.value, oDeviceEvent.timeStamp);
+					bUpdate = true;
+
+					jQuery.sap.log.debug("Update device reading " +  oDeviceEvent.deviceName + " " + oDeviceEvent.reading + ": " +oDeviceEvent.value, 
+						null, _sComponent);
+				} else {
+					jQuery.sap.log.error("Unknown device for event update" + oDeviceEvent.deviceName, null, _sComponent);
+				};
+			}
+
+			if (bUpdate) {
+				this.checkUpdate();
+			}
+		};
+
 
 		// Static properties and methods
 		FhemService.dummyVar = "";
@@ -800,8 +844,8 @@ sap.ui.define([
 		
 		/**
 		 * Handles successfully metadata request from Fhem backend.
-		 * 
-		 * Store metadata in the model instance and inform model change listeners.
+		 * - Build Fhem service model data and inform model change listeners.
+		 * - Registers local event handler for Fhem device events.
 		 * 
 		 * Called by fhem.core.Service ws connection handler.
 		 * 
@@ -818,10 +862,11 @@ sap.ui.define([
 			this.fireMetaDataLoaded(this.mFhemMetaData);
 
 			// register local event handler for Fhem device events (only once)
-			if ( this._fhemWebSocket.hasListeners("deviceEvents") ) {
+			if ( !this._fhemWebSocket.hasListeners("deviceEvents") ) {
 
 				//TODO: use private instance method
 				this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
+					this._updateModelForDeviceEvents(oEvent);
 					this.fireDeviceEvents(oEvent);
 				}, this);			
 
@@ -848,7 +893,6 @@ sap.ui.define([
 			// register internal event handler
 			oFhemService._fhemWebSocket.attachMetaDataLoaded(_onMetaData, oFhemService);
 			oFhemService._fhemWebSocket.sendMetaDataRequest();
-
 		};
 		
 
@@ -886,29 +930,138 @@ sap.ui.define([
 		 * 
 		 * @returns {object} FhemService model data
 		 * 					{
-		 * 						Device: {
-		 * 							"<DeviceId>": object
+		 * 						Device: {	//TODO
+		 * 							"<DeviceId>": DeviceSet[<DeviceId>]
 		 * 						},
-		 * 						Room: {
+		 * 						Room: {		//TODO
 		 * 							"<RoomId>": object
 		 * 						},
-		 * 						DeviceSet: [ object ], 
-		 * 						RoomSet: [object ], 
-		 * 						DeviceTypeSet: [ object], 
-		 * 						DeviceSubTypeSet: [ object ]
+		 * 						DeviceSet: [{
+		 * 							"Name": string,
+		 * 							"Internals": { 
+		 * 								<I>: Internal, ..., 
+		 * 								<I>: Internal 
+		 * 							},
+		 *  					    "InternalSet": [ { "Name": <I>, "Data": Internal } ],
+		 * 							"Readings": { 
+		 * 								<R>: Reading, ..., 
+		 * 								<R>: Reading 
+		 * 							},
+		 * 							"ReadingSet": [ { "Name: "<R>, "Data": Reading } ],
+		 *  						"Attributes": { 
+		 * 								<A>: Attribute, ..., 
+		 * 								<A>: Attribute 
+		 * 							},
+		 *  						"AttributeSet": [ { "Name": <A>, "Data": Attribute } ] 
+		 * 						}], 
+		 * 						RoomSet: [ string ], 
+		 * 						DeviceTypeSet: [ string ], 
+		 * 						DeviceSubTypeSet: [ string ]
 		 * 					}
+		 * 
+		 * <Reading>: {
+		 * 		"Value":"alive:3 dead:0 unkn:0 off:0", 
+		 * 		"Time":"2017-05-31 23:02:28"
+		 * }
+		 * 
+		 * <Internal>: "alive:3 dead:0 unkn:0 off:0"
+		 * 
+		 * <Attribute>: "ActionDetector" 
+		 * 
 		 */
 		function _buildModel(oMetaData) {
+
+			jQuery.sap.log.debug("Build Fhem service model", null, _sComponent);	
+
 			let oModel = {};
 			
+			// Devices Set and Device properties sets
 			oModel.DeviceSet = oMetaData.DeviceSet;
+			oModel.DeviceSet.forEach(oDevice => {
+				// build InternalSet
+				oDevice.InternalSet = [];
+				for (let i in oDevice.Internals) {
+					oDevice.InternalSet.push({ "Name": i,  "Data": oDevice.Internals[i] });
+				};
+				// build ReadingSet
+				oDevice.ReadingSet = [];
+				for (let r in oDevice.Readings) {
+					oDevice.ReadingSet.push({ "Name": r, "Data": oDevice.Readings[r] });
+				};
+				// build AttributSet
+				oDevice.AttributeSet = [];
+				for (let a in oDevice.Attributes) {
+					oDevice.AttributeSet.push({ "Name": a, "Data": oDevice.Attributes[a] });
+				};
+			});
+
+			// Room Set
 			oModel.RoomSet = oMetaData.RoomSet;
+
+			// Device Type Set
 			oModel.DeviceTypeSet = oMetaData.DeviceTypeSet;
+
+			// Sub Device Type Set
 			oModel.DeviceSubTypeSet = oMetaData.DeviceSubTypeSet;
 
 			return oModel;
 		};
+
 		
+		/**
+		 * Set or update a device reading value in the model data
+		 *
+		 * @param {object} oDevice Fhem device 
+		 * @param {string} sReadingId Reading name
+		 * @param {string} sValue Reading value
+		 * @param {string} sTimeStamp Time stamp the reading value has been set
+		 */
+		function _setReadingForDevice(oDevice, sReadingId, sValue, sTimeStamp) {
+
+			jQuery.sap.assert(oDevice && sReadingId && sValue, "FhemService._setReadingForDevice(): Invalid parameter" );
+			
+			// set named property
+			let oData = oDevice.Readings[sReadingId];
+			if (!oData) {
+				// create new reading with initial values
+				jQuery.sap.log.info("FhemService._setReadingForDevice(): Set new device reading " + oDevice.Name + "." + sReadingId, null, _sComponent);	
+				oData = { Value: "", Time: "" }
+				oDevice.Readings[sReadingId] = oData;
+				oDevice.ReadingSet.push({ "Name": sReadingId, "Data": oData })	
+			}
+
+			// update reading value
+			oData.Value = sValue;
+			oData.Time = sTimeStamp;
+
+			// update property array element
+			let oReading = getArrayObjectByProperty("Name", sReadingId, oDevice.ReadingSet);
+			jQuery.sap.assert(oReading, "FhemService._setReadingForDevice(): Unknown device reading " + oDevice.Name + "." + sReadingId );
+			// don't change object refernce
+			oReading.Data = oData;
+		};
+
+
+		/**
+		 * Get first object in array property value 
+		 * @param {string} sProperty the name of an object property 
+		 * @param {object} value the property value
+		 * @param {object[]} aArray an array of JSON objects
+		 * @return {object} the frist object with mathich property value
+		 *                   or undefined, of no object has been found
+		 */
+		function getArrayObjectByProperty( sProperty, value, aArray) {
+			var oElement = undefined;
+			for (var i=0, iL=aArray.length; i<iL; i++) {
+				var o = aArray[i];
+				if (o[sProperty] && o[sProperty] === value) {
+					oElement = o;
+					break;
+				}
+			}
+			return oElement;
+		};		
+
 
 		return FhemService;
 

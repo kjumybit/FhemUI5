@@ -35,7 +35,9 @@
       "STATE": "33438.5", 
       "TYPE": "dummy" 
     }, 
-    "Readings": {      "state": { "Value":"33438.5", "Time":"2017-05-01 00:00:00" }    }, 
+    "Readings": {      
+      "state": { "Value":"33438.5", "Time":"2017-05-01 00:00:00" }    
+    }, 
     "Attributes": { 
       "event-on-change-reading": "state", 
       "room": "9_Steuerung" 
