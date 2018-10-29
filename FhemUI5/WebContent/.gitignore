@@ -4,9 +4,23 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 /resources/
+<<<<<<< HEAD
+<<<<<<< HEAD
+/resources/
+=======
+>>>>>>> refs/heads/develop
+/resources/
+/notizen.txt
+/resources/
+/resources/
+/resources/
+/.gitignore
+/resources/
+=======
 /resources/
 /resources/
 =======
 >>>>>>> refs/heads/feature/Charting_UseTimeLineControl
 =======
 >>>>>>> refs/heads/feature/Charting_UseTimeLineControl
+>>>>>>> refs/heads/develop

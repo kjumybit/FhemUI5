@@ -6,3 +6,7 @@
 /org.eclipse.jdt.core.prefs
 /org.eclipse.wst.jsdt.core.prefs
 /org.eclipse.wst.jsdt.ui.prefs
+<<<<<<< HEAD
+/.gitignore
+=======
+>>>>>>> refs/heads/develop

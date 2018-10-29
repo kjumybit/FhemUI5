@@ -1,0 +1,227 @@
+Icon-Fonts
+====================
+
+XMl View:
+	<Input id="1fhem" placeholder="&#xe938; etwas text" class="myfhem" width="10em" />	
+
+css.style:
+
+.sapMInputBaseInner {
+    font-family: fhem,Arial,Helvetica,sans-serif;
+}
+	
+
+
+Metadaten
+============
+
+Organisation
+--------------
+
+Anzeigefilter für 
++ Geräte
++ Räume
++ Gerätetypen / - Geräte-Untertypen
+
+
+Zuordnung von Bezeichnungen zu 
++ Räumen
+
+Zuordnung von Icons zu 
++ Geräten
++ Räumen
+
+Zuordnung von Kommandos zu Geräten
+
+Zuordnung von Geräten zu Gruppen
+
+
+Statusdefinition
+----------------
+datatype ::= boolean, enumn, integer, float, string, datetime
+value ::= <value>
+unit ::= <unit>
+valueState ::= error, warning, success, none
+valueStateIcon ::= default, error, warning, success, none
+valueIcon :: ???
+
+
+
+Statusermittlung
+=================
+
+Aggregation des Gerätestatus zu Gesamtstatus 
++ eines Raumes
++ einer Gruppe
+
+
+NFR
+====
+
+1. interaktive Pflege ermöglichen
+2. benutzerunabhängige, allgemeine Definitionen zentral im Backend vornehmen
+
+
+Technische Lösung
+====================
+
+Neues Dummy Fhem Device für allgemeine Definitionen
+---------------------------------------------------
+
+- mit einem definierten Namen
+- wird nicht angezeigt, aber ausgewertet
+- für geräteübergreifende Definitionen
+- für Definition von Standardwerten für gerätespezifische UI Eigenschaften
+
+Name: D_FHEMUI5_DEF
+Attribute:
++ roomNames ::= Json Array, Map room names to Fhem room IDs
+		 
+                { "rooms":
+	 		  [ "<FhemRoomId>", "<roomName>"], 
+			  [ "<FhemRoomId>", "<roomName>"], 
+			  ...
+                }
+
++ deviceGroups ::= Json Object, define device groups and assign devices
+		{ "groups":
+			   [ 	
+				{ 
+				  "id": <group ID>,
+				  "name": <group name>,
+				  "devices" : [ <deviceID>, ... ]
+				},
+				...
+			    ]
+		}
+
++ noDisplay ::= Json Object, exclude device / types from display on UI
+		{
+		  "room": [ <roomList> ],
+		  "deviceType": [ <deviceTypeList> ],
+		  "deviceSybType": [ <deviceSubTypeList> ],
+		}
+
++ statusMapping ::= Json Object, Define status mapping for device, device subtype or device type
+		{
+		  "statusDef": {
+			???TODO
+		  },
+		  "statusConf":
+			[ 
+				{
+					"category": "<device>|<devicesubtype>|<devicetype>",
+					"datatype": "boolean|enum|int|float|string|datetime",
+					"unit": "<unit>",
+					"valueStates": [
+					    { 
+						"state": "error", 
+						"map": <??? TODO ein Mapping mit JavaScript>, 
+						"icon": <iconName>
+					    },
+						"state": "warning", 
+						"map": <??? TODO ein Mapping>, 
+						"icon": <iconName>
+					    },
+						"state": "success",
+						"map": <??? TODO ein Mapping>, 
+						"icon": <iconName>
+					    },
+						"state": "none",
+						"icon": <iconName>
+					    }
+					]
+				},
+				...
+			]
+		}
+
+
+
+Neue Device-spezifische Attribute für UI
+----------------------------------------
+
+Nachteil:
++ Pflege in jedem Gerät erforderlich
+
+Attribute:
+
++ ui5 ::= Json Object,
+		{
+			"visible": <true(*), false>,
+			
+		}
+
+
+
+Abfrage Plots:
+==================
+
+Beispiele:
+- ein Reading KG_IZ_StromZaehler:energyTagesVerbrauch
+
+get DB_Log_MariaDB - ALL 2017-10-01_00:00:00 2017-10-02_23:59:59 KG_IZ_StromZaehler:energyTagesVerbrauch
+
+Timestamp: Device, Type, Event, Reading, Value, Unit
+=====================================================
+2017-10-01 00:01:41: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0, energyTagesVerbrauch, 0, 
+2017-10-01 00:04:03: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0, energyTagesVerbrauch, 0, 
+2017-10-01 00:06:11: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.0132999999999993, energyTagesVerbrauch, 0.0132999999999993, 
+2017-10-01 00:09:07: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.0132999999999993, energyTagesVerbrauch, 0.0132999999999993, 
+2017-10-01 00:11:49: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.0132999999999993, energyTagesVerbrauch, 0.0132999999999993, 
+2017-10-01 00:14:17: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.0266999999999989, energyTagesVerbrauch, 0.0266999999999989, 
+2017-10-01 00:16:31: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.0266999999999989, energyTagesVerbrauch, 0.0266999999999989, 
+2017-10-01 00:18:31: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.0266999999999989, energyTagesVerbrauch, 0.0266999999999989, 
+2017-10-01 00:21:19: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.0266999999999989, energyTagesVerbrauch, 0.0266999999999989, 
+2017-10-01 00:23:53: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 0.04, energyTagesVerbrauch, 0.04, 
+....
+2017-10-02 23:54:49: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 7.5333, energyTagesVerbrauch, 7.5333, 
+2017-10-02 23:57:05: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 7.5333, energyTagesVerbrauch, 7.5333, 
+2017-10-02 23:59:08: KG_IZ_StromZaehler, CUL_HM, energyTagesVerbrauch: 7.5466, energyTagesVerbrauch, 7.5466, 
+#KG_IZ_StromZaehler:energyTagesVerbrauch:::
+
+
+
+Get when used for webcharts
+
+get <name>        <infile> <outfile> <from>       <to>               <device>            <querytype> <xaxis> <yaxis>  
+get DB_Log_MariaDB - webchart 2017-10-01_00:00:00 2017-10-02_23:59:59 KG_IZ_StromZaehler timerange TIMESTAMP energyTagesVerbrauch
+{
+	"data":[
+		{"TIMESTAMP":"2018-03-03 00:01:56","VALUE":"0.0133000000000466"},
+		{"TIMESTAMP":"2018-03-03 00:04:34","VALUE":"0.0265999999999767"}
+	]
+}
+
+
+
+==============================
+Class structure
+==============================
+
+Fhem NavigationTree control
+- UI component
+- provides the navigation tree
+
+
+Fhem Service Model
+- Application model
+- represents a Fhem connection instance
+- provides
+  + events
+  + fhem device meta data
+  + fhem device readings and device actions
+  + fhem functions
+- properties
+  + connection parameters
+- implements
+  + SAPUI message processor
+
+
+Fhem Web Socket Connection
+- service control 
+- represents WebSocket backend connection 
+- provides
+  + events
+  
+

@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+/build/
+/.classpath
+/.project
+/node_modules/
+/ui5-exports/
+/ui5-types/
+/ProductBacklog.txt
+/notizen.txt
+/.gitignore
+=======
 /node_modules/
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -15,3 +26,4 @@
 >>>>>>> refs/heads/feature/Charting_UseTimeLineControl
 /.classpath
 /.project
+>>>>>>> refs/heads/develop
