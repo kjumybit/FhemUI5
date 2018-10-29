@@ -930,12 +930,6 @@ sap.ui.define([
 		 * 
 		 * @returns {object} FhemService model data
 		 * 					{
-		 * 						Device: {	//TODO
-		 * 							"<DeviceId>": DeviceSet[<DeviceId>]
-		 * 						},
-		 * 						Room: {		//TODO
-		 * 							"<RoomId>": object
-		 * 						},
 		 * 						DeviceSet: [{
 		 * 							"Name": string,
 		 * 							"Internals": { 
