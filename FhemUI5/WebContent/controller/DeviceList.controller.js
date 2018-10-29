@@ -112,7 +112,7 @@ sap.ui.define([
 		 */
 		_showDeviceDetail: function(oDevice) {
 			this.getRouter().navTo("DeviceDetail", {
-				deviceId: oDevice.getBindingContext("fhemMetaData").getProperty("Name")
+				deviceId: oDevice.getBindingContext("Fhem").getProperty("Name")
 			});
 		}
 	

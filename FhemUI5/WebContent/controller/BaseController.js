@@ -30,7 +30,7 @@ sap.ui.define([
 				var index = -1;
 				for (var i=0, iL=aArray.length; i<iL; i++) {
 					var o = aArray[i];
-					if (o[sProperty] && o[sProperty] == value) {
+					if (o[sProperty] && o[sProperty] === value) {
 						index = i;
 						break;
 					}
@@ -45,29 +45,20 @@ sap.ui.define([
 			 * @returns {de.kjumybit.fhem.service.FhemService} Fhem Service
 			 */
 			getFhemModel: function () {
-				return this.getOwnerComponent().fhemModel;
+				// return this.getOwnerComponent().fhemModel;
+				//TODO: use model name <Fhem>
+				return this.getComponentModel('Fhem');	
 			},
 			
+
 			setFhemModel: function (oFhemModel) {
-				return this.getOwnerComponent().fhemModel = oFhemModel;
+				this.getOwnerComponent().fhemModel = oFhemModel;
+				// (re)set Fhem Service Model
+				jQuery.sap.log.debug("Set Fhem service model", null, _sComponent);	
+				this.getOwnerComponent().setModel(oFhemModel, 'Fhem');
 			},
 
-			
-			/**
-			 * Get JSON Model for Fhem metadata
-			 * @returns {sap.ui.model.json.JSONModel} JSON Model with Fhem metadata
-			 */
-			getFhemMetaModel: function () {
-				let oModel = this.getOwnerComponent().getModel('fhemMetaData');
-				if (!oModel) {
-					jQuery.sap.log.debug("Create new Fhem metadata model", null, _sComponent);					
-					oModel = new JSONModel();
-					this.getOwnerComponent().setModel(oModel, 'fhemMetaData');
-				}
-				return oModel;
-			},
-							
-			
+
 			/**
 			 * Get settings object.
 			 * 

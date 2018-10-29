@@ -1,28 +1,43 @@
-/*
+/*!
  *  
  */
+
+/**
+ * Fhem WebSocket Connection
+ *
+ * @namespace
+ * @name de.kjumybit.fhem.service.FhemWebSocket
+ * @public
+ */
+
+// Provides WebSocket Connection to Fhem server
 sap.ui.define([
 	"jquery.sap.global",
 	"sap/ui/base/ManagedObject",	
 ],
 	function(jQuery, ManagedObject) {
 		"use strict";
-															
+								
+		/**
+		 * Creates a new WebSocket connection to Fhem node.js server.
+		 *
+		 *
+		 * @class Fhem WebSocket Connection
+		 * @extends ap/ui/base/ManagedObject
+		 *
+		 * @author kjumybit
+		 * @version 
+		 * @public
+		 * @alias de.kjumybit.fhem.service.FhemWebSocket
+		 */		
 		var FhemWebSocket = ManagedObject.extend("de.kjumybit.fhem.service.FhemWebSocket", /** @lends de.kjumybit.fhem.service.FhemWebSocket.prototype */ {
 									
 			/**
 			 * Initialize a Fhem WebSocket API.
-			 * @param {string} sId ID
 			 * @param {object} mSettings Settings
 			 */
-			constructor: function(sId, mSettings) {
+			constructor: function(mSettings) {
 				ManagedObject.apply(this, arguments);
-
-				// identify how the constructor has been used to extract the settings
-				if (typeof sId !== "string") {
-					mSettings = sId;
-					sId = undefined;
-				}
 				
 				jQuery.sap.require("socket.io");
 				this._io = io;
@@ -45,6 +60,8 @@ sap.ui.define([
 			metadata: {
 				
 				properties: {
+					host: "string",
+					port: "string"
 				},
 
 				// methods

@@ -60,7 +60,7 @@ sap.ui.define([
 	 * Model implementation for Charting data.
 	 *
 	 * A ChartModel is a class which holds metda data for a set of charts. 
-	 * A sinle chart is accessed using an <code>ID</code> and 
+	 * A single chart is accessed using an <code>ID</code> and 
 	 * provides charting options and data sets which can be bound to properties of a chart control.
 	 * 
 	 * @extends sap.ui.model.ClientModel
@@ -79,7 +79,7 @@ sap.ui.define([
 			
 			ClientModel.apply(this, arguments);
 
-			// model data (defined in by superclass ClientModel)
+			// model data (defined in superclass ClientModel)
 			this.oData = {
 				chartCtrl: {
 					zoomLevel: {
@@ -227,7 +227,7 @@ sap.ui.define([
 	
 
 	/**
-	 * Retrieve date from backend for data set <code>oDataSet</code>
+	 * Retrieve data from backend for data set <code>oDataSet</code>
 	 * 
 	 * @param {object} oDataSet Dataset of a chart 
 	 * @param {de.kjumybit.fhem.chart.TimeLine} oTimeLine Time intervall for data points

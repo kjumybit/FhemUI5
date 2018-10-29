@@ -13,17 +13,17 @@
 					Device header 
 				-->
 				<ObjectHeader 
-					title="{parts:[{path:'fhemMetaData>Attributes/alias'},{path:'fhemMetaData>Name'}],
+					title="{parts:[{path:'Fhem>Attributes/alias'},{path:'Fhem>Name'}],
 	    				    formatter: '.formatter.getDeviceName'}" 
-	    			intro="{fhemMetaData>Name}" 
-	    			number="{fhemMetaData>Internals/STATE}" 
+	    			intro="{Fhem>Name}" 
+	    			number="{Fhem>Readings/state/Value}" 
 	    			numberUnit="" 
 					backgroundDesign="Solid" icon="sap-icon://heating-cooling" responsive="true" titleLevel="H2">					
 				    <statuses>					
 				        <ObjectStatus text=""/>					
 				    </statuses>					
 					<attributes>
-				    	<ObjectAttribute text="{fhemMetaData>Attributes/room}" title="{i18n>Room}"/>					
+				    	<ObjectAttribute text="{Fhem>Attributes/room}" title="{i18n>Room}"/>					
 					</attributes>				
 				</ObjectHeader>
 					
@@ -70,11 +70,14 @@
 								</f:layout>
 								<f:formContainers>
 									<!--  <f:FormContainer id="formReadings" /> -->
-									<f:FormContainer id="formReadings" formElements="{DeviceDetail>/Readings}">
+									<f:FormContainer id="formReadings" formElements="{Fhem>ReadingSet}">
 										<f:formElements>
-											<f:FormElement label="{DeviceDetail>Name}" >
+											<f:FormElement label="{Fhem>Name}" >
 												<f:fields>
-													<Text text="{DeviceDetail>Value}" />
+													<Text text="{Fhem>Data/Value}" />
+												</f:fields>
+												<f:fields>
+													<Text text="{Fhem>Data/Time}" />
 												</f:fields>
 											</f:FormElement>
 										</f:formElements>
@@ -106,7 +109,15 @@
 										singleContainerFullSize="false" />
 								</f:layout>
 								<f:formContainers>
-									<f:FormContainer id="formInternals" />
+									<f:FormContainer id="formInternals" formElements="{Fhem>InternalSet}">
+										<f:formElements>
+											<f:FormElement label="{Fhem>Name}">
+												<f:fields>
+													<Text text="{Fhem>Data}" />
+												</f:fields>
+											</f:FormElement>
+										</f:formElements>
+									</f:FormContainer>
 								</f:formContainers>
 							</f:Form>				        
 
@@ -135,7 +146,15 @@
 										singleContainerFullSize="false" />
 								</f:layout>
 								<f:formContainers>
-									<f:FormContainer id="formAttributes" />
+									<f:FormContainer id="formAttributes" formElements="{Fhem>AttributeSet}">
+										<f:formElements>
+											<f:FormElement label="{Fhem>Name}" >
+												<f:fields>
+													<Text text="{Fhem>Data}" />
+												</f:fields>
+											</f:FormElement>
+										</f:formElements>
+									</f:FormContainer>
 								</f:formContainers>
 							</f:Form>				        
 						</IconTabFilter>									        
