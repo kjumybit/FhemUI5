@@ -1,12 +1,13 @@
 sap.ui.define([
 	'de/kjumybit/fhem/controller/BaseController',
+	"sap/ui/model/json/JSONModel",		
 	'sap/m/MessagePopover',
 	'sap/m/MessagePopoverItem',
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(BaseController, MessagePopover, MessagePopoverItem, Filter, FilterOperator, Formatter, Grouper) {
+], function(BaseController, JSONModel, MessagePopover, MessagePopoverItem, Filter, FilterOperator, Formatter, Grouper) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceList", {
@@ -26,18 +27,14 @@ sap.ui.define([
 			// call the base component's init function
 			BaseController.prototype.onInit.apply(this, arguments);
 		
+			// prepare local view model
+			let oViewModel = new JSONModel({
+				deviceTableTitle: this.getResourceBundle().getText('detailDevices')
+			});
+			this.setModel(oViewModel, 'deviceDetails');
+
 			this.getRouter().getRoute("DeviceList").attachPatternMatched(this.onDisplay, this);		
 		},
-	
-		
-		/**
-		* Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
-		* (NOT before the first rendering! onInit() is used for that one!).
-		* @memberOf helloworld.Main
-		*/
-		//		onBeforeRendering: function() {
-		//
-		//	},
 	
 		
 		/**
@@ -63,39 +60,46 @@ sap.ui.define([
 					aFilter.push(new Filter("Internals/TYPE", FilterOperator.Contains, oQuery.deviceType));
 				} else if (oQuery.room) {
 					aFilter.push(new Filter("Attributes/room", FilterOperator.Contains, oQuery.room));					
-				} 				
+				}
+				// set filter for table item binding
+				let oTable = this.byId("tblDeviceList");
+				let oBinding = oTable.getBinding("items");
+				oBinding.filter(aFilter);						
 			}
-			 
-			// set filter for table item binding
-			let oTable = this.byId("tblDeviceList");
-			let oBinding = oTable.getBinding("items");
-			oBinding.filter(aFilter);
-			
 		},
 				
-		
-		/**
-		* Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
-		* This hook is the same one that SAPUI5 controls get after being rendered.
-		* @memberOf helloworld.Main
-		*/
-		//		onAfterRendering: function() {
-		//
-		//		},
-	
-		
-		/**
-		* Called when the Controller is destroyed. Use this one to free resources and finalize activities.
-		* @memberOf helloworld.Main
-		*/
-		//		onExit: function() {
-		//
-		//		}
 	
 		/** ================================================================================
 		 *  App event handler
 		 ** ================================================================================ */
 		
+
+		/**
+		 * Handles the 'updateFinished' event of the device table afte rew table data
+		 * is available.
+		 * 
+		 * Set counter in table header.
+		 * 
+		 * @param {sap.ui.base.Event} oEvent the table update finishes event
+		 * @public
+		 */
+		onTableUpdateFinished: function(oEvent) {
+
+			let oTable = oEvent.getSource();
+			let iTotalItems = oEvent.getParameter('total');
+			let sTitle = "";
+
+			// only update the counter if the length us final and the table is not empty
+			if (iTotalItems && oTable.getBinding('items').isLengthFinal()) {
+				sTitle = this.getResourceBundle().getText('detailDevicesCount', [iTotalItems]);	
+			} else {
+				sTitle = this.getResourceBundle().getText('detailDevices');
+			}
+
+			this.getModel('deviceDetails').setProperty('/deviceTableTitle', sTitle);
+
+		},
+
 		
 		/**
 		 * Handle device item selection. 

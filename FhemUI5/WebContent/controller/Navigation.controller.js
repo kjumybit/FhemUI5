@@ -114,8 +114,6 @@ sap.ui.define([
 			var oItem = oEvent.getParameters("item");
 			if (!oItem) return;
 			
-			var sText = oItem.item.getText();
-			
 			// get model binding of selected navigation item
 			var oBindingContext = oEvent.getSource().getBindingContext('sideNavigation');
 			if (!oBindingContext) return;
@@ -148,8 +146,6 @@ sap.ui.define([
 			var oItem = oEvent.getParameters("item");
 			if (!oItem) return;
 			
-			var sText = oItem.item.getText();
-			
 			// get model binding of selected navigation item
 			let oNavItem = oEvent.getSource();
 			let oBindingContext = oNavItem.getBindingContext('sideNavigation');
@@ -159,7 +155,7 @@ sap.ui.define([
 			var oParentItem = oNavItem.getParent();
 			var oParentProperty = oParentItem.getBindingContext('sideNavigation').getProperty();
 			var oItemProperty = oBindingContext.getProperty();
-						 									
+								
 			if (oParentProperty.detailView.view) {
 				// and prepare item ID as navigation parameter "deviceID" or as query parameter)				
 				let mParameter = {};

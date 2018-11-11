@@ -131,6 +131,7 @@ sap.ui.define([
 			this._oHandler.oListener = args.oListener;
 				
 			this._socket = this._io.connect('ws://' + args.host + ':' + args.port, {
+				"path": '/socket/fhem/',
 				"timeout": 5000,
 		        "sync disconnect on unload" : true
 		    });

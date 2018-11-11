@@ -24,21 +24,23 @@
 				    </statuses>					
 					<attributes>
 				    	<ObjectAttribute text="{Fhem>Attributes/room}" title="{i18n>Room}"/>					
-					</attributes>				
+					</attributes>	
+					<headerContainer>
+					</headerContainer>
 				</ObjectHeader>
 					
 				<!--
 					Device actions 
 				 -->
-				<!--
-				<OverflowToolbar width="100%" design="Solid">					
+				<Panel backgroundDesign="Translucent">
+				<Toolbar width="100%">					
 				    <content>					
 				        <Text text="Aktionstasten" />					
 				        <ToolbarSpacer/>					
 				        <Switch />
 				    </content>					
-				</OverflowToolbar>
-				-->
+				</Toolbar>
+				</Panel>
 
 				<!--
 					Device Details 
