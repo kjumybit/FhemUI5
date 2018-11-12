@@ -23,7 +23,7 @@ var crypto = require('crypto');
 var params = require('./params');
 var funcs = require('./functions');
 
-var mylog = funcs.mylog;
+var mylog = funcs.mylog;    //TODO replace
 
 var server;
 var reconnectTimeout;
