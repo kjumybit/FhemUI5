@@ -15,6 +15,7 @@
  */
 "use strict";
 
+var logger = require('logger');
 var fs = require('fs');
 var io = require('socket.io');
 var net = require('net');
