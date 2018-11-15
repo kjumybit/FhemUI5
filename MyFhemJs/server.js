@@ -15,15 +15,12 @@
  */
 "use strict";
 
-var logger = require('logger');
+var logger = require('./logger');
 var fs = require('fs');
 var io = require('socket.io');
 var net = require('net');
 var crypto = require('crypto');
 var params = require('./params');
-var funcs = require('./functions');
-
-var mylog = funcs.mylog;    //TODO replace
 
 var server;
 var reconnectTimeout;
@@ -63,13 +60,13 @@ if (params.useClientPassword) {
     var auth = require('socketio-auth');
     auth(ios, {
         authenticate: function(socket, password, callback) {
-            mylog("authentication by client", 1);
+            logger.info("authentication by client");
             var connectionPassword = fs.readFileSync(params.connectionPasswordFile).toString().substr(0, 64);
             if (crypto.createHash('sha256').update(password).digest('hex') === connectionPassword) {
-                mylog("authentication success", 1);
+                logger.verbose("authentication success");
                 return callback(null, true);
             } else {
-                mylog("authentication failed", 0);
+                logger.warn("authentication failed");
                 return callback(new Error("Invalid connection password"), false);
             }
         },
@@ -84,11 +81,11 @@ if (params.useClientPassword) {
 ios.sockets.on('connection', function(socket) {
     var q = socket.handshake.query;
     var logmess = "client connected: " + q.client + ", " + q.model + ", " + q.platform + " " + q.version + ", App " + q.appver;
-    mylog(logmess, 0);
+    logger.info(logmess);
     //emit authenticated if no passwd is used
 
     if (!params.useClientPassword) {
-        mylog("server: emit authenticated to client: no auth needed", 1);
+        logger.verbose("server: emit authenticated to client: no auth needed");
         socket.emit('authenticated');
     }
 
@@ -110,7 +107,7 @@ var defListeners = function(socket) {
      * callback function <code>fnCallBack</code>.
 	 */
 	socket.on('getMetaData', function(data, fnCallBack) {
-        mylog('client: Get Metadata from fhem', 1);
+        logger.info('client: Get Metadata from fhem');
         
 		//TODO: pass callback success and error function name as data properties a call 
 		// websocket callback handler with the correspnding fn name depending on processing
@@ -125,13 +122,13 @@ var defListeners = function(socket) {
 						DeviceTypeSet: [], 
 						DeviceSubTypeSet: []
                 };
-                mylog('fhem: Get Metadata success: call client event handler', 1);
+                logger.verbose('fhem: Get Metadata success: call client event handler');
 				oMetaData = extractFhemMetaData(oJsonList2);
 				fnCallBack(oMetaData)
 				//socket.emit('metaData', oMetaData);
 			},
 			onError : function(sError) {
-                mylog('fhem: Get Metadata: failed:' + sError, 0);
+                logger.error('fhem: Get Metadata: failed:' + sError);
 				socket.emit('metaDataError', sError);
 			}
 		})
@@ -149,7 +146,7 @@ var defListeners = function(socket) {
     socket.on('dbLog', function(query, fnCallBack) {
         
         // establish telnet connection to fhem server
-        mylog("client: Submit DbLog query to fhem: " + query, 1);
+        logger.info("client: Submit DbLog query to fhem: " + query);
         var fhemcmd = net.connect({ port: params.fhemPort, host: params.fhemHost }, function() {
             fhemcmd.write(query + ';exit\r\n');  
         });
@@ -164,12 +161,12 @@ var defListeners = function(socket) {
 
             // concat response string
             oResult.fhemResponse += response.toString(); 
-            mylog('fhem: Get DbLog: Data received', 1);        	
+            logger.verbose('fhem: Get DbLog: Data received');        	
             // mylog(oResult.fhemResponse, 1);            
         });
 
         fhemcmd.on('end', function() {
-            mylog('fhem: Get DbLog: Connection to Fhem server closed, call client event handler', 1);        	
+            logger.verbose('fhem: Get DbLog: Connection to Fhem server closed, call client event handler');        	
             
             // strip <Bye...> at the end of the response string
             let iIndex = oResult.fhemResponse.lastIndexOf('Bye');
@@ -183,7 +180,7 @@ var defListeners = function(socket) {
         fhemcmd.on('error', function() {
             fhemcmd.destroy();
             let sMsg = 'Get DbLog error: telnet connection failed'; 
-            mylog("fhem: " + sMsg, 0);
+            logger.error("fhem: " + sMsg);
             socket.emit('dbLogError', sMsg);
         });
                 
@@ -191,11 +188,7 @@ var defListeners = function(socket) {
 
 
     socket.on('disconnect', function(data) {
-        mylog('client: disconnected: ' + data, 0);
-        for (room in socket.rooms) {
-            mylog("leave " + room, 1);
-            socket.leave(room);
-        }
+        logger.info('client: disconnected: ' + data);
     });
 };
 
@@ -209,7 +202,7 @@ var defListeners = function(socket) {
 fhemSocket = new net.Socket();
 
 process.on('uncaughtException', function(err) {
-    mylog('service: process error: ' + err + ' - retry in 10 secs', 0);
+    logger.error('service: process error: ' + err + ' - retry in 10 secs');
 });
 
 
@@ -218,7 +211,7 @@ process.on('uncaughtException', function(err) {
  * Send Fhem command <code>inform</code> for listening for device events.
  */
 fhemSocket.on('connect', function(data) {
-    funcs.mylog('fhem: connected to fhem server for listen on changed values', 0);
+    logger.info('fhem: connected to fhem server for listen on changed values');
     fhemSocket.write('inform timer\r\n');
 });
 
@@ -227,7 +220,7 @@ fhemSocket.on('connect', function(data) {
  * Fhem server connection handler for <code>error</code> event
  */
 fhemSocket.on('error', function() {
-    mylog('fhem: error: telnet connection failed - retry in 10 secs', 0);
+    logger.error('fhem: error: telnet connection failed - retry in 10 secs');
     fhemSocket.destroy();
     clearTimeout(reconnectTimeout);
     reconnectTimeout = setTimeout(function() {
@@ -240,7 +233,7 @@ fhemSocket.on('error', function() {
  * Fhem server connection handler for <code>end</code> event
  */
 fhemSocket.on('end', function() {
-    funcs.mylog('fhem: error: telnet connection closed - try restart in 10 secs', 0);
+    logger.info('fhem: error: telnet connection closed - try restart in 10 secs');
     clearTimeout(reconnectTimeout);
     reconnectTimeout = setTimeout(function() {
         connectFHEMserver();
@@ -259,10 +252,12 @@ fhemSocket.on('end', function() {
  * - the colon character might be missing at the and of the reading name
  */
 fhemSocket.on('data', function(data) {
-    mylog("fhem: event data received", 1);
-    mylog(data.toString(), 2);
+    logger.verbose("fhem: event data received");
+    logger.silly(data.toString());
+
     let oEventData = extractFhemEventData(data.toString());
-    mylog(JSON.stringify(oEventData), 2);
+
+    logger.debug(JSON.stringify(oEventData));
     ios.sockets.emit('deviceEvents', oEventData);
 });
 
@@ -271,7 +266,7 @@ fhemSocket.on('data', function(data) {
  * Establish permanent telnet connection to fhem server.
  */
 function connectFHEMserver() {
-    funcs.mylog("fhem: start connection to fhem server", 0);
+    logger.info("fhem: start connection to fhem server");
     clearTimeout(reconnectTimeout);
     fhemSocket.connect({ port: params.fhemPort, host: params.fhemHost });
 };
@@ -290,7 +285,7 @@ function connectFHEMserver() {
 function getFhemMetaData(args) {
 	
     // establish telnet connection to fhem server
-    mylog('fhem: Get Metadata: get Jsonlist2 ', 1);
+    logger.info('fhem: Get Metadata: get Jsonlist2 ');
 
     var fhemreq = new net.Socket();
     fhemreq.setEncoding('utf8');
@@ -307,19 +302,20 @@ function getFhemMetaData(args) {
     fhemreq.on('data', function(response) {
         oResult.fhemResponse += response.toString(); 
 
-        mylog('fhem: Get Metadata: Data received', 1);        	
-        mylog(oResult.fhemResponse, 2);                
+        logger.verbose('fhem: Get Metadata: Data received');        	             
     });
 
     fhemreq.on('end', function() {
-        mylog('fhem: Get Metadata: Connection to Fhem server closed', 1);
+        logger.info('fhem: Get Metadata: Connection to Fhem server closed');
         
         // strip <Bye...> at the end of the response string
         let iIndex = oResult.fhemResponse.lastIndexOf('Bye');
         oResult.fhemResponse = (iIndex > 0 ? oResult.fhemResponse.substring(0, iIndex) : oResult.fhemResponse);
+        logger.silly(oResult.fhemResponse);   
 
         // parse string to JSON object
         oResult.oJsonList2 = JSON.parse(oResult.fhemResponse);        
+        logger.debug(oResult.oJsonList2);   
 
         // call event handler for JsonList2
         args.onSuccess(oResult.oJsonList2);
@@ -328,7 +324,7 @@ function getFhemMetaData(args) {
 
     fhemreq.on('error', function() {
         fhemreq.destroy();
-        mylog('fhem: error: telnet connection for getting JsonList2 failed', 0);
+        logger.error('fhem: error: telnet connection for getting JsonList2 failed');
         // call event handler for connection error 
         args.onError("fhem error: telnet connection for getting JsonList2 failed");
     });
@@ -463,14 +459,14 @@ function extractFhemEventData(sInformResponse) {
  */
 (function main() {
 	
-    mylog('service: initFinished', 1);
+    logger.info('start fhem.js service');
     
     // start http & ws server for client connection
     server.listen(params.nodePort);
     
     var messSuff = (params.useSSL) ? ' with SSL' : ' without SSL';
-    mylog('service: listen for websocket requests on port ' + params.nodePort + messSuff);
-    console.log('fhemjs service listen for websocket requests on port ' + params.nodePort + messSuff);
+    logger.info('service: listen for websocket requests on port ' + params.nodePort + messSuff);
+    console.log('fhem.js service listen for websocket requests on port ' + params.nodePort + messSuff);
     
     // establish permanent TELNET connection to fhem server for listening on fhem events
     connectFHEMserver();

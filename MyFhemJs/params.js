@@ -14,17 +14,6 @@ exports.fhemHost = "up2one.fritz.box";
 // telnet port of FHEM server
 exports.fhemPort = 7072;
 
-// extended mode
-// 0 - no JsonList2 pushed on change of device (better performance)
-// 1 - JsonList2 of device emitted to clients on changed values
-exports.extendedMode = 0;
-
-// poll in seconds for refresh fhem devices
-// just for keeping buffer sync to fhem server
-// in case of connection problems or configuratuion changes
-// that may not sent from fhem by inform on
-exports.pollForAllDevices = 600
-
 // use SSL for connections (true/false)
 exports.useSSL = false;
 
