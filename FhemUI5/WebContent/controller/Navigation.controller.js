@@ -36,6 +36,13 @@ sap.ui.define([
 		onBeforeRendering: function() {
 
 			jQuery.sap.log.debug("onBefore", null, _sComponent);
+
+			this.fhemModel = this.getFhemModel();
+
+			// register client handler
+			this.fhemModel.attachMetaDataLoaded(null, this._onMetaDataLoaded.bind(this), this);
+			this.fhemModel.attachMetaDataLoadFailed(null, this._onErrorFhemConnection.bind(this), this);
+			this.fhemModel.attachConnectionClosed(null, this._onFhemDisconnect.bind(this), this);
 			
 			this.oRuntimeModel = this.getRuntimeModel();
             this.oSettings = this.getSettings(); 
@@ -47,7 +54,7 @@ sap.ui.define([
 
 	            //TODO: re-design event based depending in Fhem metadate changed
 	            var oSideNavCtrl = this.getView().byId("sideNavigation");           
-    				            
+			            
 				oSideNavCtrl.setModel(this.oNavModel);
 	            
 	            // create item aggregation: requires Navigation List
@@ -55,7 +62,7 @@ sap.ui.define([
 				
 	            // bind item aggregation
 				oSideNavCtrl.setItem(oNavigationListTemplate);
-	            	            
+    
 			}
 								
 		},
@@ -236,33 +243,19 @@ sap.ui.define([
 		_createFhemModel : function (oSettings) {
 			
 			let mSettings = oSettings.getModel().getProperty("/");			
-			let fhemModel = this.getFhemModel();
-			
-			if (fhemModel) {
-				// close existing connection
-				fhemModel.disconnect();
-			}
 			
 			// create new Fhem model and connect to backend
-			fhemModel = new FhemService({
+			this.fhemModel.connect({
 				"host": mSettings.server.host, 
 				"port": mSettings.server.port
 			});
-
-			// register client handler
-			fhemModel.attachMetaDataLoaded(null, this._onMetaDataLoaded.bind(this), this);
-			fhemModel.attachMetaDataLoadFailed(null, this._onErrorFhemConnection.bind(this), this);
-			fhemModel.attachConnectionClosed(null, this._onFhemDisconnect.bind(this), this);
-
 
 			// local testing 
 			/*
 			oModel.loadData("model/fhemJsonList2.json");
 			this.setModel(oModel, "Fhem" );  
 			this._setSideNavModelfromFhem();			
-			*/
-			
-			this.setFhemModel(fhemModel);
+			*/			
 		},
 
 		
@@ -300,8 +293,7 @@ sap.ui.define([
 
 			// oMetaModel.loadData("model/fhemJsonList2.json"); // local testing
   
-			let oFhem = this.getFhemModel();
-			this._setSideNavModelfromFhem(oFhem);
+			this._setSideNavModelfromFhem(this.fhemModel);
 		},
 		
 		

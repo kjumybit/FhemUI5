@@ -18,15 +18,19 @@
 	    			intro="{Fhem>Name}" 
 	    			number="{Fhem>Readings/state/Value}" 
 	    			numberUnit="" 
-					backgroundDesign="Solid" icon="sap-icon://heating-cooling" responsive="true" titleLevel="H2">					
+					backgroundDesign="Solid" icon="sap-icon://heating-cooling" 
+					responsive="true" fullScreenOptimized="true"
+					titleLevel="H2">
 				    <statuses>					
-				        <ObjectStatus text=""/>					
+				        <ObjectStatus text="{i18n>Room}: {Fhem>Attributes/room}"/>					
 				    </statuses>					
+					<!--
 					<attributes>
 				    	<ObjectAttribute text="{Fhem>Attributes/room}" title="{i18n>Room}"/>					
 					</attributes>	
 					<headerContainer>
 					</headerContainer>
+					-->
 				</ObjectHeader>
 					
 				<!--

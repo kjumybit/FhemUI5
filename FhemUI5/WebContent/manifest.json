@@ -101,7 +101,13 @@
 				"settings": {
 					"defaultBindingMode": "OneWay"
 				}				
-			}									
+			},
+			"Fhem": {
+				"type": "de.kjumybit.fhem.service.FhemService",
+				"settings": {
+					"defaultBindingMode": "OneWay"
+				}				
+			}				
 		},
 		"resources": {
 			"css": [
@@ -129,34 +135,34 @@
 	  		"routes": [
 	  			{
 		  			"pattern": "",
-		  			"viewName": "App",
+		  			"view": "App",
 		  			"name": "App",
 		  			"target": ["devices", "navigation"]		  		  
 				},
 				{
 		  			"pattern": "overview",
 		  			"name": "Overview",
-		  			"target": "overview"		  		  			
+		  			"target": ["overview", "navigation"] 
 				},
 				{
 		  			"pattern": "devices:?query:",
 		  			"name": "DeviceList",
-		  			"target": "devices"
+		  			"target": ["devices", "navigation"] 
 		  		},
 		  		{
 		  			"pattern": "devicetypes",
 		  			"name": "DeviceTypeList",
-		  			"target": "deviceTypes"		  				  		  			
+		  			"target": ["deviceTypes", "navigation"]
 				},
 				{
 		  			"pattern": "rooms",
 		  			"name": "RoomList",
-		  			"target": "rooms"		  		  							
+		  			"target": ["rooms", "navigation"]					
 				},
 				{
 		  			"pattern": "devicedetail/{deviceId}",
 		  			"name": "DeviceDetail",
-		  			"target": "deviceDetail"		  		  							
+		  			"target": ["deviceDetail", "navigation"]  							
 				}
 			],
 			"targets": {

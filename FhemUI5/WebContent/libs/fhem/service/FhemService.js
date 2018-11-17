@@ -6,7 +6,7 @@
  * Fhem Model for Devices and Device Events
  *
  * @namespace
- * @name de.kjumybit.fhem.service.FhemWebSocket
+ * @name de.kjumybit.fhem.service.FhemService
  * @public
  */
 
@@ -67,6 +67,8 @@ sap.ui.define([
 									
 			constructor: function(mSettings) {
 
+				jQuery.sap.log.debug("constructor: begin", null, _sComponent);
+
 				ClientModel.apply(this, arguments);
 
 				// var that = this;
@@ -84,19 +86,12 @@ sap.ui.define([
 				this.oData = {};
 				this.setDefaultBindingMode("OneWay");
 
-				// create new connection
-				this._fhemWebSocket = new FhemWebSocket();
-				
-				// connect to Fhem
-				this._fhemWebSocket.connect({ 
-					host: mSettings.host , 
-					port: mSettings.port,
-					onErrorFhemConnection: _onErrorFhemConnection,
-					onFhemDisconnect: _onFhemDisconnect,
-					onSuccessFhemConnection: _onSuccessFhemConnection,
-					oListener: this
-				})
+				if (mSettings && mSettings.host && mSettings.port) {
+					// create new (initial) connection
+					this._connect(mSettings);
+				}
 
+				jQuery.sap.log.debug("constructor: end", null, _sComponent);				
 			},
 
 			
@@ -111,6 +106,7 @@ sap.ui.define([
 				
 				// methods
 				publicMethods : [
+					"connect",
 					"disconnect",
 					"getServiceMetadata",
 					"getDeviceTypeSet",
@@ -478,6 +474,48 @@ sap.ui.define([
 
 
 		/**
+		 * Connect to Fhem backend
+		 * A new WebSocket connection is established to the fhem backend. 
+		 * A current connection will be disconnected before.
+		 * 
+		 * @param {object} mParameters Connection Parameters
+		 * @private
+		 */
+		FhemService.prototype._connect = function(mParameters) {
+
+			// disconnect current active connection
+			//TODO
+
+			// create new connection
+			this._fhemWebSocket = new FhemWebSocket();
+			
+			// connect to Fhem
+			this._fhemWebSocket.connect({ 
+				host: mParameters.host , 
+				port: mParameters.port,
+				onErrorFhemConnection: _onErrorFhemConnection,
+				onFhemDisconnect: _onFhemDisconnect,
+				onSuccessFhemConnection: _onSuccessFhemConnection,
+				oListener: this
+			})
+		}
+
+
+		/**
+		 * Connect to Fhem backend
+		 * 
+		 * @param {object} mParameters Connection Parameters
+		 * 
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>This</code> for method chaining
+		 * @public
+		 */
+		FhemService.prototype.connect = function(mParameters) {
+			this._connect(mParameters);
+			return this.this;
+		};
+
+
+		/**
 		 * Get Fhem Service MetaData object
 		 * 
 		 * @return {Object} metdata object
@@ -486,6 +524,7 @@ sap.ui.define([
 		FhemService.prototype.getServiceMetadata = function() {
 			return this.mFhemMetaData;
 		};
+
 
 		/**
 		 * Refreshes the metadata creating a new request to the server.
@@ -706,7 +745,7 @@ sap.ui.define([
 	
 			var oObject = this._getObject(sObjectPath);
 			if (oObject) {
-				oObject[sProperty] = oValue;
+				oObject[sProperty] = oValue;			
 				this.checkUpdate(false, bAsyncUpdate);
 				return true;
 			}
@@ -775,13 +814,22 @@ sap.ui.define([
 			}
 			var aParts = sPath.split("/"),
 				iIndex = 0;
+
+			//TODO: get normalized key depending on existence of a key part: 
+			// absolut:   /<entity>(<name)[/...]
+			// relative:   <entity>(<name)[/...]
+			// either as an object property: o[p] 
+			// or     as an array element  : a[i], i: 0,...,n-1
+
 			if (!aParts[0]) {
 				// absolute path starting with slash
 				oNode = this.oData;
 				iIndex++;
 			}
+
 			while (oNode && aParts[iIndex]) {
-				oNode = oNode[aParts[iIndex]];
+				oNode = oNode[aParts[iIndex]];		// works for object[property] as well as array[index]
+													// aParts[iIndex] is either a property name or an array index
 				iIndex++;
 			}
 			return oNode;
@@ -838,10 +886,8 @@ sap.ui.define([
 		// Static properties and methods
 		FhemService.dummyVar = "";
 		FhemService.fooBar = function() {};
-		
-		
-		// Private, statics section
-		
+				
+
 		/**
 		 * Handles successfully metadata request from Fhem backend.
 		 * - Build Fhem service model data and inform model change listeners.

@@ -71,6 +71,7 @@ sap.ui.define([
 			var i = this.getArrayIndex('Name', this.sDeviceId, aDeviceSet);
 		
 			// bind the view to the current device
+			//TODO: use binding syntax: 'Fhem>/DeviceSet(' + sDeviceId + ')'
 			this.getView().bindElement('Fhem>/DeviceSet/' + i);
 			
 			// build charts

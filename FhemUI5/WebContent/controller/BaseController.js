@@ -26,13 +26,15 @@ sap.ui.define([
 			 * @return {number} iIndex the array index o fthe frist object with mathich property value
 			 *                   or -1, if no object has been found
 			 */
-			getArrayIndex: function (sProperty, value, aArray) {
+			getArrayIndex: function (sProperty, value, aArray) {				
 				var index = -1;
-				for (var i=0, iL=aArray.length; i<iL; i++) {
-					var o = aArray[i];
-					if (o[sProperty] && o[sProperty] === value) {
-						index = i;
-						break;
+				if (Array.isArray(aArray)) {
+					for (var i=0, iL=aArray.length; i<iL; i++) {
+						var o = aArray[i];
+						if (o[sProperty] && o[sProperty] === value) {
+							index = i;
+							break;
+						}
 					}
 				}
 				return index;
@@ -45,19 +47,9 @@ sap.ui.define([
 			 * @returns {de.kjumybit.fhem.service.FhemService} Fhem Service
 			 */
 			getFhemModel: function () {
-				// return this.getOwnerComponent().fhemModel;
-				//TODO: use model name <Fhem>
 				return this.getComponentModel('Fhem');	
 			},
 			
-
-			setFhemModel: function (oFhemModel) {
-				this.getOwnerComponent().fhemModel = oFhemModel;
-				// (re)set Fhem Service Model
-				jQuery.sap.log.debug("Set Fhem service model", null, _sComponent);	
-				this.getOwnerComponent().setModel(oFhemModel, 'Fhem');
-			},
-
 
 			/**
 			 * Get settings object.

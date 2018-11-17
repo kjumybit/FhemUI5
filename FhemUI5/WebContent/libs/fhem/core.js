@@ -1,11 +1,12 @@
 /**
- * Initialize library and provides core functions  
+ * Initialize fhem service library and provides core functions  
  *  
  */
 sap.ui.define([
 	'jquery.sap.global',
+	'de/kjumybit/fhem/service/FhemService'	
 ],
-	function(jQuery) {
+	function(jQuery, FhemService) {
 	"use strict";
 
 	/**
@@ -40,7 +41,9 @@ sap.ui.define([
 	
 	/**
 	 * Initialize library
-	 * Set global models: <code>Charts</code>.
+	 * Set global models: 
+	 * - <code>Charts</code>
+	 * - <code>Fhem</code>
 	 * 
 	 * @param {sap.ui.core.Component} oComponent The SAPUI5 app component
 	 * @returns {boolean} The core Fhem library has been initialized successfully
@@ -51,6 +54,10 @@ sap.ui.define([
 
 		 _oMyComponent = oComponent; 
 		 _loadConfiguration();
+
+		//sap.ui.require(['de/kjumybit/fhem/service/FhemService'], function(FhemService) {
+		_oMyComponent.setModel(new FhemService(), "Fhem");		
+		//});
 
 		sap.ui.require(['de/kjumybit/fhem/chart/ChartModel'], function(ChartModel) {
 			_oMyComponent.setModel(new ChartModel(), "Charts");		

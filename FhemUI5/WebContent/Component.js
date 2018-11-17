@@ -26,8 +26,14 @@ sap.ui.define([
 		 */
 		init : function() {
 
+			//TODO					
+			jQuery.sap.log.setLevel(jQuery.sap.log.Level.DEBUG);
+			jQuery.sap.log.debug("init: before Super.apply()", null, 'Component');
+
 			// call the base component's init function
 			UIComponent.prototype.init.apply(this, arguments);
+
+			jQuery.sap.log.debug("init: after Super.apply()", null, 'Component');
 
 			// create the views based on the url/hash
 			this.getRouter().initialize();
@@ -46,10 +52,8 @@ sap.ui.define([
 			
 			// initialize own library
 			fhem.init(this);		// TODO
-			
-			//TODO
-									
-			jQuery.sap.log.setLevel(jQuery.sap.log.Level.DEBUG);
+
+			jQuery.sap.log.debug("init: finished", null, 'Component');			
 		},
 		
 						

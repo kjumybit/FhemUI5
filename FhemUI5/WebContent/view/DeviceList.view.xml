@@ -39,7 +39,7 @@
 						</Toolbar>
 					</headerToolbar>		
 					<columns>
-						<Column witdh="auto">	
+						<Column width="auto">	
 							<Text text="{i18n>device}" />
 						</Column>					
 						<Column>	
