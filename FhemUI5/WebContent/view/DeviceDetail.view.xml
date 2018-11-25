@@ -36,6 +36,7 @@
 				<!--
 					Device actions 
 				 -->
+				<!-- 
 				<Panel backgroundDesign="Translucent">
 				<Toolbar width="100%">					
 				    <content>					
@@ -45,11 +46,12 @@
 				    </content>					
 				</Toolbar>
 				</Panel>
-
+				-->
 				<!--
 					Device Details 
+					-small icon tab bar
 				 -->					
-				<IconTabBar backgroundDesign="Transparent">					
+				<IconTabBar headerBackgroundDesign="Transcludent" backgroundDesign="Solid" tabDensityMode="Compact">					
 				    <items>			
 				    
 				    	<!-- Readings -->		

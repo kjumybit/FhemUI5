@@ -67,13 +67,14 @@ sap.ui.define([
 			this.sDeviceId =  oEvent.getParameter("arguments").deviceId;
 			
 			// get path to device in Fhem JSON model
-			var aDeviceSet = this.getFhemModel().getProperty('/DeviceSet');
-			var i = this.getArrayIndex('Name', this.sDeviceId, aDeviceSet);
+			//var aDeviceSet = this.getFhemModel().getProperty('/DeviceSet');
+			//var i = this.getArrayIndex('Name', this.sDeviceId, aDeviceSet);
 		
 			// bind the view to the current device
 			//TODO: use binding syntax: 'Fhem>/DeviceSet(' + sDeviceId + ')'
-			this.getView().bindElement('Fhem>/DeviceSet/' + i);
-			
+			//this.getView().bindElement('Fhem>/DeviceSet/' + i);
+			this.getView().bindElement('Fhem>/Device(' + this.sDeviceId + ')');
+
 			// build charts
 			this._createChart(this.byId("chartContainer"));    // via JScript
 			
@@ -165,7 +166,7 @@ sap.ui.define([
 			aCharts.forEach(device => {
 				// create chart control with data set binding
 				let oChart = new Chart(device, {
-					witdh: 400,
+					width: 400,
 					height: 150,
 					responsive: "true",
 					chartType: "{Charts>/" + device + "/chartType}",

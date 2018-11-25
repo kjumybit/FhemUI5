@@ -74,7 +74,7 @@ sap.ui.define([
 	 * @public
 	 */
 	core.getFhemService = function () {
-		return _oMyComponent.fhemModel;
+		return _oMyComponent.getModel("Fhem");
 	};
 	
 

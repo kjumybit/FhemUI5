@@ -815,21 +815,32 @@ sap.ui.define([
 			var aParts = sPath.split("/"),
 				iIndex = 0;
 
-			//TODO: get normalized key depending on existence of a key part: 
-			// absolut:   /<entity>(<name)[/...]
-			// relative:   <entity>(<name)[/...]
-			// either as an object property: o[p] 
-			// or     as an array element  : a[i], i: 0,...,n-1
-
 			if (!aParts[0]) {
 				// absolute path starting with slash
 				oNode = this.oData;
 				iIndex++;
 			}
 
+			if ( oNode && !Object.keys(oNode).length ) {
+				// oNode is an empty object "{}"; there is no model / context content at this time
+				return oNode;
+			}
+
+			// search node relative to oNode
 			while (oNode && aParts[iIndex]) {
-				oNode = oNode[aParts[iIndex]];		// works for object[property] as well as array[index]
-													// aParts[iIndex] is either a property name or an array index
+
+				// get property or array index for aParts[iIndex]
+				// - either as an name of an property: p => o[p] 
+				// - or     as an array index        : i => o[i], i: 0,...,n-1	
+				// - or     as entity with key       : e(k) => o.es[k]				//TODO
+				let nameOrIndex = _getNameOrIndex(aParts[iIndex], oNode);
+
+				jQuery.sap.assert(nameOrIndex, "FhemService._getObject: no key for path " + sPath);
+
+				oNode = ( typeof nameOrIndex === "object" ? oNode[nameOrIndex.entitySetName][nameOrIndex.entityIndex] : oNode[nameOrIndex]);
+				// works for object[property] as well as array[index]
+				// aParts[iIndex] is either a property name or an array index
+
 				iIndex++;
 			}
 			return oNode;
@@ -967,6 +978,70 @@ sap.ui.define([
 		};
 		
 
+		// Meta data for Fhem entities
+		const _rEntityKey = /(.+)(\(.+\))/;
+		const _aFhemEntities = [
+			({ entity: "DeviceSet", key: "Name", pattern: /Device\((.+)\)/ }),
+			({ entity: "ReadingSet", key: "Name", pattern: /ReadingSet\((.+)\)/ }),
+			({ entity: "InternalSet", key: "Name", pattern: /InternalSet\((.+)\)/ }),
+			({ entity: "AttributeSet", key: "Name", pattern: /AttributeSet\((.+)\)/ }),								
+			({ entity: "RoomSet", key: "Name", pattern: /Room\((.+)\)/ }),
+			({ entity: "DeviceTypeSet", key: "Name", pattern: /DeviceTypeSet\((.+)\)/ }),
+			({ entity: "DeviceSubTypeSet", key: "Name", pattern: /DeviceSubTypeSet\((.+)\)/ }),
+		];
+
+
+		/**
+		 * Return property name in object <code>oNode</code> if <code>sKey</code> doesn't contain an 
+		 * Fhem entity key otherwise the array index for enity key with <code>oNode</code> as array.
+		 * 
+		 * Supported Fhem entities:
+		 * - Device(<id>)/
+		 * - Reading(<id>)/
+		 * - Internal(<id>)/
+		 * - Attribute(<id>)/
+		 * - Room(<id>)/
+		 * - DeviceType(<id>)/
+		 * - DeviceSubType(<id>)/
+		 * 
+		 * @param {string} sKey Property name <code>entity_property</code> or 
+		 * 				   entity key <code>entity_set(entity_id)</code>
+		 * @param {object} oNode Object node in Fhem model
+		 * @returns {string|number|object} Property name or array index or
+		 *                                 property and index of the entity
+		 */
+		function _getNameOrIndex(sKey, oNode) {
+
+			let nameOrIndex = sKey;	// default
+
+			// basic check for an entity with key
+			if (sKey.match(_rEntityKey)) {
+
+				let index = null;
+				nameOrIndex = null;
+
+				// check for the supported entity
+				for (let i=0, iL=_aFhemEntities.length; i<iL; i++) {
+					let aEntity = sKey.match(_aFhemEntities[i].pattern);
+					if (aEntity) {
+						// known entity type: find index for entity with key in oNode (as Array)
+						// the regex returns the extracted Device ID in aEntity[1]						
+						index = getArrayIndexForObjectByProperty(_aFhemEntities[i].key, aEntity[1], oNode[_aFhemEntities[i].entity]);
+						if (index) {
+							nameOrIndex = {
+								entitySetName:  _aFhemEntities[i].entity,	// name of node property (array) for entity set
+								entityIndex: index						    // index of entity (object) referenced by key
+							};
+							break;
+						}
+					}
+				}
+			}
+
+			return nameOrIndex;
+		};
+
+
 		/**
 		 * Build model data from Fhem metadata
 		 * Retrieve Fhem metadata via web socket connection.
@@ -975,7 +1050,7 @@ sap.ui.define([
 		 * 					{ DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] }
 		 * 
 		 * @returns {object} FhemService model data
-		 * 					{
+		 * 					{	
 		 * 						DeviceSet: [{
 		 * 							"Name": string,
 		 * 							"Internals": { 
@@ -1087,7 +1162,7 @@ sap.ui.define([
 		 * @param {string} sProperty the name of an object property 
 		 * @param {object} value the property value
 		 * @param {object[]} aArray an array of JSON objects
-		 * @return {object} the frist object with mathich property value
+		 * @return {object} the first object which match property value
 		 *                   or undefined, of no object has been found
 		 */
 		function getArrayObjectByProperty( sProperty, value, aArray) {
@@ -1102,6 +1177,26 @@ sap.ui.define([
 			return oElement;
 		};		
 
+
+		/**
+		 * Get first object in array property value 
+		 * @param {string} sProperty the name of an object property 
+		 * @param {object} value the property value
+		 * @param {object[]} aArray an array of JSON objects
+		 * @return {i} index of the first object which match property value
+		 *                   or undefined, of no object has been found
+		 */
+		function getArrayIndexForObjectByProperty(sProperty, value, aArray) {
+			var idx = undefined;
+			for (var i=0, iL=aArray.length; i<iL; i++) {
+				let o = aArray[i];
+				if (o[sProperty] && o[sProperty] === value) {
+					idx = i;
+					break;
+				}
+			}
+			return idx;
+		};		
 
 		return FhemService;
 
