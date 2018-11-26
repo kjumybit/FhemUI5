@@ -16,6 +16,8 @@
 "use strict";
 
 var logger = require('./logger');
+var FhemSrv = require('./fhemsrv');
+
 var fs = require('fs');
 var io = require('socket.io');
 var net = require('net');
@@ -26,6 +28,7 @@ var server;
 var reconnectTimeout;
 var fhemSocket;
 
+var fhemserver = new FhemSrv(logger);
 
 // -------------------------------------------------------------------
 // setup http(s) server

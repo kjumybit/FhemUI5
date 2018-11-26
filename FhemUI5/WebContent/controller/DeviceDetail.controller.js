@@ -65,14 +65,8 @@ sap.ui.define([
 			this.onDisplay();
 			
 			this.sDeviceId =  oEvent.getParameter("arguments").deviceId;
-			
-			// get path to device in Fhem JSON model
-			//var aDeviceSet = this.getFhemModel().getProperty('/DeviceSet');
-			//var i = this.getArrayIndex('Name', this.sDeviceId, aDeviceSet);
 		
 			// bind the view to the current device
-			//TODO: use binding syntax: 'Fhem>/DeviceSet(' + sDeviceId + ')'
-			//this.getView().bindElement('Fhem>/DeviceSet/' + i);
 			this.getView().bindElement('Fhem>/Device(' + this.sDeviceId + ')');
 
 			// build charts
