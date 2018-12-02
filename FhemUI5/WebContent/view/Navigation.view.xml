@@ -11,8 +11,8 @@
 		showNavButton="false" >
 		<customHeader>
 			<Toolbar width="100%" class="sapContrastPlus">
-					<Button icon="sap-icon://nav-back" press="onPressNavigationBack" />
-					<ToolbarSpacer/>
+				<Button icon="sap-icon://nav-back" press="onPressNavigationBack" />
+				<ToolbarSpacer/>
 			 </Toolbar>
 		</customHeader>
 

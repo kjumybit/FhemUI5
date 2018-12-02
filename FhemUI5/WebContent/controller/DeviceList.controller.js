@@ -54,18 +54,20 @@ sap.ui.define([
 			let oQuery = oArgs["?query"];
 			let aFilter = [];
 			
+			// reset or set filter
 			if (oQuery) {
 				// prepare filter value				
 				if (oQuery.deviceType) {
 					aFilter.push(new Filter("Internals/TYPE", FilterOperator.Contains, oQuery.deviceType));
 				} else if (oQuery.room) {
 					aFilter.push(new Filter("Attributes/room", FilterOperator.Contains, oQuery.room));					
-				}
-				// set filter for table item binding
-				let oTable = this.byId("tblDeviceList");
-				let oBinding = oTable.getBinding("items");
-				oBinding.filter(aFilter);						
+				}			
 			}
+
+			// set filter for table item binding
+			let oTable = this.byId("tblDeviceList");
+			let oBinding = oTable.getBinding("items");
+			oBinding.filter(aFilter);			
 		},
 				
 	

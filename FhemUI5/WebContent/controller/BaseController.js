@@ -16,8 +16,39 @@ sap.ui.define([
 				this.getView().addStyleClass(this.getOwnerComponent().getContentDensityClass());
 		
 			},
-						
+				
 			
+			onExit : function () {
+				if (this._oFhemConnPopover) {
+					this._oFhemConnPopover.destroy();
+				}
+			},
+
+			
+			/**
+			 * Handle press on button for Fhem Connection within the default footer.
+			 * Displays a popover dialog with adhoc actions and  options.
+			 * 
+			 * @param {object} oEvent Button press event
+			 */
+			handlePressBtnConnected: function(oEvent) {
+
+				var oView = this.getView();
+				var oDialog = oView.byId("connectionDlg");
+				
+				if (!oDialog) {
+					// giving the view ID as fragment ID will allow calling this.byId(…) in the view’s controller 
+					// to retrieve controls inside the fragment.
+					// create dialog via fragment factory (provide 'this' to enable callback handlers
+					oDialog = sap.ui.xmlfragment(oView.getId(), "de.kjumybit.fhem.view.FhemConnectionActions", this);
+					// connect dialog to view (models, lifecycle)
+					oView.addDependent(oDialog);
+				}
+
+				oDialog.openBy(oEvent.getSource());	
+			},
+
+
 			/**
 			 * Get array index of property value of an JSON object in an array
 			 * @param {string} sProperty the name of an object property 

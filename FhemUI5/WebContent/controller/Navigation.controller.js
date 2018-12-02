@@ -75,6 +75,8 @@ sap.ui.define([
 		
 		/**
 		 * Handle press on Settings button. Display app settings dialog. 
+		 * 
+		 * @param {object} oEvent Button event
 		 */
 		onPressSettings: function(oEvent) {
 			var oView = this.getView();
@@ -95,7 +97,8 @@ sap.ui.define([
 		 * Handle close settings dialog.
 		 * - Save settings properties and
 		 * - (Re-) connect to the Fhem service.
-		 *  
+		 * 
+		 * @param {object} oEvent Button event
 		 */
 		onPressCloseSettingsDlg: function(oEvent) {
 			oEvent.getSource().getParent().close();
@@ -112,8 +115,8 @@ sap.ui.define([
 		 * Handles item selection in navigation list on level 1 
 		 * (overview, devices, rooms, ...)
 		 * 
-		 * @parameter oEvent ..,
-		 * @parameter oEvent.getSource() ... Navigation List Item (Level 1)   
+		 * @param {object} oEvent Navigation item select event
+		 * @param oEvent.getSource() ... Navigation List Item (Level 1)   
 		 */
 		onNavItemSelect: function(oEvent) {
 			
@@ -145,7 +148,9 @@ sap.ui.define([
 		 * device type	device list filtered by device type
 		 * 
 		 * @parameter oEvent ..,
-		 * @parameter oEvent.getSource() ... Navigation List Item (Level 2)   
+		 * @parameter oEvent.getSource() ... Navigation List Item (Level 2)
+		 * 
+		 * @param {object} oEvent Sub item select event
 		 */
 		onNavSubItemSelect: function(oEvent) {
 			
@@ -185,6 +190,8 @@ sap.ui.define([
 		/**
 		 * Handles page Back button press
 		 * Hide navigation view (master page)
+		 * 
+		 * @param {object} oEvent Button event
 		 */
 		onPressNavigationBack: function(oEvent) {
 			//TODO
@@ -278,6 +285,8 @@ sap.ui.define([
 		 * Handle Fhem metadata 
 		 * Set & update local models
 		 * - Side navigation model 
+		 * 
+		 * @param {object} oEvent Fhem event
 		 */
 		//TODO create sideNavigation if required
 		_onMetaDataLoaded : function(oEvent) {

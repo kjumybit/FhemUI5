@@ -73,13 +73,7 @@
 		</content> 
 		
 		<footer>
-			<Bar>
-				<contentRight>
-					<Button 
-						icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
-						type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
-				</contentRight>
-			</Bar>
+			<core:Fragment fragmentName="de.kjumybit.fhem.view.FooterDefault" type="XML" />	
 		</footer>
 	</Page>
 </mvc:View>

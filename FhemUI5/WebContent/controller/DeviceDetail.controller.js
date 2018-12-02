@@ -160,7 +160,7 @@ sap.ui.define([
 			aCharts.forEach(device => {
 				// create chart control with data set binding
 				let oChart = new Chart(device, {
-					width: 400,
+					//width: 400,
 					height: 150,
 					responsive: "true",
 					chartType: "{Charts>/" + device + "/chartType}",

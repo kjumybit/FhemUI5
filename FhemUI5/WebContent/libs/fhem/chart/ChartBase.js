@@ -3,9 +3,10 @@ sap.ui.define([
 ], function(Control) {
   'use strict';
 
+  var _sComponent = "de.kjumybit.fhem.chart.ChartBase";
   var CHART_CANVAS_NAME_PREFIX = 'chartJSCanvas';
 
- 	/**
+  /**
 	 * Constructor for a new Base Chart control.
 	 *  
 	 * @class
@@ -44,7 +45,7 @@ sap.ui.define([
         },
         responsive: {
           type: 'string',
-          defaultValue: 'false'
+          defaultValue: 'true'
         },
         maintainAspectRatio: {
           type: 'string',
@@ -104,9 +105,19 @@ sap.ui.define([
      * 
      */
     onAfterRendering: function() {
-      // Get the context of the canvas element we want to select
-      var ctx = document.getElementById(CHART_CANVAS_NAME_PREFIX + this.getId()).getContext("2d");
 
+        // calculte witdh and height
+        //var iWidth = this.getParent().$().width();
+        //var iHeight = this.getParent().$().height() - 50;
+
+        // Get the context of the canvas element we want to select
+        var oCanvas = document.getElementById(CHART_CANVAS_NAME_PREFIX + this.getId());
+        // $(oCanvas).width(iWidth);
+        // $(oCanvas).height(iHeight);
+
+        jQuery.sap.log.info("onAfterRendering: set width " + $(oCanvas).width() + " and height " + $(oCanvas).height(), null, _sComponent);
+
+        var ctx = oCanvas.getContext("2d");
 
         var chartType = this.getChartType().charAt(0).toLowerCase() + this.getChartType().slice(1);
         var chartData = this.getData();
@@ -114,9 +125,9 @@ sap.ui.define([
        
         // hint: the Chart object stores a reference of chartData, but not for the chartOptions
         this._newCustomChart = new Chart(ctx, {
-                type: chartType,
-                data: chartData,
-                options: chartOptions
+            type: chartType,
+            data: chartData,
+            options: chartOptions
         });
     },
 
@@ -146,6 +157,7 @@ sap.ui.define([
       oRm.write('>');
 
       oRm.write('<canvas id="' + CHART_CANVAS_NAME_PREFIX + oControl.getId() + '" width="' + width + '" height="' + height + '"></canvas>');
+      //oRm.write('<canvas id="' + CHART_CANVAS_NAME_PREFIX + oControl.getId() + '"></canvas>');
 
       oRm.write('</div>');
     },

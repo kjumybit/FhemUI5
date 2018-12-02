@@ -51,7 +51,11 @@
 					Device Details 
 					-small icon tab bar
 				 -->					
-				<IconTabBar headerBackgroundDesign="Transcludent" backgroundDesign="Solid" tabDensityMode="Compact">					
+				<IconTabBar headerBackgroundDesign="Transcludent" backgroundDesign="Solid"
+					tabDensityMode="Compact"
+					applyContentPadding="true"
+					stretchContentHeight="true">	
+
 				    <items>			
 				    
 				    	<!-- Readings -->		
@@ -186,9 +190,10 @@
 				            	</content>					
 				            </OverflowToolbar>						
 
-				        	<VBox id="chartContainer">
-            					<!-- width & height only used for ratio of the chart, but not used if control is set to responsive -->
-          					</VBox>				                  							        
+					        <VBox id="chartContainer">
+            					<!-- height="100%" will overflow the footer-->
+          					</VBox> 									
+	                  							        
 						</IconTabFilter>
 						
 					</items>
@@ -198,13 +203,7 @@
 		</content> 
 
 		<footer>
-			<Bar> 
-				<contentRight>
-			    	<Button 
-				    	icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
-						type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
-			    </contentRight>
-			</Bar>		
+			<core:Fragment fragmentName="de.kjumybit.fhem.view.FooterDefault" type="XML" />			
 		</footer>
 		
 	</Page>
