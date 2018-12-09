@@ -13,7 +13,7 @@
                 mode="none"
                 showSeparators="none"
 		        inset="false" 
-                width="200px">
+                width="300px">
                <columns>
                     <Column hAlign="Begin">
                     </Column>
@@ -24,7 +24,8 @@
                     <ColumnListItem>
                         <cells>
                             <Text text="{i18n>fhemConnectEventUpdate}"  />
-                            <Switch state="true">
+                            <Switch state="{runtime>/fhemConnection/enableDeviceUpdates}" 
+                                    change="onChangeFhemEventUpdate">
                                 <layoutData>
                                     <FlexItemData growFactor="1" />
                                 </layoutData>
@@ -34,20 +35,6 @@
                 </items> 
             </Table>
 
-            <!--
-            <form:SimpleForm 
-                editable="false"
-                layout="ColumnLayout">                
-                <form:content>
-                    <Label text="i18n>fhemConnectEventUpdate" />
-                         <Switch state="true">
-                            <layoutData>
-                                <FlexItemData growFactor="1" />
-                            </layoutData>
-                        </Switch>
-                </form:content>
-            </form:SimpleForm>
-            -->        
         </content>
 	</Popover>    
 

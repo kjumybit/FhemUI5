@@ -75,6 +75,7 @@ sap.ui.define([
 
 				this.bMetaDataLoaded = false;
 				this.bMetaDataFailed = false;
+				this.bEnabledEventUpdate = true;
 				
 				this.mFhemMetaData = { 
 						DeviceSet: [], 
@@ -108,6 +109,8 @@ sap.ui.define([
 				publicMethods : [
 					"connect",
 					"disconnect",
+					"getEnabledEventUpdate",
+					"setEnabledEventUpdate",
 					"getServiceMetadata",
 					"getDeviceTypeSet",
 					"getDeviceSet",
@@ -444,7 +447,6 @@ sap.ui.define([
 		 */
 		FhemService.prototype.attachDeviceEvents = function(oData, fnFunction, oListener) {
 			this.attachEvent("deviceEvents", oData, fnFunction, oListener);
-
 			return this;
 		};
 
@@ -467,6 +469,7 @@ sap.ui.define([
 			if ( !this.hasListeners("deviceEvents") ) {
 				// detach local event handler from FhemWebSocket connection
 				//TODO: detach private instance method
+				//this._fhemWebSocket.attachDeviceEvents( _onSuccessFhemConnection, this);	
 			}
 
 			return this;
@@ -615,7 +618,28 @@ sap.ui.define([
 			//TODO callDbLogQuery
 		};
 
+
+		/**
+		 * Enable or disable listening for Fhem device update events.
+		 * 
+		 * @param {boolean} bEnabled Enable or disable device event updates
+		 */
+		FhemService.prototype.setEnabledEventUpdate = function(bEnabled) {
+			this.bEnabledEventUpdate = bEnabled;
+			jQuery.sap.log.info("Enable device event updates: " + this.bEnabledEventUpdate, null, _sComponent);
+		};
+
+
+		/**
+		 * Get state if Fhem device update events are handled.
+		 * 
+		 * @return {boolean} Device event updates enbabled
+		 */
+		FhemService.prototype.getEnabledEventUpdate = function() {
+			return this.bEnabledEventUpdate;
+		};
 		
+
 		/**
 		 * Retrieve log entries from a DbLog Device {sDevice} applying the command in 
 		 * {mQuery.command} 
@@ -911,6 +935,8 @@ sap.ui.define([
 		 */
 		function _onMetaData(oEvent) {
 			
+			// this referencec a FhemService  instance
+
 			// { DeviceSet: [], RoomSet: [], DeviceTypeSet: [], DeviceTypeSet: [] };
 			this.mFhemMetaData = oEvent.getParameters(); 
 			this.setData( _buildModel(this.mFhemMetaData) );
@@ -920,20 +946,11 @@ sap.ui.define([
 
 			// register local event handler for Fhem device events (only once)
 			if ( !this._fhemWebSocket.hasListeners("deviceEvents") ) {
-
-				//TODO: use private instance method
-				this._fhemWebSocket.attachDeviceEvents(function(oEvent) {
-					this._updateModelForDeviceEvents(oEvent);
-					this.fireDeviceEvents(oEvent);
-				}, this);			
-
-				// subscribe to Fhem device events (only once)
-				//TODO: move it to attachDeviceEvents() method of FhemWebSocket class
-				this._fhemWebSocket.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents.onEvent);
+				this._fhemWebSocket.attachDeviceEvents( _onDeviceEvent, this);			
 			}
 		};
 
-		
+				
 		/**
 		 * Handle successful Fhem connection
 		 * Retrieve Fhem metadata via web socket connection.
@@ -977,6 +994,24 @@ sap.ui.define([
 			//TODO refresh internal data
 		};
 		
+
+		/**
+		 * Handle Fhem device event
+		 * Update local model and inform UI listeners
+		 * 
+		 * @param {de.kjumybit.fhem.service.FhemService} oFhemService Service Model
+		 */
+		function _onDeviceEvent(oEvent) {
+			
+			// this referencec a FhemService  instance
+			jQuery.sap.log.debug("onDeviceEvent: is model update enabled: " + this.bEnabledEventUpdate, null, _sComponent);
+
+			if (this.bEnabledEventUpdate) {
+				this._updateModelForDeviceEvents(oEvent);
+				this.fireDeviceEvents(oEvent);
+			}
+		};
+
 
 		// Meta data for Fhem entities
 		const _rEntityKey = /(.+)(\(.+\))/;

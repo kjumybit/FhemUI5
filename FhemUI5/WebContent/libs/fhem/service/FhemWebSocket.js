@@ -97,13 +97,17 @@ sap.ui.define([
 		});
 
 		
-		// Fhem Websocket events send to the Fhem backend service
+		/**
+		 *  Fhem Websocket events send to the Fhem backend service
+		 */ 
 		FhemWebSocket.M_PUBLISH_EVENTS = {
 				getMetaData : "getMetaData",
 				dbLog: "dbLog"
 		};
 		
-		// Fhem Websocket events received from the Fhem backend service
+		/** 
+		 * Fhem Websocket events received from the Fhem backend service
+		 */ 
 		// TODO: assign event handler
 		FhemWebSocket.M_SUBSCRIBE_EVENTS = {
 				getMetaData : { onEvent: "metaData", fireEventFnName: "" }, 
@@ -276,6 +280,50 @@ sap.ui.define([
 				}
 			}.bind(this));
 
+			return this;
+		};
+
+
+		/**
+		 * Attach event-handler <code>fnFunction</code> to the <code>deviceEvents</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * @param {object}
+		 *            [oData] The object, that should be passed along with the event-object when firing the event.
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs. This function will be called on the
+		 *            oListener-instance (if present) or in a 'static way'.
+		 * @param {object}
+		 *            [oListener] Object on which to call the given function. If empty, the global context (window) is used.
+		 *
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemWebSocket.prototype.attachDeviceEvents = function(oData, fnFunction, oListener) {
+			this.attachEvent("deviceEvents", oData, fnFunction, oListener);
+
+			// subscribe to Fhem device events (only once)
+			//TODO
+			this.subscribeEvent(FhemWebSocket.M_SUBSCRIBE_EVENTS.deviceEvents.onEvent);
+			return this;
+		};
+
+
+		/**
+		 * Detach event-handler <code>fnFunction</code> from the <code>deviceEvents</code> event of this <code>de.kjumybit.fhem.service.FhemService</code>.
+		 *
+		 * The passed function and listener object must match the ones previously used for event registration.
+		 *
+		 * @param {function}
+		 *            fnFunction The function to call, when the event occurs.
+		 * @param {object}
+		 *            oListener Object on which the given function had to be called.
+		 * @return {de.kjumybit.fhem.service.FhemService} <code>this</code> to allow method chaining
+		 * @public
+		 */
+		FhemWebSocket.prototype.detachDeviceEvents = function(fnFunction, oListener) {
+			this.detachEvent("deviceEvents", fnFunction, oListener);
+
+			//TODO: unsubscribe to Fhem device events
 			return this;
 		};
 

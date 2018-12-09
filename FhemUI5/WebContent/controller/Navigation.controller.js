@@ -196,7 +196,7 @@ sap.ui.define([
 		onPressNavigationBack: function(oEvent) {
 			//TODO
 			this.getOwnerComponent()._oApp.setMode("HideMode");
-			this.getOwnerComponent()._oApp.hideMaster();
+			//this.getOwnerComponent()._oApp.hideMaster();
 		},
 
 		

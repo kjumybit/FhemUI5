@@ -24,7 +24,18 @@ sap.ui.define([
 				}
 			},
 
-			
+
+			/**
+			 * Handle press on Menue button at detail views.
+			 * Show navigation view (master view)
+			 * 
+			 * @param {object} oEvent Button press event
+			 */			
+			onMenuBtnPress: function(oEvent) {
+				this.getSplitAppObj().setMode("ShowHideMode");
+			},
+
+
 			/**
 			 * Handle press on button for Fhem Connection within the default footer.
 			 * Displays a popover dialog with adhoc actions and  options.
@@ -46,6 +57,18 @@ sap.ui.define([
 				}
 
 				oDialog.openBy(oEvent.getSource());	
+			},
+
+
+			/**
+			 * Fhem Connection Dialog
+			 * Handle change switch for Fhem Event Update
+			 * Enable or Disable Fhem Event updated in Fhem Model
+			 * 
+			 * @param {object} oEvent Button press event
+			 */
+			onChangeFhemEventUpdate: function(oEvent) {
+				this.getFhemModel().setEnabledEventUpdate( oEvent.getSource().getState() );
 			},
 
 
@@ -149,6 +172,22 @@ sap.ui.define([
 			getResourceBundle : function () {
 				return this.getOwnerComponent().getModel("i18n").getResourceBundle();
 			},
+
+
+			/**
+			 * Get Split App object
+			 * 
+			 * @returns {sap/m/SplitApp} Split App object
+			 */
+			getSplitAppObj : function() {
+				// get Split App control 
+				var oApp = this.getOwnerComponent().getRootControl().byId('app');
+				if (!oApp)  {
+					jQuery.sap.log.error("SplitApp object can't be found");
+				}
+				return oApp;
+			}
+	
 
 		});
 
