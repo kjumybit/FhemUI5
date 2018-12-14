@@ -1,7 +1,8 @@
 sap.ui.define([
+	'jquery.sap.global',
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/json/JSONModel"	
-], function (Controller, JSONModel) {
+], function (jquery, Controller, JSONModel) {
 		"use strict";
 
 		const _sComponent = "BaseController";		
@@ -17,7 +18,7 @@ sap.ui.define([
 		
 			},
 				
-			
+							
 			onExit : function () {
 				if (this._oFhemConnPopover) {
 					this._oFhemConnPopover.destroy();
@@ -32,7 +33,18 @@ sap.ui.define([
 			 * @param {object} oEvent Button press event
 			 */			
 			onMenuBtnPress: function(oEvent) {
-				this.getSplitAppObj().setMode("ShowHideMode");
+				let oApp = this.getSplitAppObj();
+				oApp.setMode("ShowHideMode");
+
+				let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
+				if (oMasterBtn) { oMasterBtn.setVisible(false); }
+
+				//jquery(".sapMSplitContainerMasterBtn").attr("hidden", "true");
+				
+				//oApp.showMaster();
+				//oApp.toMaster('Navigation');
+				//this.getRouter().navTo('Navigation');
+
 			},
 
 

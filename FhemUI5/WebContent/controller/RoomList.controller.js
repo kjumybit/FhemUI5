@@ -1,11 +1,12 @@
 sap.ui.define([
+	'jquery.sap.global',
 	'de/kjumybit/fhem/controller/BaseController',
 	'sap/m/GenericTile',
 	'sap/m/TileContent',
 	'sap/m/NumericContent',	
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(BaseController, GenericTile, TileContent, NumericContent, Formatter, Grouper) {
+], function(jquery, BaseController, GenericTile, TileContent, NumericContent, Formatter, Grouper) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.RoomList", {
@@ -47,9 +48,12 @@ sap.ui.define([
 		* This hook is the same one that SAPUI5 controls get after being rendered.
 		* @memberOf helloworld.Main
 		*/
-		//		onAfterRendering: function() {
-		//
-		//		},
+		onAfterRendering: function() {
+
+			// disable Navigation Button of Split Container
+			jquery(".sapMSplitContainerMasterBtn").attr("hidden", "false");
+
+		},
 	
 		
 		/**

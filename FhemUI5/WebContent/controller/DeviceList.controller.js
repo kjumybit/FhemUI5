@@ -1,4 +1,5 @@
 sap.ui.define([
+	'jquery.sap.global',	
 	'de/kjumybit/fhem/controller/BaseController',
 	"sap/ui/model/json/JSONModel",		
 	'sap/m/MessagePopover',
@@ -7,7 +8,7 @@ sap.ui.define([
 	"sap/ui/model/FilterOperator",
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(BaseController, JSONModel, MessagePopover, MessagePopoverItem, Filter, FilterOperator, Formatter, Grouper) {
+], function(jquery, BaseController, JSONModel, MessagePopover, MessagePopoverItem, Filter, FilterOperator, Formatter, Grouper) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceList", {
@@ -36,7 +37,15 @@ sap.ui.define([
 			this.getRouter().getRoute("DeviceList").attachPatternMatched(this.onDisplay, this);		
 		},
 	
+
+		onAfterRendering: function() {
+
+			// disable Navigation Button of Split Container
+			jquery(".sapMSplitContainerMasterBtn").attr("hidden", "false");
+
+		},
 		
+
 		/**
 		 * Called each time the view is displayed (via routing, but not for the root view)
 		 * The view may be called with an optional query parameter, which is used as a filter 

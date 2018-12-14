@@ -37,16 +37,29 @@ sap.ui.define([
 		* @memberOf helloworld.Main
 		*/
 		onBeforeRendering: function() {
+
+			// call the base component's function
+			// BaseController.prototype.onBeforeRendering.apply(this, arguments);
+
 			// initialization on display view
 			this.onDisplay();
 		},
 
+
+		onAfterRendering: function() {
+
+			// disable Navigation Button of Split Container
+			this.getOwnerComponent().getRootControl().byId('app-MasterBtn').setVisible(false);
+			//jquery(".sapMSplitContainerMasterBtn").attr("hidden", "true");
+
+		},
 		
+
 		/**
 		 * Do initialization tasks each time before the view is shown.
 		 */
 		onDisplay: function() {
-			//TODO
+
 		},
 		
 		
@@ -78,6 +91,11 @@ sap.ui.define([
 		/** ================================================================================
 		 *  Control event handler
 		 ** ================================================================================ */
+		
+		onPressNavigationBack: function( oEvent ) {
+
+		},
+
 		
 		/** 
 		 * Handle press on button Chart Backward

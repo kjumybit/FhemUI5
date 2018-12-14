@@ -5,8 +5,20 @@
 	xmlns="sap.m" 
 	displayBlock="true">
       	
-	<Page id="viewOverview" title="{i18n>Overview}">
-	
+	<Page id="viewOverview" title="{i18n>Overview}"  showNavButton="false">
+		<customHeader>
+			<Bar design="Header">
+				<contentLeft>
+					<!-- show master view-->
+					<Button icon="sap-icon://menu2" press="onMenuBtnPress"/>
+				</contentLeft>
+				<contentMiddle>
+					<Text text="{i18n>Overview}" wrapping="true" textAlign="Center"/>
+				</contentMiddle>
+			    <contentRight>
+				</contentRight>
+			</Bar>
+		</customHeader>	
 		<content>
 
 		<!-- Tile List -->

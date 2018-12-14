@@ -25,6 +25,8 @@ sap.ui.define([
 			// call the base component's init function
 			BaseController.prototype.onInit.apply(this, arguments);
 
+			this.getRouter().getRoute("DeviceDetail").attachPatternMatched(this._onNavigationMatched, this);
+
 		},
 
 		
@@ -65,6 +67,12 @@ sap.ui.define([
     
 			}
 								
+		},
+
+		_onNavigationMatched : function (oEvent) {
+			
+			// initialization on display view
+			// this.onDisplay();
 		},
 
 		
@@ -194,9 +202,10 @@ sap.ui.define([
 		 * @param {object} oEvent Button event
 		 */
 		onPressNavigationBack: function(oEvent) {
-			//TODO
+			//TODO			
 			this.getOwnerComponent()._oApp.setMode("HideMode");
-			//this.getOwnerComponent()._oApp.hideMaster();
+			//jQuery(".sapMSplitContainerMasterBtn").attr("hidden", "true");			
+			this.getOwnerComponent().getRootControl().byId('app-MasterBtn').setVisible(false);			
 		},
 
 		

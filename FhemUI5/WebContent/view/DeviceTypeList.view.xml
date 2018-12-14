@@ -4,7 +4,20 @@
 	xmlns:mvc="sap.ui.core.mvc" 
 	xmlns="sap.m" 
 	displayBlock="true">
-	<Page id="viewDeviceTypeList" title="{i18n>DeviceTypeList}">
+	<Page id="viewDeviceTypeList" title="{i18n>DeviceTypeList}"  showNavButton="false">
+		<customHeader>
+			<Bar design="Header">
+				<contentLeft>
+					<!-- show master view-->
+					<Button icon="sap-icon://menu2" press="onMenuBtnPress"/>
+				</contentLeft>
+				<contentMiddle>
+					<Text text="{i18n>DeviceTypeList}" wrapping="true" textAlign="Center"/>
+				</contentMiddle>
+			    <contentRight>
+				</contentRight>
+			</Bar>
+		</customHeader>
 	
 		<content>
 

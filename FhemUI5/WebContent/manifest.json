@@ -140,6 +140,11 @@
 		  			"target": ["devices", "navigation"]		  		  
 				},
 				{
+					"pattern": "navigation",
+					"name": "Navigation",
+					"target": ["navigation"]		  		  
+				},
+				{
 		  			"pattern": "overview",
 		  			"name": "Overview",
 		  			"target": ["overview", "navigation"] 

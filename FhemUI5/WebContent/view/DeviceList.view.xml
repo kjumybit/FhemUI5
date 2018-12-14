@@ -4,7 +4,21 @@
 	xmlns:mvc="sap.ui.core.mvc" 
 	xmlns="sap.m" 
 	displayBlock="true">
-	<Page id="viewDeviceList" title="{i18n>detailDeviceList}">
+	<Page id="viewDeviceList" title="{i18n>detailDeviceList}"  showNavButton="false" navButtonPress="onMenuBtnPress">
+		<customHeader>
+			<Bar design="Header">
+				<contentLeft>
+					<!-- show master view-->
+					<Button icon="sap-icon://menu2" press="onMenuBtnPress"/>
+				</contentLeft>
+				<contentMiddle>
+					<Text text="{i18n>detailDeviceList}" wrapping="true" textAlign="Center"/>
+				</contentMiddle>
+			    <contentRight>
+				</contentRight>
+			</Bar>
+		</customHeader>
+
 		<content>
 			
 			<Panel backgroundDesign="Transparent">

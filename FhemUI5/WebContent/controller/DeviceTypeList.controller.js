@@ -1,10 +1,11 @@
 sap.ui.define([
+	'jquery.sap.global',
 	'de/kjumybit/fhem/controller/BaseController',
 	'sap/m/MessagePopover',
 	'sap/m/MessagePopoverItem',
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(BaseController, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
+], function(jquery, BaseController, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
 	"use strict";
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceTypeList", {
@@ -37,9 +38,13 @@ sap.ui.define([
 	* This hook is the same one that SAPUI5 controls get after being rendered.
 	* @memberOf helloworld.Main
 	*/
-//		onAfterRendering: function() {
-//
-//		},
+	onAfterRendering: function() {
+
+		// disable Navigation Button of Split Container
+		jquery(".sapMSplitContainerMasterBtn").attr("hidden", "false");
+
+	},
+
 
 	/**
 	* Called when the Controller is destroyed. Use this one to free resources and finalize activities.
