@@ -1,6 +1,10 @@
-/**
- * Model for a Fhem data base logging device
- *  
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
  */
 sap.ui.define([
 	'jquery.sap.global',
@@ -83,6 +87,8 @@ sap.ui.define([
 
 
 	/**
+ 	 * Model for a Fhem data base logging device
+	 *  
 	 * @param {object} mSettings Settings object
 	 * @param {String} mSettings.logDevice Name of Fhem DbLog Device   
 	 * @param {String} mSettings.gevice Name of Fhem Device

@@ -1,13 +1,10 @@
-/*!
- *  
- */
-
-/**
- * Fhem WebSocket Connection
- *
- * @namespace
- * @name de.kjumybit.fhem.service.FhemWebSocket
- * @public
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
  */
 
 // Provides WebSocket Connection to Fhem server

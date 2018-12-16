@@ -1,3 +1,11 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/Device"
@@ -31,22 +39,13 @@ sap.ui.define([
 				fhemConnection : {
 					isConnected : false,
 					enableDeviceUpdates: true
-				}
+				},
+				header: {
+					masterBtnVisible: false
+				}				
 			};
 			return new JSONModel(mState);
-		},
-		
-				
-		/**
-		 * Create user dialog model
-		 * 
-		 * @returns {sap/ui/model/json/JSONModel} Runtime model
-		 */
-		createUserDialogModel: function() {
-			return new JSONModel({
-				//TODO
-			});
-		},
+		}
 				
 	};
 });

@@ -10,7 +10,7 @@
 			<Bar design="Header">
 				<contentLeft>
 					<!-- show master view-->
-					<Button icon="sap-icon://menu2" press="onMenuBtnPress"/>
+					<Button icon="sap-icon://menu2" press="onMenuBtnPress" visible="{runtime>/header/masterBtnVisible}"/>
 				</contentLeft>
 				<contentMiddle>
 					<Text text="{i18n>RoomList}" wrapping="true" textAlign="Center"/>

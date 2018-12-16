@@ -1,3 +1,11 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([
 	'jquery.sap.global',	
 	'de/kjumybit/fhem/controller/BaseController',
@@ -10,6 +18,8 @@ sap.ui.define([
 	'de/kjumybit/fhem/model/grouper'
 ], function(jquery, BaseController, JSONModel, MessagePopover, MessagePopoverItem, Filter, FilterOperator, Formatter, Grouper) {
 	"use strict";
+
+	const _sComponent = "DeviceList";	
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceList", {
 
@@ -38,11 +48,28 @@ sap.ui.define([
 		},
 	
 
-		onAfterRendering: function() {
+		/**
+		* Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
+		* (NOT before the first rendering! onInit() is used for that one!).
+		* @memberOf helloworld.Main
+		*/
+		onBeforeRendering: function() {
 
-			// disable Navigation Button of Split Container
-			jquery(".sapMSplitContainerMasterBtn").attr("hidden", "false");
+			jQuery.sap.log.debug("onBeforeRendering", null, _sComponent);	
 
+			// call the base component's function
+			// BaseController.prototype.onBeforeRendering.apply(this, arguments);
+
+			// set own navigation button
+			let bMaster = this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', !bMaster);
+
+			// hide master button
+			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
+			if (oMasterBtn) { oMasterBtn.setVisible(false); }
+
+			// initialization on display view
+			//this.onDisplay();
 		},
 		
 

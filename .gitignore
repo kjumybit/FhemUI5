@@ -1,1 +1,9 @@
 FhemUI5/WebContent/resources
+MyFhemJs/logs/app.log
+MyFhemJs/.settings/org.eclipse.wst.jsdt.ui.superType.name
+MyFhemJs/.settings/org.eclipse.wst.jsdt.ui.superType.container
+MyFhemJs/.settings/.jsdtscope
+MyFhemJs/.project
+MyFhemJs/.gitignore
+FhemUI5/.settings/org.eclipse.core.resources.prefs
+FhemUI5/resources

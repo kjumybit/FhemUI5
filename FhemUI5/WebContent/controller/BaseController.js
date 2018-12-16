@@ -1,3 +1,11 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([
 	'jquery.sap.global',
 	"sap/ui/core/mvc/Controller",
@@ -33,18 +41,19 @@ sap.ui.define([
 			 * @param {object} oEvent Button press event
 			 */			
 			onMenuBtnPress: function(oEvent) {
+
+				// hide own navigation button
+				this.getRuntimeModel().setProperty('/header/masterBtnVisible', false)
+
 				let oApp = this.getSplitAppObj();
 				oApp.setMode("ShowHideMode");
 
+				// keep default master button invisible
 				let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
 				if (oMasterBtn) { oMasterBtn.setVisible(false); }
 
-				//jquery(".sapMSplitContainerMasterBtn").attr("hidden", "true");
-				
-				//oApp.showMaster();
-				//oApp.toMaster('Navigation');
-				//this.getRouter().navTo('Navigation');
-
+				//TODO: portrait mode
+				// Master is not shown
 			},
 
 

@@ -1,13 +1,10 @@
-/*!
- *  
- */
-
-/**
- * Fhem Model for Devices and Device Events
- *
- * @namespace
- * @name de.kjumybit.fhem.service.FhemService
- * @public
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
  */
 
 // Provides WebSocket Connection to Fhem server

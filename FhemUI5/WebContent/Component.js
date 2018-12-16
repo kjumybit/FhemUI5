@@ -1,3 +1,11 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([ 
 	"sap/ui/core/UIComponent", 
 	"sap/ui/Device", 

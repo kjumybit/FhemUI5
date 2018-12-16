@@ -1,8 +1,21 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([ 
 	"sap/ui/core/mvc/Controller" 
 ], function(Controller) {
 	"use strict";
 
+
+	/** 
+	 * FhemUI5 App controller
+	 * 
+	 */	
 	return Controller.extend("de.kjumybit.fhem.controller.App", {
 
 		/**

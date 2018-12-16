@@ -1,6 +1,10 @@
-/**
+/** 
+ * FhemUI5 App
  * 
- *  
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
  */
 sap.ui.define([
 	'jquery.sap.global',

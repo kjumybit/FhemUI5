@@ -1,13 +1,11 @@
-/**
- * A base chart model for Chart.js charts
- *  
- *
- * @namespace
- * @name de.kjumybit.fhem.chart
- * @public
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
  */
-
-// Provides the Chart.js based model implementation
 sap.ui.define([
 	'jquery.sap.global',
 	'sap/ui/model/ClientModel',	

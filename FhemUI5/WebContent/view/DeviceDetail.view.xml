@@ -12,7 +12,7 @@
 			<Bar design="Header">
 				<contentLeft>
 					<!-- show master view-->
-					<Button icon="sap-icon://menu2" press="onMenuBtnPress"/>
+					<Button id="showNavigationBtn" icon="sap-icon://menu2" press="onMenuBtnPress" visible="{runtime>/header/masterBtnVisible}"/>
 				</contentLeft>
 				<contentMiddle>
 					<!-- device icon and name and state-->

@@ -1,3 +1,11 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([
 	"de/kjumybit/fhem/controller/BaseController",
 	"de/kjumybit/fhem/libs/Settings",	
@@ -202,10 +210,13 @@ sap.ui.define([
 		 * @param {object} oEvent Button event
 		 */
 		onPressNavigationBack: function(oEvent) {
-			//TODO			
+	
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', true);
 			this.getOwnerComponent()._oApp.setMode("HideMode");
-			//jQuery(".sapMSplitContainerMasterBtn").attr("hidden", "true");			
-			this.getOwnerComponent().getRootControl().byId('app-MasterBtn').setVisible(false);			
+
+			// keep default master button invisible
+			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
+			if (oMasterBtn) { oMasterBtn.setVisible(false); }
 		},
 
 		

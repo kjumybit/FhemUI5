@@ -1,3 +1,11 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([
 	'jquery.sap.global',	
 	'de/kjumybit/fhem/controller/BaseController',
@@ -10,6 +18,8 @@ sap.ui.define([
 	'de/kjumybit/fhem/chart/ChartBase'	
 ], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, FhemCore, Chart) {
 	"use strict";
+
+	const _sComponent = "DeviceDetail";	
 
 	return BaseController.extend("de.kjumybit.fhem.controller.DeviceDetail", {
 
@@ -38,8 +48,18 @@ sap.ui.define([
 		*/
 		onBeforeRendering: function() {
 
+			jQuery.sap.log.debug("onBeforeRendering", null, _sComponent);	
+
 			// call the base component's function
 			// BaseController.prototype.onBeforeRendering.apply(this, arguments);
+
+			// set own navigation button
+			let bMaster = this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', !bMaster);
+
+			// hide master button
+			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
+			if (oMasterBtn) { oMasterBtn.setVisible(false); }
 
 			// initialization on display view
 			this.onDisplay();
@@ -48,9 +68,11 @@ sap.ui.define([
 
 		onAfterRendering: function() {
 
-			// disable Navigation Button of Split Container
-			this.getOwnerComponent().getRootControl().byId('app-MasterBtn').setVisible(false);
-			//jquery(".sapMSplitContainerMasterBtn").attr("hidden", "true");
+			//jQuery.sap.log.debug("onAfterRendering:", null, _sComponent);	
+
+			// hide master button
+			//let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
+			//if (oMasterBtn) { oMasterBtn.setVisible(false); }
 
 		},
 		
@@ -59,7 +81,7 @@ sap.ui.define([
 		 * Do initialization tasks each time before the view is shown.
 		 */
 		onDisplay: function() {
-
+			//jQuery.sap.log.debug("onDisplay:", null, _sComponent);	
 		},
 		
 		
@@ -91,10 +113,7 @@ sap.ui.define([
 		/** ================================================================================
 		 *  Control event handler
 		 ** ================================================================================ */
-		
-		onPressNavigationBack: function( oEvent ) {
 
-		},
 
 		
 		/** 

@@ -1,5 +1,10 @@
-/*!
- * License
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
  */
 
 // Provides the Chart model implementation of a property binding

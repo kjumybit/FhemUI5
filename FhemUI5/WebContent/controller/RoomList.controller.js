@@ -1,3 +1,11 @@
+/** 
+ * FhemUI5 App
+ * 
+ * @author kjumybit
+ * @license MIT
+ * @version 0.1
+ * 
+ */
 sap.ui.define([
 	'jquery.sap.global',
 	'de/kjumybit/fhem/controller/BaseController',
@@ -8,6 +16,8 @@ sap.ui.define([
 	'de/kjumybit/fhem/model/grouper'
 ], function(jquery, BaseController, GenericTile, TileContent, NumericContent, Formatter, Grouper) {
 	"use strict";
+
+	const _sComponent = "RoomList";	
 
 	return BaseController.extend("de.kjumybit.fhem.controller.RoomList", {
 
@@ -38,31 +48,19 @@ sap.ui.define([
 		*/
 		onBeforeRendering: function() {
 			
+			jQuery.sap.log.debug("onBeforeRendering", null, _sComponent);	
+
+			// set own navigation button
+			let bMaster = this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', !bMaster);
+
+			// hide master button
+			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
+			if (oMasterBtn) { oMasterBtn.setVisible(false); }
+
 			// call hook at view creation time
 			this.onDisplay();
 		},
-	
-		
-		/**
-		* Called when the View has been rendered (so its HTML is part of the document). Post-rendering manipulations of the HTML could be done here.
-		* This hook is the same one that SAPUI5 controls get after being rendered.
-		* @memberOf helloworld.Main
-		*/
-		onAfterRendering: function() {
-
-			// disable Navigation Button of Split Container
-			jquery(".sapMSplitContainerMasterBtn").attr("hidden", "false");
-
-		},
-	
-		
-		/**
-		* Called when the Controller is destroyed. Use this one to free resources and finalize activities.
-		* @memberOf helloworld.Main
-		*/
-		//		onExit: function() {
-		//
-		//		}
 	
 		
 		/**
