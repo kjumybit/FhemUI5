@@ -11,12 +11,11 @@ sap.ui.define([
 	'de/kjumybit/fhem/controller/BaseController',
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper',
-	'sap/ui/model/json/JSONModel',
 	'sap/ui/layout/form/FormElement',
 	'sap/m/Text',
 	'de/kjumybit/fhem/core',	
 	'de/kjumybit/fhem/chart/ChartBase'	
-], function(jquery, BaseController, Formatter, Grouper, JSONModel, FormElement, Text, FhemCore, Chart) {
+], function(jQuery, BaseController, Formatter, Grouper, FormElement, Text, FhemCore, Chart) {
 	"use strict";
 
 	const _sComponent = "DeviceDetail";	
@@ -38,7 +37,12 @@ sap.ui.define([
 			// call the base component's init function
 			BaseController.prototype.onInit.apply(this, arguments);
 
-			this.getRouter().getRoute("DeviceDetail").attachPatternMatched(this._onDeviceMatched, this);
+			// register event handler called every time the detail view is displayed
+			this.getView().addEventDelegate({
+				onBeforeShow: this.onBeforeShow,
+			}, this);
+
+			//this.getRouter().getRoute("DeviceDetail").attachPatternMatched(this._onDeviceMatched, this);
 		},
 	
 		/**
@@ -50,30 +54,15 @@ sap.ui.define([
 
 			jQuery.sap.log.debug("onBeforeRendering", null, _sComponent);	
 
-			// call the base component's function
-			// BaseController.prototype.onBeforeRendering.apply(this, arguments);
-
 			// set own navigation button
-			let bMaster = this.getSplitAppObj().isMasterShown();
-			this.getRuntimeModel().setProperty('/header/masterBtnVisible', !bMaster);
+			let bMaster = !this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', bMaster);
 
 			// hide master button
-			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
-			if (oMasterBtn) { oMasterBtn.setVisible(false); }
+			this.hideDefaultMasterButton();
 
 			// initialization on display view
 			this.onDisplay();
-		},
-
-
-		onAfterRendering: function() {
-
-			//jQuery.sap.log.debug("onAfterRendering:", null, _sComponent);	
-
-			// hide master button
-			//let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
-			//if (oMasterBtn) { oMasterBtn.setVisible(false); }
-
 		},
 		
 
@@ -81,10 +70,36 @@ sap.ui.define([
 		 * Do initialization tasks each time before the view is shown.
 		 */
 		onDisplay: function() {
-			//jQuery.sap.log.debug("onDisplay:", null, _sComponent);	
+			jQuery.sap.log.debug("onDisplay:", null, _sComponent);	
 		},
 		
 		
+
+		/** 
+		 * Triggered before dispayling the view when Spli Container navigation is used.
+		 * 
+		 * @param {object} oData
+		 * 				   oData.data Payload of the navigation.
+		 * 				   oData.data.deviceId ID of the Fhem device those details should be displayed
+		 */
+		onBeforeShow: function (oData) {
+
+			jQuery.sap.log.debug("onBeforeShow - display device details for device " + oData.deviceId, null, _sComponent);				
+
+			// initialization on display view
+			this.onDisplay();
+
+			this.sDeviceId =  oData.data.deviceId;
+		
+			// bind the view to the current device
+			this.getView().bindElement('Fhem>/Device(' + this.sDeviceId + ')');
+
+			// build charts
+			this._createChart(this.byId("chartContainer"));    // via JScript
+
+		},
+
+
 		/**
 		 * Binds the view to the device path. The deviceId is the name of the path parameter defined 
 		 * in the routing configuration: "pattern": "devicedetail/{deviceId}". It represents the 
@@ -94,8 +109,11 @@ sap.ui.define([
 		 * @param {sap.ui.base.Event} oEvent pattern match event in route 'devicedetail'
 		 * @private
 		 */
+		/*
 		_onDeviceMatched : function (oEvent) {
 			
+			jQuery.sap.log.debug("onDeviceMatched ", null, _sComponent);	
+
 			// initialization on display view
 			this.onDisplay();
 			
@@ -108,7 +126,8 @@ sap.ui.define([
 			this._createChart(this.byId("chartContainer"));    // via JScript
 			
 		},
-		
+		*/
+
 		
 		/** ================================================================================
 		 *  Control event handler

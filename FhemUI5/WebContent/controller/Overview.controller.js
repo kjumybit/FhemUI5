@@ -9,11 +9,9 @@
 sap.ui.define([
 	'jquery.sap.global',
 	'de/kjumybit/fhem/controller/BaseController',
-	'sap/m/MessagePopover',
-	'sap/m/MessagePopoverItem',
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(jquery, BaseController, MessagePopover, MessagePopoverItem, Formatter, Grouper) {
+], function(jQuery, BaseController, Formatter, Grouper) {
 	"use strict";
 
 	const _sComponent = "DeviceOverview";	
@@ -46,16 +44,24 @@ sap.ui.define([
 			jQuery.sap.log.debug("onBeforeRendering", null, _sComponent);	
 
 			// set own navigation button
-			let bMaster = this.getSplitAppObj().isMasterShown();
-			this.getRuntimeModel().setProperty('/header/masterBtnVisible', !bMaster);
+			let bMaster = !this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', bMaster);
 
 			// hide master button
-			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
-			if (oMasterBtn) { oMasterBtn.setVisible(false); }
+			this.hideDefaultMasterButton();
 
 			// initialization on display view
 			//this.onDisplay();
-		}
+		},
+
+
+		/** 
+		 * Triggered before dispayling the view when Spli Container navigation is used.
+		 * 
+		 * @param {object} oData Payload of the navigation.
+		 */
+		beforeShow: function (oData) {
+		},
 
 
 		/** ================================================================================

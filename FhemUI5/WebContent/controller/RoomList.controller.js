@@ -14,7 +14,7 @@ sap.ui.define([
 	'sap/m/NumericContent',	
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(jquery, BaseController, GenericTile, TileContent, NumericContent, Formatter, Grouper) {
+], function(jQuery, BaseController, GenericTile, TileContent, NumericContent, Formatter, Grouper) {
 	"use strict";
 
 	const _sComponent = "RoomList";	
@@ -33,11 +33,14 @@ sap.ui.define([
 		*/
 		onInit: function() {
 	
+			// register event handler called every time the detail view is displayed
+			this.getView().addEventDelegate({
+				onBeforeShow: this.onBeforeShow,
+			}, this);			
+			
 			// register hook for initializations each time the view is displayed
-			this.getRouter().getRoute('RoomList').attachPatternMatched(this.onDisplay, this);
+			//this.getRouter().getRoute('RoomList').attachPatternMatched(this.onDisplay, this);
 							
-			// create tile the first time
-			this._createTiles();
 		},
 	
 		
@@ -51,12 +54,11 @@ sap.ui.define([
 			jQuery.sap.log.debug("onBeforeRendering", null, _sComponent);	
 
 			// set own navigation button
-			let bMaster = this.getSplitAppObj().isMasterShown();
-			this.getRuntimeModel().setProperty('/header/masterBtnVisible', !bMaster);
+			let bMaster = !this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', bMaster);
 
 			// hide master button
-			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
-			if (oMasterBtn) { oMasterBtn.setVisible(false); }
+			this.hideDefaultMasterButton();
 
 			// call hook at view creation time
 			this.onDisplay();
@@ -71,6 +73,19 @@ sap.ui.define([
 		},
 		
 		
+		/** 
+		 * Triggered before displaying the view when Split Container navigation is used.
+		 * 
+		 * @param {object} oData Payload of the navigation.
+		 */
+		onBeforeShow: function (oData) {
+			this.onDisplay();
+
+			// create tiles 
+			this._createTiles();
+		},
+
+
 		/** ================================================================================
 		 *  App event handler
 		 ** ================================================================================ */
@@ -81,17 +96,23 @@ sap.ui.define([
 		 * Navigate to the device list view, filtered by the room assigned to the selected
 		 * tile.
 		 * The room ID is stored in the subheader property of the tile.
+		 * 
+		 * @param {object} oEvent Tile press event parameter
 		 */
 		onTilePress: function (oEvent) {
 			
 			let oTile = oEvent.getSource();
-			let oRouter = this.getRouter();
-			
-			oRouter.navTo("DeviceList", {
-				"query": {
-					"room": oTile.getSubheader()
-				}
-			}); 				
+
+			this.getSplitAppObj().toDetail(this.getDetailPageId("DeviceListView"), "show", { 
+				room: oTile.getSubheader()
+			}); 
+
+			//let oRouter = this.getRouter();			
+			//oRouter.navTo("DeviceList", {
+			//	"query": {
+			//		"room": oTile.getSubheader()
+			//	}
+			//}); 				
 		},
 				
 		

@@ -4,7 +4,7 @@
 			{
 				"navItemID": "dashboard",
 				"i18nText": "navItemDashBoard",
-				"view": "OverviewView",
+				"view": "Overview",
 				"detailView": {
 					"view": ""
 				},
@@ -15,7 +15,7 @@
 			{
 				"navItemID": "roomList",
 				"i18nText": "navItemRooms",
-				"view": "RoomListView",
+				"view": "RoomList",
 				"detailView": {
 					"view": "DeviceList",
 					"query": "room"					
@@ -29,7 +29,7 @@
 			{
 				"navItemID": "deviceList",
 				"i18nText": "navItemDevices",
-				"view": "DeviceListView",
+				"view": "DeviceList",
 				"detailView": {
 					"view": "DeviceDetail",
 					"parameter": "deviceId"
@@ -44,7 +44,7 @@
 			{
 				"navItemID": "deviceTypeList",
 				"i18nText": "navItemDeviceTyps",
-				"view": "DeviceTypeListView",
+				"view": "DeviceTypeList",
 				"detailView": {
 					"view": "DeviceList",
 					"query": "deviceType"

@@ -10,13 +10,11 @@ sap.ui.define([
 	'jquery.sap.global',	
 	'de/kjumybit/fhem/controller/BaseController',
 	"sap/ui/model/json/JSONModel",		
-	'sap/m/MessagePopover',
-	'sap/m/MessagePopoverItem',
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
 	'de/kjumybit/fhem/model/formatter',
 	'de/kjumybit/fhem/model/grouper'
-], function(jquery, BaseController, JSONModel, MessagePopover, MessagePopoverItem, Filter, FilterOperator, Formatter, Grouper) {
+], function(jQuery, BaseController, JSONModel, Filter, FilterOperator, Formatter, Grouper) {
 	"use strict";
 
 	const _sComponent = "DeviceList";	
@@ -44,7 +42,11 @@ sap.ui.define([
 			});
 			this.setModel(oViewModel, 'deviceDetails');
 
-			this.getRouter().getRoute("DeviceList").attachPatternMatched(this.onDisplay, this);		
+			// register event handler called every time the detail view is displayed
+			this.getView().addEventDelegate({
+				onBeforeShow: this.onBeforeShow,
+			}, this);			
+			//this.getRouter().getRoute("DeviceList").attachPatternMatched(this.onDisplay, this);		
 		},
 	
 
@@ -57,21 +59,54 @@ sap.ui.define([
 
 			jQuery.sap.log.debug("onBeforeRendering", null, _sComponent);	
 
-			// call the base component's function
-			// BaseController.prototype.onBeforeRendering.apply(this, arguments);
-
 			// set own navigation button
-			let bMaster = this.getSplitAppObj().isMasterShown();
-			this.getRuntimeModel().setProperty('/header/masterBtnVisible', !bMaster);
+			let bMaster = !this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', bMaster);
 
 			// hide master button
-			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
-			if (oMasterBtn) { oMasterBtn.setVisible(false); }
+			this.hideDefaultMasterButton();
 
 			// initialization on display view
 			//this.onDisplay();
 		},
 		
+
+		/** 
+		 * Triggered before displaying the view when Split Container navigation is used.
+		 * The view may be called with an optional query parameter, which is used as a filter 
+		 * for displayed devices.
+		 * 
+		 * Supported query parameter (filter parameters): 
+		 * - room		: /DeviceSet/Attributes/room
+		 * - deviceType : /DeviceSet/Internals/TYPE
+
+		 * 
+		 * @param {object} oData Payload of the navigation.
+		 * 				   oData.deviceTyp
+		 * 				   oData.room
+		 */
+		onBeforeShow: function (oData) {
+
+			let aFilter = [];
+			
+			jQuery.sap.log.debug("onBeforeShow - display device list", null, _sComponent);				
+			
+			// reset or set filter
+			if (oData.data) {
+				// prepare filter value
+				if (oData.data.deviceType) {
+					aFilter.push(new Filter("Internals/TYPE", FilterOperator.Contains, oData.data.deviceType));
+				} else if (oData.data.room) {
+					aFilter.push(new Filter("Attributes/room", FilterOperator.Contains, oData.data.room));					
+				}			
+			}
+
+			// set filter for table item binding
+			let oTable = this.byId("tblDeviceList");
+			let oBinding = oTable.getBinding("items");
+			oBinding.filter(aFilter);			
+		},
+
 
 		/**
 		 * Called each time the view is displayed (via routing, but not for the root view)
@@ -84,6 +119,7 @@ sap.ui.define([
 		 *
 		 * @param {sap.ui.base.Event} oEvent pattern match event in route 'devicedetail' 
 		 */
+		/*
 		onDisplay: function(oEvent) {
 			
 			let oArgs = oEvent.getParameter("arguments");
@@ -105,7 +141,8 @@ sap.ui.define([
 			let oBinding = oTable.getBinding("items");
 			oBinding.filter(aFilter);			
 		},
-				
+		*/
+
 	
 		/** ================================================================================
 		 *  App event handler
@@ -135,13 +172,14 @@ sap.ui.define([
 			}
 
 			this.getModel('deviceDetails').setProperty('/deviceTableTitle', sTitle);
-
 		},
 
 		
 		/**
 		 * Handle device item selection. 
 		 * Show device detail. 
+		 * 
+		 * @param {object} oEvent Event parameter for table item selection
 		 */
 		onItemPress: function(oEvent) {
 			// the source is the table list item that got pressed 
@@ -151,11 +189,18 @@ sap.ui.define([
 		
 		/**
 		 * Navigates to the detail view of the selected device.
+		 * 
+		 * @param {object} oDevice Fhem device object
 		 */
 		_showDeviceDetail: function(oDevice) {
-			this.getRouter().navTo("DeviceDetail", {
+
+			this.getSplitAppObj().toDetail(this.getDetailPageId("DeviceDetailView"), "show", { 
 				deviceId: oDevice.getBindingContext("Fhem").getProperty("Name")
-			});
+			}); 
+	
+			//this.getRouter().navTo("DeviceDetail", {
+			//	deviceId: oDevice.getBindingContext("Fhem").getProperty("Name")
+			//});
 		}
 	
 	});

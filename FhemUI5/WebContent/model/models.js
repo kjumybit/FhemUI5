@@ -42,8 +42,25 @@ sap.ui.define([
 				},
 				header: {
 					masterBtnVisible: false
-				}				
+				},
+				viewMode: {
+					mode: "full",
+					fullScreen: true,
+					overlay: false,
+					singleView: false
+				},
+				cordova: {
+					isACordovaApp: false,
+					version: "",
+				}
 			};
+
+			// check cordova
+			if (window.cordova) {
+				oRuntime.cordova.isACordovaApp = true;
+				oRuntime.cordova.version = window.cordova.version;
+			}
+
 			return new JSONModel(mState);
 		}
 				

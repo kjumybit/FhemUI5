@@ -5,5 +5,5 @@
 	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc"  
 	xmlns="sap.m">
-	<SplitApp id="app"/>
+	<SplitApp id="app" orientationChange="onOrientationChange"/>
 </mvc:View>

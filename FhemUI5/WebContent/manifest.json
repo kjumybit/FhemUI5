@@ -137,70 +137,59 @@
 		  			"pattern": "",
 		  			"view": "App",
 		  			"name": "App",
-		  			"target": ["devices", "navigation"]		  		  
-				},
-				{
-					"pattern": "navigation",
-					"name": "Navigation",
-					"target": ["navigation"]		  		  
-				},
-				{
-		  			"pattern": "overview",
-		  			"name": "Overview",
-		  			"target": ["overview", "navigation"] 
-				},
-				{
-		  			"pattern": "devices:?query:",
-		  			"name": "DeviceList",
-		  			"target": ["devices", "navigation"] 
-		  		},
-		  		{
-		  			"pattern": "devicetypes",
-		  			"name": "DeviceTypeList",
-		  			"target": ["deviceTypes", "navigation"]
-				},
-				{
-		  			"pattern": "rooms",
-		  			"name": "RoomList",
-		  			"target": ["rooms", "navigation"]					
-				},
-				{
-		  			"pattern": "devicedetail/{deviceId}",
-		  			"name": "DeviceDetail",
-		  			"target": ["deviceDetail", "navigation"]  							
+		  			"target": ["navigation", "overview", "rooms", "deviceTypes", "deviceDetail", "settings", "devices"]
 				}
 			],
 			"targets": {
 				"navigation": {
 					"viewName": "Navigation",
+					"viewId": "NavigationView",
 					"viewLevel": 1,
+					"transition": "show",					
 					"controlAggregation": "masterPages"				
 				},
 				"overview": {
 					"viewName": "Overview",
+					"viewId": "OverviewView",					
 					"viewLevel": 1,
+					"transition": "show",					
 					"controlAggregation": "detailPages"				
 				},
 				"rooms": {
 					"viewName": "RoomList",
+					"viewId": "RoomListView",					
 					"viewLevel": 1,
+					"transition": "show",					
 					"controlAggregation": "detailPages"				
 				},	
 				"devices": {
 					"viewName": "DeviceList",
+					"viewId": "DeviceListView",					
 					"viewLevel": 1,
+					"transition": "show",					
 					"controlAggregation": "detailPages"				
 				},
 				"deviceTypes": {
 					"viewName": "DeviceTypeList",
+					"viewId": "DeviceTypeListView",					
 					"viewLevel": 1,
+					"transition": "show",					
 					"controlAggregation": "detailPages"				
 				},
 				"deviceDetail": {
 					"viewName": "DeviceDetail",
+					"viewId": "DeviceDetailView",					
+					"viewLevel": 2,
+					"transition": "show",					
+					"controlAggregation": "detailPages"									
+				},
+				"settings": {
+					"viewName": "Settings",
+					"viewId": "SettingsView",					
 					"viewLevel": 1,
+					"transition": "show",					
 					"controlAggregation": "detailPages"				
-				}												
+				}
 			}			
 		}
   	}	

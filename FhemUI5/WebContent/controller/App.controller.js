@@ -7,16 +7,19 @@
  * 
  */
 sap.ui.define([ 
-	"sap/ui/core/mvc/Controller" 
-], function(Controller) {
+	"de/kjumybit/fhem/controller/BaseController",
+	"jquery.sap.global"	
+], function(BaseController, jQuery) {
+
 	"use strict";
 
+	const _sComponent = "App";	
 
 	/** 
 	 * FhemUI5 App controller
 	 * 
 	 */	
-	return Controller.extend("de.kjumybit.fhem.controller.App", {
+	return BaseController.extend("de.kjumybit.fhem.controller.App", {
 
 		/**
 		 * Called when a controller is instantiated and its View controls (if
@@ -27,7 +30,8 @@ sap.ui.define([
 		 * @memberOf de.kjumybit.fhem.App 
 		 */
 		onInit : function() {
-			this.getView().addStyleClass(this.getOwnerComponent().getContentDensityClass());
+			// call the base component's init function
+			BaseController.prototype.onInit.apply(this, arguments);
 		},
 
 		
@@ -39,8 +43,16 @@ sap.ui.define([
 		 * @memberOf de.kjumybit.fhem.App
 		 */
 		onBeforeRendering: function() {
-			// save split app control
-			this.getOwnerComponent()._oApp = this.byId("app");
+
+			// set initial master and detail view (page)
+			this._oSplittApp = this._oSplittApp || this.getSplitAppObj();
+			
+			this._oSplittApp.setMode("ShowHideMode");  // default
+			this._oSplittApp.setInitialDetail('DeviceList');  // don't work
+
+			this.determineViewMode();
+			this.hideDefaultMasterButton();	
+
 		},
 		
 		
@@ -64,5 +76,29 @@ sap.ui.define([
 		 // onExit: function() {
 		 // }
 		 
-		});
+
+		/** ================================================================================
+		 *  App event handler
+		 ** ================================================================================ */
+
+		 /**
+		  * Handle device orientation change.
+		  * The UI5 device model is already changed, but own bindings haven't been updated.
+		  * So force model binding update.
+		  * 
+		  * @param {object} oEvent Event parameter
+		  */
+		 onOrientationChange: function(oEvent) {
+
+			this.getDeviceModel().updateBindings(true);  // "force" is required
+			this.determineViewMode();
+			this.hideDefaultMasterButton();	
+
+			// set visbility of own master button 
+			let bMaster = !this.getSplitAppObj().isMasterShown();
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', bMaster);
+		},
+
+
+	});
 });

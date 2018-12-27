@@ -8,13 +8,12 @@
  */
 sap.ui.define([
 	"de/kjumybit/fhem/controller/BaseController",
-	"de/kjumybit/fhem/libs/Settings",	
 	"jquery.sap.global",	
-	"sap/ui/model/json/JSONModel",	
 	"sap/tnt/NavigationList",
 	"sap/tnt/NavigationListItem",
 	"de/kjumybit/fhem/service/FhemService"	
-], function(BaseController, Settings, jQuery, JSONModel, NavigationList, NavigationListItem, FhemService) {
+], function(BaseController, jQuery, NavigationList, NavigationListItem, FhemService) {
+
 	"use strict";
 
 	const _sComponent = "Navigation";
@@ -32,9 +31,6 @@ sap.ui.define([
 			
 			// call the base component's init function
 			BaseController.prototype.onInit.apply(this, arguments);
-
-			this.getRouter().getRoute("DeviceDetail").attachPatternMatched(this._onNavigationMatched, this);
-
 		},
 
 		
@@ -77,16 +73,41 @@ sap.ui.define([
 								
 		},
 
-		_onNavigationMatched : function (oEvent) {
-			
-			// initialization on display view
-			// this.onDisplay();
-		},
-
 		
 		/** ================================================================================
 		 *  App event handler
 		 ** ================================================================================ */
+
+
+		/**
+		 * Handles page Back button press
+		 * Hide navigation view (master page)
+		 * 
+		 * @param {object} oEvent Button event
+		 */
+		onPressNavigationBack: function(oEvent) {
+
+			this._closeMasterView(true);
+		},
+
+
+		/**
+		 * Handles press on button "Settings"
+		 * Open Settings view as detail page.
+		 * Replace current detail view but don't close master view.
+		 * 
+		 * @param {object} oEvent Button event
+		 */		
+		onPressSettings: function(oEvent) {
+
+			var sPageId = "SettingsView";
+
+			jQuery.sap.log.info("Navigate to settings view " + sPageId, null, _sComponent);
+
+			// replace current detail view with new detail in navigation container for detail pages
+			this.getSplitAppObj().toDetail(this.getDetailPageId(sPageId)); 
+
+		},
 
 		
 		/**
@@ -94,6 +115,7 @@ sap.ui.define([
 		 * 
 		 * @param {object} oEvent Button event
 		 */
+		/*
 		onPressSettings: function(oEvent) {
 			var oView = this.getView();
 			var oDialog = oView.byId("settingsDlg");
@@ -107,8 +129,9 @@ sap.ui.define([
 
 			oDialog.open();		
 		},
+		*/
 		
-		
+
 		/**
 		 * Handle close settings dialog.
 		 * - Save settings properties and
@@ -116,6 +139,7 @@ sap.ui.define([
 		 * 
 		 * @param {object} oEvent Button event
 		 */
+		/*
 		onPressCloseSettingsDlg: function(oEvent) {
 			oEvent.getSource().getParent().close();
 
@@ -125,18 +149,18 @@ sap.ui.define([
 				this._createFhemModel(this.oSettings);
 			}
 		},
-		
+		*/
+
 
 		/**
 		 * Handles item selection in navigation list on level 1 
 		 * (overview, devices, rooms, ...)
 		 * 
 		 * @param {object} oEvent Navigation item select event
-		 * @param oEvent.getSource() ... Navigation List Item (Level 1)   
 		 */
 		onNavItemSelect: function(oEvent) {
 			
-			var oRouter = this.getRouter();
+			//var oRouter = this.getRouter();
 			var oItem = oEvent.getParameters("item");
 			if (!oItem) return;
 			
@@ -146,8 +170,15 @@ sap.ui.define([
 			
 			// get view name of item
 			var oItemProperty = oBindingContext.getProperty();
-			if (oItemProperty.view) {
-				oRouter.navTo(oItemProperty.view, true);
+			if (oItemProperty.view) {				
+				//oRouter.navTo(oItemProperty.view, true);
+
+				jQuery.sap.log.info("Navigate to detail view " + oItemProperty.view, null, _sComponent);
+			
+				// replace current detail view with new detail in navigation container for detail pages
+				this.getSplitAppObj().toDetail(this.getDetailPageId(oItemProperty.view), "show"); 
+	
+				this._closeMasterView(false);
 			}
 		},
 		
@@ -168,6 +199,7 @@ sap.ui.define([
 		 * 
 		 * @param {object} oEvent Sub item select event
 		 */
+		/*
 		onNavSubItemSelect: function(oEvent) {
 			
 			var oRouter = this.getRouter();
@@ -201,28 +233,101 @@ sap.ui.define([
 			}
 
 		},
-		
+		*/
 		
 		/**
 		 * Handles page Back button press
-		 * Hide navigation view (master page)
+		 * Hide navigation view (master page) and display current (last) detail view
 		 * 
 		 * @param {object} oEvent Button event
 		 */
+		/*
 		onPressNavigationBack: function(oEvent) {
-	
+			let oApp = this.getSplitAppObj();
+
+			jQuery.sap.log.info("Close master view", null, _sComponent);
+
+			// enable Master Button on Detail Views
 			this.getRuntimeModel().setProperty('/header/masterBtnVisible', true);
-			this.getOwnerComponent()._oApp.setMode("HideMode");
+
+			switch (this.getViewMode()) {
+				case this.ViewMode.full:
+					// hide master view 
+					oApp.setMode("HideMode"); 
+					//oApp.hideMaster(); don't work
+					break;
+				case this.ViewMode.overlay:
+					// hide master view 
+					oApp.setMode("HideMode"); 
+					// oApp.hideMaster();
+					break;					
+				case this.ViewMode.single:
+					// navigate to detail view (replace master view)
+					//TODO: navigate to last (current) detail view
+					oApp.toMaster(this.getDetailPageId('DetailView'), 'show');
+					break;
+				default:					
+			}
 
 			// keep default master button invisible
-			let oMasterBtn = this.getOwnerComponent().getRootControl().byId('app-MasterBtn');
-			if (oMasterBtn) { oMasterBtn.setVisible(false); }
+			this.hideDefaultMasterButton();			
 		},
-
+		*/
 		
+
 		/** ================================================================================
 		 *  Private functions
 		 ** ================================================================================ */
+
+		/**
+		 * On Phones there is always only one view visible. The current master view mus be replaced
+		 * by a detail view. 
+		 * - the detail view must have been loaded by the router (or on bootstrap)
+		 * - if we navigate to a new detail view, it is already set by the <code>onNavItemPress</code>.
+		 * - if we go back to the current (last) detail view  by <code>onPressNavigationBack</code> we have 
+		 *   request a navigation
+		 * 
+		 * OpenUI5 Docu:
+		 * - hideMaster() and showMaster: 
+		 *   Used to hide/show the master page when in ShowHideMode and the device is in portrait mode.
+		 * 
+		 * @param {boolean} bBackToDetailView Navigate to current detail view 
+		 */
+		_closeMasterView: function(bBackToDetailView) {
+
+			let oApp = this.getSplitAppObj();
+
+			jQuery.sap.log.info("Close master view", null, _sComponent);
+
+			// enable Master Button on Detail Views
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', true);
+
+			switch (this.getViewMode()) {
+				case this.ViewMode.full:
+					// hide master view 
+					oApp.setMode("HideMode"); 
+					break;
+				case this.ViewMode.overlay:
+					// hide master view 
+					oApp.setMode("HideMode"); 
+					break;					
+				case this.ViewMode.single:
+					// if called from navigation item, the new target detail view is loaded, but 
+					// not active, so do a navigation only if triggerd by the navigation back button			
+					if (bBackToDetailView) {
+						// navigate to (current) detail view (replace master view)
+						// getPreviousPage() returns a detail view as we have have even one master view
+						let oDetailView = oApp.getPreviousPage();
+						jQuery.sap.log.info("Navigate to previous page " + oDetailView.getId(), null, _sComponent);
+						oApp.toDetail(oDetailView.getId()); 	
+					}					
+					break;
+				default:					
+			}
+
+			// keep default master button invisible
+			this.hideDefaultMasterButton();			
+		},
 
 		
 		/**
@@ -238,6 +343,7 @@ sap.ui.define([
 				items: {
 					template: new NavigationListItem({
 						text: '{sideNavigation>navItemID}',
+						/*
 						items: {
 							template: new NavigationListItem({
 								text: '{sideNavigation>itemId}',
@@ -246,6 +352,7 @@ sap.ui.define([
 							path: 'sideNavigation>items',
 							templateShareable: "false"					//avoids framework warning
 						},
+						*/
 						expanded: false,
 						select: [this.onNavItemSelect, this],
 						icon: "sap-icon://fhem/hm_ccu"
@@ -328,6 +435,8 @@ sap.ui.define([
 		
 		/**
 		 * update Fhem connection state in runtime model 
+		 * 
+		 * @param {boolean} bConnected Connected to Fhem Service
 		 */
 		_setRuntimeFhemConnectionState: function( bConnected ) {					
 			this.oRuntimeModel.setProperty("/fhemConnection/isConnected", bConnected);
@@ -341,7 +450,7 @@ sap.ui.define([
 		 * - Device Types
 		 * - Device Sub Types
 		 * 
-		 *  @params {oFhem}  //TODO
+		 *  @param {object} oFhem Fhem Service model
 		 */
 		_setSideNavModelfromFhem: function(oFhem) {
 			

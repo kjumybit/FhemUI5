@@ -14,24 +14,23 @@ sap.ui.define([
 ], function(jQuery, BaseController, Formatter, Grouper) {
 	"use strict";
 
-	const _sComponent = "DeviceTypeList";	
+	const _sComponent = "DeviceOverview";	
 
-
-	return BaseController.extend("de.kjumybit.fhem.controller.DeviceTypeList", {
+	return BaseController.extend("de.kjumybit.fhem.controller.Overview", {
 
 		
 		// init local members
 		formatter: Formatter,
 		grouper: Grouper,
-		
-
+			
 		/**
 		* Called when a controller is instantiated and its View controls (if available) are already created.
 		* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
 		* @memberOf helloworld.Main
 		*/
 		onInit: function() {
-			
+
+					
 		},
 
 
@@ -56,19 +55,13 @@ sap.ui.define([
 		},
 
 
-		/** 
-		 * Triggered before dispayling the view when Spli Container navigation is used.
-		 * 
-		 * @param {object} oData Payload of the navigation.
-		 */
-		beforeShow: function (oData) {
-		},
-
-		
 		/** ================================================================================
 		 *  App event handler
 		 ** ================================================================================ */
-		
+	
+		onSettingsBackBtnPress: function(oEvent) {
+			this.onDetailBackBtnPress(oEvent);
+		}	
 	
 	});
 });
