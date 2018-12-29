@@ -109,6 +109,48 @@ sap.ui.define([
 
 		},
 
+		
+		/**
+		 * Handle press on Settings button. Display app settings dialog. 
+		 * 
+		 * @param {object} oEvent Button event
+		 */
+		/*
+		onPressSettings: function(oEvent) {
+			var oView = this.getView();
+			var oDialog = oView.byId("settingsDlg");
+			
+			if (!oDialog) {
+				// create dialog via fragment factory (provide 'this' to enable callback handlers
+				oDialog = sap.ui.xmlfragment(oView.getId(), "de.kjumybit.fhem.view.SettingsDialog", this);
+				// connect dialog to view (models, lifecycle)
+				oView.addDependent(oDialog);
+			}
+
+			oDialog.open();		
+		},
+		*/
+		
+
+		/**
+		 * Handle close settings dialog.
+		 * - Save settings properties and
+		 * - (Re-) connect to the Fhem service.
+		 * 
+		 * @param {object} oEvent Button event
+		 */
+		/*
+		onPressCloseSettingsDlg: function(oEvent) {
+			oEvent.getSource().getParent().close();
+
+			if ( this.oSettings.isComplete() ) {
+				this.oSettings.save();
+				// (re) connect to Fhem backend server and get metadata model				
+				this._createFhemModel(this.oSettings);
+			}
+		},
+		*/
+
 
 		/**
 		 * Handles item selection in navigation list on level 1 
@@ -193,7 +235,46 @@ sap.ui.define([
 		},
 		*/
 		
+		/**
+		 * Handles page Back button press
+		 * Hide navigation view (master page) and display current (last) detail view
+		 * 
+		 * @param {object} oEvent Button event
+		 */
+		/*
+		onPressNavigationBack: function(oEvent) {
+			let oApp = this.getSplitAppObj();
+
+			jQuery.sap.log.info("Close master view", null, _sComponent);
+
+			// enable Master Button on Detail Views
+			this.getRuntimeModel().setProperty('/header/masterBtnVisible', true);
+
+			switch (this.getViewMode()) {
+				case this.ViewMode.full:
+					// hide master view 
+					oApp.setMode("HideMode"); 
+					//oApp.hideMaster(); don't work
+					break;
+				case this.ViewMode.overlay:
+					// hide master view 
+					oApp.setMode("HideMode"); 
+					// oApp.hideMaster();
+					break;					
+				case this.ViewMode.single:
+					// navigate to detail view (replace master view)
+					//TODO: navigate to last (current) detail view
+					oApp.toMaster(this.getDetailPageId('DetailView'), 'show');
+					break;
+				default:					
+			}
+
+			// keep default master button invisible
+			this.hideDefaultMasterButton();			
+		},
+		*/
 		
+
 		/** ================================================================================
 		 *  Private functions
 		 ** ================================================================================ */

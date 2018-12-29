@@ -1,0 +1,31 @@
+<mvc:View controllerName="de.kjumybit.fhem.controller.Overview"
+	xmlns:html="http://www.w3.org/1999/xhtml" 
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m" 
+	displayBlock="true">
+      	
+	<Page id="viewOverview" title="{i18n>Overview}"  showNavButton="false">
+		<customHeader>
+			<Bar design="Header">
+				<contentLeft>
+					<!-- show master view-->
+					<Button icon="sap-icon://menu2" press="onMenuBtnPress" visible="{runtime>/header/masterBtnVisible}"/>
+				</contentLeft>
+				<contentMiddle>
+					<Text text="{i18n>Overview}" wrapping="true" textAlign="Center"/>
+				</contentMiddle>
+			    <contentRight>
+				</contentRight>
+			</Bar>
+		</customHeader>	
+		<content>
+
+		<!-- Tile List -->
+		</content> 
+
+		<footer>
+			<core:Fragment fragmentName="de.kjumybit.fhem.view.FooterDefault" type="XML" />			
+		</footer>
+	</Page>
+</mvc:View>

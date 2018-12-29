@@ -1,0 +1,41 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form">
+
+    <!-- Fhem connection: popover menue with adhoc actions and options-->
+	<Popover
+		title="{i18n>fhemConnectDlgTitle}"
+		placement="Top" >
+        <content>
+
+	        <Table
+                mode="none"
+                showSeparators="none"
+		        inset="false" 
+                width="300px">
+               <columns>
+                    <Column hAlign="Begin">
+                    </Column>
+                    <Column width="4em" hAlign="Begin">
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{i18n>fhemConnectEventUpdate}"  />
+                            <Switch state="{runtime>/fhemConnection/enableDeviceUpdates}" 
+                                    change="onChangeFhemEventUpdate">
+                                <layoutData>
+                                    <FlexItemData growFactor="1" />
+                                </layoutData>
+                            </Switch>
+                        </cells>
+                    </ColumnListItem>        
+                </items> 
+            </Table>
+
+        </content>
+	</Popover>    
+
+</core:FragmentDefinition>

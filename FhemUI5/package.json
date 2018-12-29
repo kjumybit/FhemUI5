@@ -1,6 +1,6 @@
 {
-  "name": "FhemUI5",
-  "version": "0.1",
+  "name": "fhemui5",
+  "version": "0.1.0",
   "description": "OpenUI5 Frontend for Fhem",
   "main": "",
   "scripts": {},
@@ -11,6 +11,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jquery": "^3.3.1",
-    "ui5ts": "^0.3.1"   
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "ui5ts": "^0.3.1"
   }
 }

@@ -1,0 +1,196 @@
+{
+	"_version": "1.1.0",
+	"sap.app": {
+		"_version": "1.1.0",
+		"id": "de.kjumybit.fhem",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"applicationVersion": {
+			"version": "1.0.0"
+		},
+		"title": "{{appTitle}}",
+		"subTitle": "{{appSubTitle}}",
+		"description": "{{appDescription}}",
+		"dataSources": {
+			"sideNavigation": {
+				"uri": "model/NavigationTree.json",
+				"type": "JSON"
+			},
+			"charts": {
+				"uri": "model/ChartConfig.json",
+				"type": "JSON"
+			}			
+		},
+		"openSourceComponents": [
+			{
+                "name": "socket.io",
+                "packagedWithMySelf": true 
+            },		
+            {
+                "name": "Chart.js",
+                "packagedWithMySelf": true 
+            }
+		],		
+		"offline": false
+	},
+
+	"sap.ui": {
+		"_version": "1.1.0",
+		"technology": "UI5",
+		"fullWidth": true,
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		},
+		"supportedThemes": [
+			"sap_hcb",
+			"sap_bluecrystal",
+			"sap_belize",
+			"sap_belize_plus"
+		]
+	},
+
+	"sap.ui5": {
+		"_version": "1.1.0",
+		"handleValidation": true,
+		"rootView": {
+			"viewName": "de.kjumybit.fhem.view.App",
+			"type": "XML"
+		},
+		"dependencies": {
+			"minUI5Version": "1.38.0",
+			"libs": {
+				"sap.ui.core": {},
+				"sap.m": {},
+				"sap.ui.layout": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+	    "config": {
+    		"chartjsModel": "/model/data_chartjs.json"
+    	},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "de.kjumybit.fhem.i18n.i18n"
+				}
+			},
+			"sideNavigation": {
+				"type": "sap.ui.model.json.JSONModel",
+				"dataSource": "sideNavigation",
+				"settings": {
+					"defaultBindingMode": "OneWay"
+				}				
+			},
+			"chartConfig": {
+				"type": "sap.ui.model.json.JSONModel",
+				"dataSource": "charts",
+				"settings": {
+					"defaultBindingMode": "OneWay"
+				}				
+			},
+			"Fhem": {
+				"type": "de.kjumybit.fhem.service.FhemService",
+				"settings": {
+					"defaultBindingMode": "OneWay"
+				}				
+			}				
+		},
+		"resources": {
+			"css": [
+				{
+					"uri": "css/style.css"
+				},
+				{
+					"uri": "css/fhemfont.css"
+				}				
+			],
+			"js": [
+				{
+		    		"uri": "/libs/Chart.bundle.min.js"
+		      	}
+			]
+		},
+		"routing": {
+		  	"config": {
+		  		"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"viewPath": "de.kjumybit.fhem.view",
+				"controlId": "app",
+				"transition": "show"
+	 	 	},
+	  		"routes": [
+	  			{
+		  			"pattern": "",
+		  			"view": "App",
+		  			"name": "App",
+		  			"target": ["navigation", "overview", "rooms", "deviceTypes", "deviceDetail", "settings", "devices"]
+				}
+			],
+			"targets": {
+				"navigation": {
+					"viewName": "Navigation",
+					"viewId": "NavigationView",
+					"viewLevel": 1,
+					"transition": "show",					
+					"controlAggregation": "masterPages"				
+				},
+				"overview": {
+					"viewName": "Overview",
+					"viewId": "OverviewView",					
+					"viewLevel": 1,
+					"transition": "show",					
+					"controlAggregation": "detailPages"				
+				},
+				"rooms": {
+					"viewName": "RoomList",
+					"viewId": "RoomListView",					
+					"viewLevel": 1,
+					"transition": "show",					
+					"controlAggregation": "detailPages"				
+				},	
+				"devices": {
+					"viewName": "DeviceList",
+					"viewId": "DeviceListView",					
+					"viewLevel": 1,
+					"transition": "show",					
+					"controlAggregation": "detailPages"				
+				},
+				"deviceTypes": {
+					"viewName": "DeviceTypeList",
+					"viewId": "DeviceTypeListView",					
+					"viewLevel": 1,
+					"transition": "show",					
+					"controlAggregation": "detailPages"				
+				},
+				"deviceDetail": {
+					"viewName": "DeviceDetail",
+					"viewId": "DeviceDetailView",					
+					"viewLevel": 2,
+					"transition": "show",					
+					"controlAggregation": "detailPages"									
+				},
+				"settings": {
+					"viewName": "Settings",
+					"viewId": "SettingsView",					
+					"viewLevel": 1,
+					"transition": "show",					
+					"controlAggregation": "detailPages"				
+				}
+			}			
+		}
+  	}	
+}

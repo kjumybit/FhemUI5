@@ -3,8 +3,9 @@
 
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta charset="UTF-8">
-
+		<meta charset="UTF-8">        
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+        
 		<title>Fhem UI5</title>
 
 		<script id="sap-ui-bootstrap"
@@ -20,6 +21,10 @@
 				"de.kjumybit.fhem.chart": "libs/fhem/chart",								
 				"de.kjumybit.fhem.dblog": "libs/fhem/dblog",
 				"de.kjumybit.fhem.service": "libs/fhem/service",
+			    "controller" : "controller",		    
+				"view" : "view",
+                "model" : "model",
+                "img" : "img",
 			  	"libs" : "libs",
 			  	"socket.io" : "libs/socket.io.min",
 				"fhem.model": "libs/fhemcli",
@@ -30,21 +35,12 @@
 		<!-- load my custom style sheets --> 
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<link rel="stylesheet" type="text/css" href="css/fhemfont.css">
-
-		<script>
-			sap.ui.getCore().attachInit(function() {
-				new sap.m.Shell({
-					appWidthLimited: false,
-					app: new sap.ui.core.ComponentContainer({
-						height : "100%",
-						name : "de.kjumybit.fhem"
-					})
-				}).placeAt("content");
-			});
-		</script>
+				
 	</head>
 
 	<body class="sapUiBody" id="content">
+		<script type="text/javascript" src="cordova.js"></script>	
+		<script type="text/javascript" src="js/index.js"></script>
 	</body>
 
 </html>

@@ -1,0 +1,16 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:form="sap.ui.layout.form">
+
+    <!-- Default footer-->
+    <Bar> 
+        <contentRight>
+            <Button 
+                press="handlePressBtnConnected"
+                icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
+                type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
+        </contentRight>
+    </Bar>	
+
+</core:FragmentDefinition>

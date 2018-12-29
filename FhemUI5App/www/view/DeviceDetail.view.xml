@@ -1,0 +1,207 @@
+<mvc:View controllerName="de.kjumybit.fhem.controller.DeviceDetail"
+	xmlns:html="http://www.w3.org/1999/xhtml" 
+	xmlns:core="sap.ui.core"
+	xmlns:mvc="sap.ui.core.mvc" 
+	xmlns="sap.m"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:chart="de.kjumybit.fhem.chart"
+	displayBlock="true">
+	<Page id="viewDeviceDetail" title="{i18n>DeviceDetail}" showNavButton="false" >
+		<customHeader>
+			<Bar design="Header">
+				<contentLeft>
+					<!-- show master view-->
+					<Button id="showNavigationBtn" icon="sap-icon://nav-back" press="onDetailBackBtnPress" />
+				</contentLeft>
+				<contentMiddle>
+					<!-- device icon and name and state-->
+					<HBox>
+						<items>
+							<core:Icon src="sap-icon://heating-cooling" size="2em" class="sapUiSmallMarginEnd"/>
+							<Text text="{parts:[{path:'Fhem>Attributes/alias'},{path:'Fhem>Name'}],
+	    				    	formatter: '.formatter.getDeviceName'}" 
+								wrapping="true" textAlign="Center"/>
+						</items>
+					</HBox> 
+				</contentMiddle>
+			    <contentRight>
+					<!-- device status or action -->
+					<ObjectNumber number="{Fhem>Readings/state/Value}" class="sapUiSmallMarginEnd"/>
+				</contentRight>
+			</Bar>
+		</customHeader>
+		<subHeader>
+			<Bar design="Header">
+				<contentLeft>
+					<!-- room(s)-->
+					<Button enabled="false"/>
+					<Label text="{i18n>room}: {Fhem>Attributes/room}"/>
+				</contentLeft>
+			    <contentRight>
+					<Label text="2 minues ago" class="sapUiSmallMarginEnd"/>
+				</contentRight>
+			</Bar>
+		</subHeader>
+		<content>
+				<!--
+					Device Details 
+					-small icon tab bar
+				 -->					
+				<IconTabBar headerBackgroundDesign="Transcludent" backgroundDesign="Solid"
+					tabDensityMode="Compact"
+					applyContentPadding="true"
+					stretchContentHeight="true">	
+
+				    <items>			
+				    
+				    	<!-- Readings -->		
+				        <IconTabFilter text="Readings" icon="sap-icon://measure" key="devReading">
+							<f:Form editable="false" >
+								<f:title> 
+									<core:Title text="Readings" />
+								</f:title>
+								<f:layout>
+									<f:ResponsiveGridLayout
+										labelSpanXL="3"
+										labelSpanL="3"
+										labelSpanM="4"
+										labelSpanS="12"
+										adjustLabelSpan="false"
+										emptySpanXL="0"
+										emptySpanL="0"
+										emptySpanM="0"
+										emptySpanS="0"
+										columnsXL="2"
+										columnsL="1"
+										columnsM="1"
+										singleContainerFullSize="false" />
+								</f:layout>
+								<f:formContainers>
+									<!--  <f:FormContainer id="formReadings" /> -->
+									<f:FormContainer id="formReadings" formElements="{Fhem>ReadingSet}">
+										<f:formElements>
+											<f:FormElement label="{Fhem>Name}" >
+												<f:fields>
+													<Text text="{Fhem>Data/Value}" />
+												</f:fields>
+												<f:fields>
+													<Text text="{Fhem>Data/Time}" />
+												</f:fields>
+											</f:FormElement>
+										</f:formElements>
+									</f:FormContainer>
+								</f:formContainers>
+							</f:Form>				        
+				        </IconTabFilter>
+					
+						<!-- Internals -->
+				        <IconTabFilter text="Internals" icon="sap-icon://action-settings" key="devInternal">
+							<f:Form editable="false" >
+								<f:title> 
+									<core:Title text="Internals" />
+								</f:title>
+								<f:layout>
+									<f:ResponsiveGridLayout
+										labelSpanXL="3"
+										labelSpanL="3"
+										labelSpanM="4"
+										labelSpanS="12"
+										adjustLabelSpan="false"
+										emptySpanXL="0"
+										emptySpanL="0"
+										emptySpanM="0"
+										emptySpanS="0"
+										columnsXL="2"
+										columnsL="1"
+										columnsM="1"
+										singleContainerFullSize="false" />
+								</f:layout>
+								<f:formContainers>
+									<f:FormContainer id="formInternals" formElements="{Fhem>InternalSet}">
+										<f:formElements>
+											<f:FormElement label="{Fhem>Name}">
+												<f:fields>
+													<Text text="{Fhem>Data}" />
+												</f:fields>
+											</f:FormElement>
+										</f:formElements>
+									</f:FormContainer>
+								</f:formContainers>
+							</f:Form>				        
+
+						</IconTabFilter>
+									   
+				    	<!-- Attributes -->									        
+						<IconTabFilter text="Attributes" icon="sap-icon://action-settings" key="devAttribute">
+							<f:Form editable="false" >
+								<f:title> 
+									<core:Title text="Attributes" />
+								</f:title>
+								<f:layout>
+									<f:ResponsiveGridLayout
+										labelSpanXL="3"
+										labelSpanL="3"
+										labelSpanM="4"
+										labelSpanS="12"
+										adjustLabelSpan="false"
+										emptySpanXL="0"
+										emptySpanL="0"
+										emptySpanM="0"
+										emptySpanS="0"
+										columnsXL="2"
+										columnsL="1"
+										columnsM="1"
+										singleContainerFullSize="false" />
+								</f:layout>
+								<f:formContainers>
+									<f:FormContainer id="formAttributes" formElements="{Fhem>AttributeSet}">
+										<f:formElements>
+											<f:FormElement label="{Fhem>Name}" >
+												<f:fields>
+													<Text text="{Fhem>Data}" />
+												</f:fields>
+											</f:FormElement>
+										</f:formElements>
+									</f:FormContainer>
+								</f:formContainers>
+							</f:Form>				        
+						</IconTabFilter>									        
+				        
+				    	<!-- Charts -->				        
+				        <IconTabFilter text="Charts" icon="sap-icon://line-chart" key="devChart">
+	                
+							<OverflowToolbar width="100%">					
+				                <content>					
+				                    <Button width="auto" press="onChartBackLong" icon="sap-icon://navigation-left-arrow"/>								
+				                    <Button width="auto" press="onChartBack" icon="sap-icon://slim-arrow-left"/>					
+				                    <ToolbarSpacer />					
+				                    <PagingButton count="{Charts>/chartCtrl/zoomLevel/count}" 
+										position="{= ${Charts>/chartCtrl/zoomLevel/count} - ${Charts>/chartCtrl/zoomLevel/position} }" 
+										previousButtonTooltip="{i18n>chartZoomOutBtn}"
+										nextButtonTooltip="{i18n>chartZoomInBtn}"
+										positionChange="onChartZoom" />
+				                    <ToolbarSpacer />					
+				                    <Button width="auto" press="onChartForth" icon="sap-icon://slim-arrow-right"/>					
+				                    <Button width="auto" press="onChartForthLong" icon="sap-icon://navigation-right-arrow"/>														
+				            	</content>					
+				            </OverflowToolbar>						
+
+					        <VBox id="chartContainer">
+            					<!-- height="100%" will overflow the footer-->
+          					</VBox> 									
+	                  							        
+						</IconTabFilter>
+						
+					</items>
+				</IconTabBar>		
+
+ 
+		</content> 
+
+		<footer>
+			<core:Fragment fragmentName="de.kjumybit.fhem.view.FooterDefault" type="XML" />			
+		</footer>
+		
+	</Page>
+</mvc:View>
