@@ -37,8 +37,8 @@ sap.ui.define([
 		/**
 		 * Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
 		 * (NOT before the first rendering! onInit() is used for that one!).
-		 * @memberOf helloworld.Main
 		 */
+		//TODO: move to component initialization / base controller
 		onBeforeRendering: function() {
 
 			jQuery.sap.log.debug("onBefore", null, _sComponent);
@@ -56,7 +56,7 @@ sap.ui.define([
             
 			// connect to Fhem backend server and get metadata model
 			if ( this.oSettings.isComplete() ) {				
-				this._createFhemModel(this.oSettings);
+				this.createFhemModel(this.oSettings);
 
 	            //TODO: re-design event based depending in Fhem metadate changed
 	            var oSideNavCtrl = this.getView().byId("sideNavigation");           
@@ -70,7 +70,7 @@ sap.ui.define([
 				oSideNavCtrl.setItem(oNavigationListTemplate);
     
 			}
-								
+		
 		},
 
 		
@@ -285,32 +285,6 @@ sap.ui.define([
 			return oNavigationListTemplate;
 		},
 						
-		
-		/**
-		 * Establish connection to Fhem backend server.
-		 * An existing connection is closed before.
-		 * 
-		 * @param {oSettings}
-		 */
-		//TODO: check for connection change
-		_createFhemModel : function (oSettings) {
-			
-			let mSettings = oSettings.getModel().getProperty("/");			
-			
-			// create new Fhem model and connect to backend
-			this.fhemModel.connect({
-				"host": mSettings.server.host, 
-				"port": mSettings.server.port
-			});
-
-			// local testing 
-			/*
-			oModel.loadData("model/fhemJsonList2.json");
-			this.setModel(oModel, "Fhem" );  
-			this._setSideNavModelfromFhem();			
-			*/			
-		},
-
 		
 		_onFhemConnection : function(oEvent) {
 			this._setRuntimeFhemConnectionState(false);

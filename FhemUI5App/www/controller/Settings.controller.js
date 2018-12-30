@@ -26,18 +26,17 @@ sap.ui.define([
 		/**
 		* Called when a controller is instantiated and its View controls (if available) are already created.
 		* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
-		* @memberOf helloworld.Main
 		*/
 		onInit: function() {
 
-					
+			// call the base component's init function
+			BaseController.prototype.onInit.apply(this, arguments);
 		},
 
 
 		/**
 		* Similar to onAfterRendering, but this hook is invoked before the controller's View is re-rendered
 		* (NOT before the first rendering! onInit() is used for that one!).
-		* @memberOf helloworld.Main
 		*/
 		onBeforeRendering: function() {
 
@@ -59,6 +58,41 @@ sap.ui.define([
 		 *  App event handler
 		 ** ================================================================================ */
 	
+
+		/**
+		 * Handles press on button Save.
+		 * Check and save all current settings
+		 * Close settings view and return to previous detail view.
+		 * 
+		 * @param {oEvent} oEvent Button event parameter
+		 */
+		onSettingsSave: function(oEvent) {
+
+			this.oSettings = this.oSettings || this.getSettings();
+
+			// Fhem server 
+			if ( this.oSettings.isComplete() ) {
+				this.oSettings.save();
+				// (re) connect to Fhem backend server and get metadata model				
+				this.createFhemModel(this.oSettings);
+			}			
+
+			this.onDetailBackBtnPress(oEvent);
+		},
+
+
+		/**
+		 * Handles press on button Decline.
+		 * Discard all changes. 
+		 * Close settings view and return to previous detail view.
+		 * 
+		 * @param {oEvent} oEvent Button event parameter
+		 */
+		onSettingsCancel: function(oEvent) {
+			this.onDetailBackBtnPress(oEvent);
+		},
+
+
 		onSettingsBackBtnPress: function(oEvent) {
 			this.onDetailBackBtnPress(oEvent);
 		}	

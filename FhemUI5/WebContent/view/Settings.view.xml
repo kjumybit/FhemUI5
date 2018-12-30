@@ -6,7 +6,7 @@
 	xmlns="sap.m" 
 	displayBlock="true">
       	
-	<Page id="viewOverview" title="{i18n>SettingsTitle}"  showNavButton="false">
+	<Page id="viewOverview" title="{i18n>settingsTitle}"  showNavButton="false">
 		<customHeader>
 			<Bar design="Header">
 				<contentLeft>
@@ -14,9 +14,11 @@
 					<Button icon="sap-icon://nav-back" press="onSettingsBackBtnPress" />
 				</contentLeft>
 				<contentMiddle>
-					<Text text="{i18n>SettingsTitle}" wrapping="true" textAlign="Center"/>
+					<Text text="{i18n>settingsTitle}" wrapping="true" textAlign="Center"/>
 				</contentMiddle>
 			    <contentRight>
+					<Button icon="sap-icon://accept" press="onSettingsSave" type="Accept" width="4em" />
+					<Button icon="sap-icon://decline" press="onSettingsCancel" type="Reject" width="4em" />				
 				</contentRight>
 			</Bar>
 		</customHeader>	

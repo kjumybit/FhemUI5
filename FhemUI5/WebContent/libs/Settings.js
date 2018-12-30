@@ -5,8 +5,7 @@ sap.ui.define([
 	"jquery.sap.storage",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/model/json/JSONModel" 	
-],
-	function(jQueryStorage, ManagedObject, JSONModel) {
+], function(jQueryStorage, ManagedObject, JSONModel) {
 		"use strict";
 								
 		const _sComponent = "Settings";

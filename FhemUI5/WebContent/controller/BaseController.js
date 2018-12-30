@@ -109,7 +109,7 @@ sap.ui.define([
 		 * @return {oSettings} [de.kjumybit.fhem.libs.Settings]
 		 */
 		getSettings: function () {
-			return this.getOwnerComponent().oSettings;			
+			return this.getOwnerComponent().oSettings;
 		},
 		
 		
@@ -286,6 +286,34 @@ sap.ui.define([
 			return this.getRuntimeModel().getProperty('/viewMode/fullScreen');
 		},
 		
+		
+
+		/**
+		 * Establish connection to Fhem backend server.
+		 * An existing connection is closed before.
+		 * 
+		 * @param {oSettings}
+		 */
+		//TODO: check for connection change
+		createFhemModel : function (oSettings) {
+			
+			this.fhemModel = this.getFhemModel();			
+			let mSettings = oSettings.getModel().getProperty("/");			
+			
+			// create new Fhem model and connect to backend
+			this.fhemModel.connect({
+				"host": mSettings.server.host, 
+				"port": mSettings.server.port
+			});
+
+			// local testing 
+			/*
+			oModel.loadData("model/fhemJsonList2.json");
+			this.setModel(oModel, "Fhem" );  
+			this._setSideNavModelfromFhem();			
+			*/			
+		},
+
 		
 		/** ================================================================================
 		 *  App event handler
