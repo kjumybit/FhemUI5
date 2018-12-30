@@ -98,7 +98,8 @@ sap.ui.define([
 				if (!sap.ui.Device.support.touch) {
 					this._sContentDensityClass = "sapUiSizeCompact";
 				} else {
-					this._sContentDensityClass = "sapUiSizeCozy";
+					//this._sContentDensityClass = "sapUiSizeCozy";
+					this._sContentDensityClass = "sapUiSizeCompact";
 				}
 			}
 			return this._sContentDensityClass;

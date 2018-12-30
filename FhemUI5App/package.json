@@ -1,15 +1,16 @@
 {
-    "name": "helloworld",
-    "displayName": "HelloCordova",
+    "name": "fhemui5",
+    "displayName": "Fhem",
     "version": "1.0.0",
-    "description": "A sample Apache Cordova application that responds to the deviceready event.",
+    "description": "An OpenUI5 frontend for Fhem.",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "Apache Cordova Team",
+    "author": "kjumybit",
     "license": "Apache-2.0",
     "dependencies": {
+        "cordova-android": "^7.1.4",
         "cordova-browser": "^5.0.4",
         "cordova-plugin-whitelist": "^1.3.3",
         "web": "0.0.2"
@@ -19,7 +20,8 @@
             "cordova-plugin-whitelist": {}
         },
         "platforms": [
-            "browser"
+            "browser",
+            "android"
         ]
     }
 }

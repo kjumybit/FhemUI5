@@ -81,6 +81,8 @@ sap.ui.define([
 		onBeforeShow: function (oData) {
 			this.onDisplay();
 
+			jQuery.sap.log.debug("onBeforeShow", null, _sComponent);	
+
 			// create tiles 
 			this._createTiles();
 		},
@@ -122,15 +124,19 @@ sap.ui.define([
 		
 		
 		/**
-		 * Create Tile controls for all Fhem rooms. Add properties
+		 * Create (rebuild) Tile controls for all Fhem rooms. Add properties
 		 * - room name
 		 * - most severe status (error, waring, info)
 		 * - icon
 		 * - number of devices
 		 */
 		//TODO: replace "Beschreibung" and numeric content
+		//TODO: use model binding
 		_createTiles: function() {
-						
+			
+			let oContainer = this.byId("TileRoomList");
+			oContainer.destroyContent();
+
 			var aRooms = this.getFhemModel().getRoomSet();
 			
 			for (var i = 0, iL = aRooms.length; i < iL; i++) {
@@ -149,7 +155,7 @@ sap.ui.define([
 				oTile.attachPress(this.onTilePress, this);
 				oTile.addStyleClass("sapUiSmallMarginEnd");
 				oTile.addStyleClass("sapUiSmallMarginBottom");
-				oTile.placeAt(this.byId("TileRoomList"));
+				oTile.placeAt(oContainer);
 			}
 			
 		},
