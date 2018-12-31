@@ -294,7 +294,7 @@ sap.ui.define([
 		 * 
 		 * @param {oSettings}
 		 */
-		//TODO: check for connection change
+		//TODO: check for connection change, move to component controller, implenent as event handler
 		createFhemModel : function (oSettings) {
 			
 			this.fhemModel = this.getFhemModel();			

@@ -4,9 +4,9 @@
 	xmlns:form="sap.ui.layout.form">
 
     <!-- Fhem connection: popover menue with adhoc actions and options-->
-	<Popover
+	<ResponsivePopover
 		title="{i18n>fhemConnectDlgTitle}"
-		placement="Top" >
+		placement="Vertical" >
         <content>
 
 	        <Table
@@ -36,6 +36,6 @@
             </Table>
 
         </content>
-	</Popover>    
+	</ResponsivePopover>
 
 </core:FragmentDefinition>

@@ -4,6 +4,7 @@
 	xmlns:mvc="sap.ui.core.mvc" 
 	xmlns="sap.m" 
 	xmlns:t="sap.tnt"
+	xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"	
 	height="100%">
 	<Page id="viewNavigation" 
 		title="{i18n>navTitle}"
@@ -12,24 +13,43 @@
 		<customHeader>
 			<Toolbar width="100%" class="sapContrastPlus">
 				<Button icon="sap-icon://nav-back" press="onPressNavigationBack" />
+				<ToolbarSpacer/>				
+				<Text text="{i18n>navTitle}" wrapping="true" />
 				<ToolbarSpacer/>
+				<Button 
+					press="handlePressBtnConnected"
+					icon="{= ${runtime>/fhemConnection/isConnected} ? 'sap-icon://connected' : 'sap-icon://disconnected'}"  
+					type="{= ${runtime>/fhemConnection/isConnected} ? 'Accept' : 'Reject'}"/>
 			 </Toolbar>
 		</customHeader>
 
 		<content>
 			 
-			<t:SideNavigation id="sideNavigation" class="sapUiForceWidthAuto side-navigation"/> 
-			  
-			<!-- no Padding, no margin -->
-		</content>
+			<t:SideNavigation id="sideNavigation" class="sapUiForceWidthAuto side-navigation"> 
+				<t:item>
+					<t:NavigationList itemSelect="onNavItemSelect">
+						<t:NavigationListItem icon="sap-icon://grid" text="{i18n>navItemDashBoard}" custom:to="OverviewView" />
+						<t:NavigationListItem icon="sap-icon://text-align-justified" text="{i18n>navItemDevices}" custom:to="DeviceListView" />
+						<t:NavigationListItem icon="sap-icon://home" text="{i18n>navItemRooms}" custom:to="RoomListView" />
+						<t:NavigationListItem icon="sap-icon://group-2" text="{i18n>navItemDeviceTypes}" custom:to="DeviceTypeListView" />
+					</t:NavigationList>
+				</t:item>
+				<t:fixedItem>
+					<t:NavigationList>
+						<t:NavigationListItem icon="sap-icon://action-settings" text="{i18n>navItemSettings}" select="onPressSettings"/>
+					</t:NavigationList>
+				</t:fixedItem>
+			</t:SideNavigation>
 
+		</content>
+		<!--
 		<footer>
 			<Bar> 
 				<contentRight>
-			    	<Button press="onPressSettings" icon="sap-icon://action-settings"/>
+				<Button press="onPressSettings" icon="sap-icon://action-settings"/>
 			    </contentRight>
 			</Bar>		
 		</footer>
-		
+		-->
 	</Page>
 </mvc:View>

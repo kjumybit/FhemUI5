@@ -1059,7 +1059,7 @@ sap.ui.define([
 						// known entity type: find index for entity with key in oNode (as Array)
 						// the regex returns the extracted Device ID in aEntity[1]						
 						index = getArrayIndexForObjectByProperty(_aFhemEntities[i].key, aEntity[1], oNode[_aFhemEntities[i].entity]);
-						if (index) {
+						if (typeof index !== 'undefined') {
 							nameOrIndex = {
 								entitySetName:  _aFhemEntities[i].entity,	// name of node property (array) for entity set
 								entityIndex: index						    // index of entity (object) referenced by key

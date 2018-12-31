@@ -20,17 +20,16 @@
 		</customHeader>
 
 		<content>
-			
-			<!-- <Panel backgroundDesign="Transparent" class="sapUiResponsiveMargin"> -->
-			
+						
 				<Table id="tblDeviceList" 		
 					items="{ path: 'Fhem>/DeviceSet',
 								sorter : {
 									path : 'Internals/TYPE',
 									group : true
 								},
-								groupHeaderFactory: '.grouper.getDeviceSetGroupHeader' 				   
+								groupHeaderFactory: '.grouper.getDeviceSetGroupHeader'
 							}"
+					sticky="ColumnHeaders"
 					updateFinished="onTableUpdateFinished"
 					growing="true"
 					growingScrollToLoad="true">
@@ -56,15 +55,15 @@
 						<Column width="auto">	
 							<Text text="{i18n>device}" />
 						</Column>					
-						<Column>	
+						<Column hAlign="End">	
 							<Text text="{i18n>state}" />
 						</Column>
-						<Column minScreenWidth="Tablet">	
+						<Column minScreenWidth="Tablet" demandPopin="false" hAlign="End">
 							<Text text="{i18n>stateTime}" />
 						</Column>								
 					</columns>
 					<items>
-						<ColumnListItem type="Navigation" press="onItemPress">
+						<ColumnListItem type="Active" press="onItemPress">
 							<cells>
 								<ObjectIdentifier 
 									title="{ 
@@ -82,12 +81,12 @@
 						</ColumnListItem>
 					</items>
 				</Table>
-			<!-- </Panel> -->
 
 		</content> 
-		
+		<!--
 		<footer>
 			<core:Fragment fragmentName="de.kjumybit.fhem.view.FooterDefault" type="XML" />	
 		</footer>
+		-->
 	</Page>
 </mvc:View>

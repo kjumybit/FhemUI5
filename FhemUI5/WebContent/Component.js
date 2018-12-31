@@ -47,7 +47,8 @@ sap.ui.define([
 			this.getRouter().initialize();
 
 			// initialize component runtime state model
-			this.setModel(Models.createRuntimeModel(), "runtime");
+			this.oRuntimeModel = Models.createRuntimeModel();
+			this.setModel(this.oRuntimeModel, "runtime");
 			
 			// set the device model
 			this.setModel(Models.createDeviceModel(), "device");
@@ -59,12 +60,80 @@ sap.ui.define([
 			this._registerFhemIcons();
 			
 			// initialize own library
-			fhem.init(this);		// TODO
+			fhem.init(this);		// TODO: Was???
+
+			this.fhemModel = fhem.getFhemService();
+
+			// register client handler
+			this.fhemModel.attachMetaDataLoaded(null, this._onMetaDataLoaded.bind(this), this);
+			this.fhemModel.attachMetaDataLoadFailed(null, this._onErrorFhemConnection.bind(this), this);
+			this.fhemModel.attachConnectionClosed(null, this._onFhemDisconnect.bind(this), this);
+		
+			// TODO: implement as event handler
+			if ( this.oSettings.isComplete() ) {				
+				this.createFhemModel(this.oSettings);
+			}			
 
 			jQuery.sap.log.debug("init: finished", null, 'Component');			
 		},
+	
+
+		/**
+		 * Establish connection to Fhem backend server.
+		 * An existing connection is closed before.
+		 * 
+		 * @param {oSettings}
+		 */
+		//TODO: check for connection change, move to component controller, implenent as event handler
+		//      delete implementation in BaseController
+		createFhemModel : function (oSettings) {
+			
+			let mSettings = oSettings.getModel().getProperty("/");			
+			
+			// create new Fhem model and connect to backend
+			this.fhemModel.connect({
+				"host": mSettings.server.host, 
+				"port": mSettings.server.port
+			});
+
+		},		
+
+
+		_onFhemConnection : function(oEvent) {
+			this._setRuntimeFhemConnectionState(false);
+		},
+
 		
-						
+		_onErrorFhemConnection : function(oEvent) {
+			this._setRuntimeFhemConnectionState(false);
+		},
+		
+		
+		_onFhemDisconnect : function(oEvent) {
+			this._setRuntimeFhemConnectionState(false);
+		},
+
+		
+		/**
+		 * Handle Fhem metadata 
+		 * Set & update local models
+		 * 
+		 * @param {object} oEvent Fhem event
+		 */
+		_onMetaDataLoaded : function(oEvent) {			
+			this._setRuntimeFhemConnectionState(true);						
+		},
+		
+		
+		/**
+		 * update Fhem connection state in runtime model 
+		 * 
+		 * @param {boolean} bConnected Connected to Fhem Service
+		 */
+		_setRuntimeFhemConnectionState: function( bConnected ) {					
+			this.oRuntimeModel.setProperty("/fhemConnection/isConnected", bConnected);
+		},
+
 		
 		/**
 		 * Register custom Fhem icon font at SAPUI5 core

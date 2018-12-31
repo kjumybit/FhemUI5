@@ -34,10 +34,10 @@
 			</Panel>
 			
 		</content> 
-				
+		<!--
 		<footer>
 			<core:Fragment fragmentName="de.kjumybit.fhem.view.FooterDefault" type="XML" />	
 		</footer>
-		
+		-->
 	</Page>
 </mvc:View>

@@ -4,6 +4,9 @@
     font-family: fhem,Arial,Helvetica,sans-serif;
 }
 
+/**
+ * Side Navigation: use full width and height of master view
+ */
 .side-navigation {
     display: -webkit-box;
     display: -webkit-flex;
