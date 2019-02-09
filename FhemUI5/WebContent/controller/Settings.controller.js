@@ -58,6 +58,18 @@ sap.ui.define([
 		 *  App event handler
 		 ** ================================================================================ */
 	
+		/**
+		 * Handles press on list item
+		 * Navigate to conrete settings page.
+		 * 
+		 * @param {oEvent} oEvent Button event parameter
+		 */
+		onListItemPress: function(oEvent) {
+			// the list ID is used as PageId
+			var sPageId = this.getView().getLocalId(oEvent.getParameter('listItem').getId());;
+			this.getSplitAppObj().toDetail(this.getDetailPageId(sPageId));
+		},
+
 
 		/**
 		 * Handles press on button Save.

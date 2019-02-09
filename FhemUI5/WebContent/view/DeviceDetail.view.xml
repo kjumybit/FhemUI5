@@ -16,25 +16,29 @@
 				</contentLeft>
 				<contentMiddle>
 					<!-- device icon and name and state-->
+					<!--
 					<HBox>
 						<items>
 							<core:Icon src="sap-icon://heating-cooling" size="2em" class="sapUiSmallMarginEnd"/>
+					-->
 							<Text text="{parts:[{path:'Fhem>Attributes/alias'},{path:'Fhem>Name'}],
 	    				    	formatter: '.formatter.getDeviceName'}" 
 								wrapping="true" textAlign="Center"/>
+					<!-- 
 						</items>
 					</HBox> 
+					-->
 				</contentMiddle>
 			    <contentRight>
 					<!-- device status or action -->
-					<ObjectNumber number="{Fhem>Readings/state/Value}" class="sapUiSmallMarginEnd"/>
+					<!-- <ObjectNumber number="{Fhem>Readings/state/Value}" class="sapUiSmallMarginEnd"/> -->
 				</contentRight>
 			</Bar>
 		</customHeader>
+		<!-- 
 		<subHeader>
 			<Bar design="Header">
 				<contentLeft>
-					<!-- room(s)-->
 					<Button enabled="false"/>
 					<Label text="{i18n>room}: {Fhem>Attributes/room}"/>
 				</contentLeft>
@@ -43,6 +47,7 @@
 				</contentRight>
 			</Bar>
 		</subHeader>
+		-->
 		<content>
 				<!--
 					Device Details 

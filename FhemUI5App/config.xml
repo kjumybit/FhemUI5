@@ -17,7 +17,16 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     <platform name="android">
+        <icon src="res/browser/favicon.ico" />
+    </platform>
+    <platform name="android">
         <allow-intent href="market:*" />
+        <icon density="ldpi" src="res/android/fhemui_36ico.png" />
+        <icon density="mdpi" src="res/android/fhemui_48ico.png" />
+        <icon density="hdpi" src="res/android/fhemui_72ico.png" />
+        <icon density="xhdpi" src="res/android/fhemui_96ico.png" />
+        <icon density="xxhdpi" src="res/android/fhemui_128ico.png" />
+        <icon density="xxxhdpi" src="res/android/fhemui_192ico.png" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />

@@ -70,7 +70,10 @@
 										parts:[{path:'Fhem>Attributes/alias'},{path:'Fhem>Name'}],
 										formatter: '.formatter.getDeviceName'
 									}"/>
-								<Text text="{Fhem>Readings/state/Value}" />
+								<VBox>
+									<Text text="{Fhem>Readings/state/Value}" visible="false"/>
+									<Switch type="AcceptReject" state="true" />
+								</VBox>
 								<Text text="{ path: 'Fhem>Readings/state/Time',
 											type: 'sap.ui.model.type.DateTime', 
 											formatOptions: {

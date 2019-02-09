@@ -42,14 +42,6 @@
 			</t:SideNavigation>
 
 		</content>
-		<!--
-		<footer>
-			<Bar> 
-				<contentRight>
-				<Button press="onPressSettings" icon="sap-icon://action-settings"/>
-			    </contentRight>
-			</Bar>		
-		</footer>
-		-->
+
 	</Page>
 </mvc:View>

@@ -5,121 +5,32 @@
 	xmlns:form="sap.ui.layout.form"
 	xmlns="sap.m" 
 	displayBlock="true">
-      	
-	<Page id="viewOverview" title="{i18n>settingsTitle}"  showNavButton="false">
-		<customHeader>
-			<Bar design="Header">
-				<contentLeft>
-					<!-- back to previous detail view-->
-					<Button icon="sap-icon://nav-back" press="onSettingsBackBtnPress" />
-				</contentLeft>
-				<contentMiddle>
-					<Text text="{i18n>settingsTitle}" wrapping="true" textAlign="Center"/>
-				</contentMiddle>
-			    <contentRight>
-					<Button icon="sap-icon://accept" press="onSettingsSave" type="Accept" width="4em" />
-					<Button icon="sap-icon://decline" press="onSettingsCancel" type="Reject" width="4em" />				
-				</contentRight>
-			</Bar>
-		</customHeader>	
-
-		<content>
-			<Panel expandable="true" expanded="false" headerText="{i18n>cfgSrvTitle}" 
-				width="auto" class="sapUiNoMargin">
-				<content>
-					<form:Form editable="true">				
-						<form:formContainers>
-							<form:FormContainer title="{i18n>cfgSrvConnection}">
-								<form:formElements>
-									<form:FormElement label="{i18n>cfgSrvHost}" >
-										<form:fields>
-											<Input value="{settings>/server/host}"/>
-										</form:fields>
-									</form:FormElement>
-									<form:FormElement label="{i18n>cfgSrvPort}">
-										<form:fields>
-											<Input value="{settings>/server/port}"/>
-										</form:fields>
-									</form:FormElement>
-									<form:FormElement label="{i18n>cfgConnSecure}">
-									<form:fields>
-										<Switch state="{settings>/protocoll/secure}"/>
-									</form:fields>
-									</form:FormElement>
-								</form:formElements>
-							</form:FormContainer>
-							
-							<form:FormContainer title="{i18n>cfgUsrAuth}" >
-								<form:formElements>
-									<form:FormElement label="{i18n>cfgUsrName}" >
-										<form:fields>
-											<Input value="{settings>/authentication/userName}"/>
-										</form:fields>
-									</form:FormElement>
-									<form:FormElement label="{i18n>cfgUsrPassword}" >
-										<form:fields>
-											<Input value="{settings>/authentication/password}"/>
-										</form:fields>
-									</form:FormElement>
-								</form:formElements>
-							</form:FormContainer>
-						</form:formContainers>
-						
-						<form:layout>
-							<form:ResponsiveGridLayout breakpointM="480" labelSpanM="4"/>
-						</form:layout>
-					</form:Form>						
-				</content>
-			</Panel>
-
-			<Panel expandable="true" expanded="false" headerText="Konfigurationseintrag" 
-				width="auto" class="sapUiNoMargin">
-				<content>
-
-				</content>
-			</Panel>
-
-			<Panel expandable="true" expanded="false" headerText="{i18n>cfgAboutTitle}" 
-				width="auto" class="sapUiNoMargin">
-				<content>
-					<form:SimpleForm
-						editable="false"
-						layout="ResponsiveGridLayout"
-						labelSpanXL="3"
-						labelSpanL="3"
-						labelSpanM="3"
-						labelSpanS="12"
-						adjustLabelSpan="false"
-						emptySpanXL="4"
-						emptySpanL="4"
-						emptySpanM="4"
-						emptySpanS="0"
-						columnsXL="1"
-						columnsL="1"
-						columnsM="1"
-						singleContainerFullSize="false" >
-						<form:content>
-							<Label text="FhemUI" />
-							<Text text="Value" />
-							<Label text="FhemJs" />
-							<Text text="Value" />
-							<Label text="OpenUI5" />
-							<Text text="Value" />
-							<Label text="Socket.IO" />
-							<Text text="Value" />
-							<Label text="Cordova" />
-							<Text text="Value" />
-						</form:content>
-					</form:SimpleForm>						
-				</content>
-			</Panel>
-
+	<Page id="viewSettings" title="{i18n>settingsTitle}" showNavButton="true" navButtonPress="onSettingsBackBtnPress">
+		<content> 
+			<List itemPress="onListItemPress">
+				<items>
+					<StandardListItem
+						id="SettingsSrvView"
+						title="{i18n>cfgSrvTitle}"
+						icon="sap-icon://home"
+						iconDensityAware="true"
+						iconInset="true"
+						type="Navigation" />
+					<StandardListItem
+						title="neue Einstellung"
+						icon="sap-icon://action-settings"
+						iconDensityAware="true"
+						iconInset="true"
+						type="Navigation" />
+					<StandardListItem
+						id="SettingsAboutView"
+						title="{i18n>cfgAboutTitle}"
+						icon="sap-icon://developer-settings"
+						iconDensityAware="true"
+						iconInset="true"
+						type="Navigation"/>
+				</items>
+			</List>
 		</content> 
-
-		<footer>
-			<!--
-			<core:Fragment fragmentName="de.kjumybit.fhem.view.FooterDefault" type="XML" />			
-			-->
-		</footer>
 	</Page>
 </mvc:View>

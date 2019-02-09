@@ -137,7 +137,7 @@
 		  			"pattern": "",
 		  			"view": "App",
 		  			"name": "App",
-		  			"target": ["navigation", "overview", "rooms", "deviceTypes", "deviceDetail", "settings", "devices"]
+		  			"target": ["navigation", "overview", "rooms", "deviceTypes", "deviceDetail", "settings", "settingsSrv", "settingsAbout", "devices"]
 				}
 			],
 			"targets": {
@@ -189,7 +189,21 @@
 					"viewLevel": 1,
 					"transition": "show",					
 					"controlAggregation": "detailPages"				
-				}
+				},
+				"settingsSrv": {
+					"viewName": "SettingsSrv",
+					"viewId": "SettingsSrvView",					
+					"viewLevel": 2,
+					"transition": "show",					
+					"controlAggregation": "detailPages"				
+				},
+				"settingsAbout": {
+					"viewName": "SettingsAbout",
+					"viewId": "SettingsAboutView",					
+					"viewLevel": 2,
+					"transition": "show",					
+					"controlAggregation": "detailPages"				
+				}								
 			}			
 		}
   	}	
